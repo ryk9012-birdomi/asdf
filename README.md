@@ -48,7 +48,3 @@ godot/
 
 - [프로젝트 구조와 1단계 기록](godot/README.md)
 - [MVP 1 · 2단계: 턴제 전투 구현·조작·테스트](godot/docs/MVP1_STEP2.md)
-
-## 참고
-
-저장소 루트의 `Assets/`, `Packages/`, `ProjectSettings/`, `Open-Unity.ps1`은 초기에 만든 Unity 템플릿의 잔재입니다. 게임 코드는 없고 현재 개발에 쓰이지 않습니다. Godot 빌드와 실행에는 영향이 없습니다.
