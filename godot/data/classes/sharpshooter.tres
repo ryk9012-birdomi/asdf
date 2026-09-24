@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/characters/CharacterData.gd" id="1_data"]
+[ext_resource type="Script" path="res://scripts/skills/SkillData.gd" id="2_type"]
+[ext_resource type="Resource" path="res://data/skills/rail_shot.tres" id="3_basic"]
+[ext_resource type="Resource" path="res://data/skills/aimed_shot.tres" id="4_skill"]
+
+[resource]
+script = ExtResource("1_data")
+id = &"noa"
+character_name = "노아"
+class_id = &"sharpshooter"
+class_name_label = "Sharpshooter"
+description = "궤도 감시망 출신의 사수. 잔해 너머의 미세한 열원을 읽는다."
+display_color = Color(0.61, 0.66, 1, 1)
+max_hp = 80
+starting_shield = 5
+max_energy = 6
+speed = 12
+attack = 28
+defense = 3
+accuracy = 0.99
+evasion = 0.08
+critical_chance = 0.2
+skills = Array[ExtResource("2_type")]([ExtResource("3_basic"), ExtResource("4_skill")])

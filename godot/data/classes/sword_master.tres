@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/characters/CharacterData.gd" id="1_data"]
+[ext_resource type="Script" path="res://scripts/skills/SkillData.gd" id="2_type"]
+[ext_resource type="Resource" path="res://data/skills/quick_slash.tres" id="3_basic"]
+[ext_resource type="Resource" path="res://data/skills/double_slash.tres" id="4_skill"]
+
+[resource]
+script = ExtResource("1_data")
+id = &"iren"
+character_name = "이렌"
+class_id = &"sword_master"
+class_name_label = "Sword Master"
+description = "잔광 인양단의 선봉. 폐쇄된 함선의 격벽을 에너지 검으로 돌파한다."
+display_color = Color(0.38, 0.88, 0.80, 1)
+max_hp = 100
+starting_shield = 10
+max_energy = 5
+speed = 16
+attack = 24
+defense = 5
+accuracy = 0.95
+evasion = 0.1
+critical_chance = 0.15
+skills = Array[ExtResource("2_type")]([ExtResource("3_basic"), ExtResource("4_skill")])

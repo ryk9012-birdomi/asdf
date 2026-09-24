@@ -1,0 +1,20 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/UnitCard.gd" id="1_view"]
+[ext_resource type="PackedScene" path="res://scenes/battle/CharacterUnit.tscn" id="2_unit"]
+
+[node name="UnitCard" type="PanelContainer"]
+custom_minimum_size = Vector2(320, 0)
+size_flags_horizontal = 3
+script = ExtResource("1_view")
+
+[node name="CharacterUnit" parent="." instance=ExtResource("2_unit")]
+
+[node name="Margin" type="MarginContainer" parent="."]
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 16
+
+[node name="Content" type="VBoxContainer" parent="Margin"]
+theme_override_constants/separation = 5

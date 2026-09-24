@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/skills/SkillData.gd" id="1_skill"]
+
+[resource]
+script = ExtResource("1_skill")
+id = &"shield_guard"
+skill_name = "Shield Guard"
+description = "자신에게 실드 25를 부여합니다."
+target_type = 0
+damage_type = 1
+effect_type = 1
+attack_multiplier = 0.00
+flat_value = 25
+hit_count = 1
+energy_cost = 2
+cooldown = 1

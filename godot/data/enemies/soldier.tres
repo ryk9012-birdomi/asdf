@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/characters/EnemyData.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/skills/SkillData.gd" id="2"]
+[ext_resource type="Resource" path="res://data/skills/soldier_shot.tres" id="3"]
+[ext_resource type="Resource" path="res://data/skills/soldier_guard.tres" id="4"]
+[ext_resource type="Resource" path="res://data/skills/soldier_burst.tres" id="5"]
+
+[resource]
+script = ExtResource("1")
+id = &"blockade_soldier"
+character_name = "봉쇄군 병사"
+class_id = &"soldier"
+class_name_label = "Blockade Soldier"
+display_color = Color(0.95, 0.39, 0.42, 1)
+max_hp = 78
+starting_shield = 8
+max_energy = 4
+speed = 10
+attack = 19
+defense = 4
+accuracy = 0.94
+evasion = 0.04
+critical_chance = 0.08
+skills = Array[ExtResource("2")]([ExtResource("3"), ExtResource("4"), ExtResource("5")])
+action_pattern = Array[int]([0, 1, 2])
