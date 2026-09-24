@@ -18,14 +18,15 @@ BattleScene (Control)                ← BattleScene.gd
 ├─ BattleManager (Node)              ← BattleManager.tscn / BattleManager.gd
 │  └─ TurnManager (Node)             ← TurnManager.gd
 ├─ BattleUI (Control)                ← BattleUI.tscn / BattleUI.gd
-│  └─ Scroll / Margin / VBox        # 실행 시 생성
-│     ├─ 제목 / 준비실 / 재시작
-│     ├─ 라운드 / 남은 행동 순서
-│     ├─ 적 카드 / Intent
-│     ├─ 아군 카드 / 능력치
-│     ├─ 승패 결과
-│     ├─ 스킬 버튼 / 대기
-│     └─ 전투 로그 / 조작 안내
+│  ├─ SpaceBackdrop                 # 성운·별 셰이더 배경
+│  ├─ Scroll / Margin / VBox        # 실행 시 생성
+│  │  ├─ 제목 / 준비실 / 재시작
+│  │  ├─ 라운드 / 행동 순서 칩
+│  │  ├─ 전장: 아군 카드(왼쪽) │ VS │ 적 카드·Intent(오른쪽)
+│  │  ├─ 승패 결과 배너
+│  │  ├─ 스킬 버튼 / 대기
+│  │  └─ 전투 로그 / 조작 안내
+│  └─ FX 레이어                     # 빔·파편·피해 숫자·파동
 └─ ActionTimer (Timer, One Shot)
 ```
 
@@ -45,7 +46,8 @@ CharacterLab의 `전투 시작` 버튼은 BattleScene으로, 전투의 `준비�
 | `res://scripts/battle/TargetRules.gd` | 여덟 가지 대상 유형, 살아 있는 전열/후열 판정 |
 | `res://scripts/battle/BattleScene.gd` | 유닛 생성, 타이머, 화면 이동 연결 |
 | `res://scripts/ui/BattleUI.gd` | 상태 표시, 스킬/대상 선택, 로그, 결과 화면 |
-| `res://scripts/ui/CombatantView.gd` | HP 카드, 행동/대상 강조, 타격·실드 색상 효과 |
+| `res://scripts/ui/CombatantView.gd` | 절차적 엠블럼, HP 잔상 바·실드 바·에너지 칸, 행동/대상 발광, 타격 흔들림, 전투 불능 표시 |
+| `res://scripts/ui/SpaceBackdrop.gd` | 전투·준비실 공용 애니메이션 우주 배경 셰이더 |
 | `res://scenes/battle/EnemyUnit.tscn` | EnemyUnit 스크립트가 붙은 Node |
 | `res://scenes/battle/BattleManager.tscn` | BattleManager와 TurnManager 연결 |
 | `res://scenes/battle/BattleScene.tscn` | 실행 가능한 3 대 3 전투 구성 |
@@ -83,9 +85,9 @@ CharacterLab의 `전투 시작` 버튼은 BattleScene으로, 전투의 `준비�
 
 **적:** EnemyData의 `action_pattern=[0,1,2]`는 Skills 배열의 공격 → 실드 → 강공격을 반복합니다. 계획한 스킬이 에너지나 쿨다운 때문에 불가능하면 배열에서 첫 사용 가능한 스킬을 고르고, 하나도 없으면 대기합니다. 현재/다음 개인 턴의 에너지 회복과 쿨다운 감소를 반영해 Intent를 표시합니다. Intent의 공격 수치는 방어·치명타·명중 판정 전 기본량입니다. 공격 대상은 TargetRules가 반환하는 첫 유효 대상입니다.
 
-**Signal:** TurnManager는 `round_started`, `turn_started`, `turn_finished`를 제공합니다. BattleManager는 `changed`, `message_logged`, `action_resolved`, `battle_finished(victory)`를 제공합니다. UI는 상태를 읽고 명령 Signal을 보내며 직접 피해를 적용하지 않습니다. 전투 종료는 한 번만 발생하고 종료 시 AI 타이머를 멈춥니다. 재시작은 씬을 새로 만들어 이전 유닛·타이머·연결을 함께 정리합니다.
+**Signal:** TurnManager는 `round_started`, `turn_started`, `turn_finished`를 제공합니다. BattleManager는 `changed`, `message_logged`, `action_resolved`, `battle_finished(victory)`와 연출용 `hit_resolved`, `hit_missed`, `shield_granted`를 제공합니다. UI는 상태를 읽고 명령 Signal을 보내며 직접 피해를 적용하지 않습니다. 전투 종료는 한 번만 발생하고 종료 시 AI 타이머를 멈춥니다. 재시작은 씬을 새로 만들어 이전 유닛·타이머·연결을 함께 정리합니다.
 
-스킬의 기존 DAMAGE/SHIELD 효과와 대상 조합은 `.tres`만 추가해서 사용할 수 있습니다. 새로운 상태 효과·패시브·효과 종류를 추가할 때는 그 규칙을 구현하는 별도 로직이 필요합니다. 아이콘·사운드·애니메이션 필드는 정의를 유지하지만 이번 단계는 색상 피드백만 사용합니다.
+스킬의 기존 DAMAGE/SHIELD 효과와 대상 조합은 `.tres`만 추가해서 사용할 수 있습니다. 새로운 상태 효과·패시브·효과 종류를 추가할 때는 그 규칙을 구현하는 별도 로직이 필요합니다. 아이콘·사운드·애니메이션 필드는 정의를 유지하지만 아직 사용하지 않습니다. 현재 연출은 코드로 생성하는 빔·파편·피해 숫자·파동뿐입니다.
 
 ## 5. Godot Editor 설정
 
@@ -111,7 +113,7 @@ cd C:\Users\ryk01\Documents\ChatGPT\game
 .\Open-Godot.ps1 -Run
 ```
 
-첫 행동은 이렌(Speed 16), 다음은 노아(12), 병사 세 명(10), 베카(8) 순서입니다. 금색 테두리는 현재 행동자, 초록색 테두리는 선택 가능한 대상입니다. 스킬 버튼 → 초록색 카드 순서로 클릭하세요. 베카의 Shield Guard는 베카 자신을 대상으로 선택합니다. 사용 불가능한 스킬 버튼에는 에너지 부족 또는 쿨다운 사유가 표시됩니다. 전투 기록은 최근 60줄을 유지하고 스크롤해서 볼 수 있습니다.
+첫 행동은 이렌(Speed 16), 다음은 노아(12), 병사 세 명(10), 베카(8) 순서입니다. 아군은 왼쪽, 적은 오른쪽에 있고 전열 카드가 가운데에 가장 가깝습니다. 금색으로 빛나는 카드는 현재 행동자, 청록색으로 빛나는 카드는 선택 가능한 대상입니다. 스킬 버튼 → 빛나는 카드 순서로 클릭하세요. 베카의 Shield Guard는 베카 자신을 대상으로 선택합니다. 사용 불가능한 스킬 버튼에는 에너지 부족 또는 쿨다운 사유가 표시됩니다. 전투 기록은 최근 60줄을 유지하고 스크롤해서 볼 수 있습니다.
 
 적 전멸 시 작전 성공, 아군 전멸 시 작전 실패가 나타납니다. `전투 재시작`은 새 전투를 시작합니다. `준비실`에서는 기존 캐릭터 상태 테스트를 할 수 있습니다.
 
@@ -141,7 +143,7 @@ cd C:\Users\ryk01\Documents\ChatGPT\game
 | --- | --- |
 | 여전히 준비실이 먼저 열림 | F6는 현재 씬 실행입니다. F5 또는 실행 파일로 프로젝트를 시작하세요 |
 | 새 클래스가 인식되지 않음 | Editor 파일 스캔을 기다리거나 `Open-Godot.ps1 -Test`로 가져오기 실행 |
-| 스킬을 눌러도 바로 공격하지 않음 | 초록색 대상 카드를 눌러 확정해야 합니다. SELF 스킬도 동일합니다 |
+| 스킬을 눌러도 바로 공격하지 않음 | 청록색으로 빛나는 대상 카드를 눌러 확정해야 합니다. SELF 스킬도 동일합니다 |
 | 병사 공격량이 예고보다 낮음 | 예고는 방어 전 기본량. 실제 방어·치명타·회피·실드가 별도로 적용됩니다 |
 | 특정 스킬을 다음 차례에 못 씀 | 쿨다운 1은 다음 자기 차례 한 번을 쉬는 규칙입니다 |
 | 새 적 데이터가 시작되지 않음 | Skills의 null 슬롯, action_pattern의 잘못된 인덱스, 적 인원 제한 확인 |

@@ -7,6 +7,9 @@ var messages: PackedStringArray = []
 
 
 func _ready() -> void:
+	var backdrop := SpaceBackdrop.new()
+	add_child(backdrop)
+	move_child(backdrop, 0)
 	for card in party.get_children():
 		card.action_requested.connect(on_action_requested)
 		card.unit.unit_died.connect(on_unit_died)

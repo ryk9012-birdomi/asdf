@@ -6,7 +6,7 @@
 
 항성 간 항로가 무너진 시대, 세 명의 인양 대원이 전쟁 잔해 속에서 귀환 항로를 찾는 SF 파티 로그라이트입니다. 이번 산출물은 **MVP 1의 1단계: 캐릭터 데이터와 상태를 직접 조작하는 실행 가능한 준비실**입니다.
 
-기준 엔진은 **Godot 4.7.2 stable / GDScript / Compatibility 렌더러**입니다. 버전은 [Godot 공식 Windows 다운로드](https://godotengine.org/download/windows/)에서 확인했습니다. Unity 프로젝트와 구분하기 위해 `godot/`를 독립 프로젝트 루트로 사용합니다. 이 문서에서 `res://`는 이 폴더입니다.
+기준 엔진은 **Godot 4.7.2 stable / GDScript / Compatibility 렌더러**입니다. 버전은 [Godot 공식 Windows 다운로드](https://godotengine.org/download/windows/)에서 확인했습니다. 저장소 루트에는 실행 스크립트만 두고 `godot/`를 독립 프로젝트 루트로 사용합니다. 이 문서에서 `res://`는 이 폴더입니다.
 
 ## 전체 구조와 클래스 관계
 

@@ -6,6 +6,9 @@ signal changed
 signal message_logged(message: String)
 signal action_resolved(actor: CharacterUnit, targets: Array[CharacterUnit], skill: SkillData)
 signal battle_finished(victory: bool)
+signal hit_resolved(target: CharacterUnit, health_damage: int, shield_damage: int, critical: bool)
+signal hit_missed(target: CharacterUnit)
+signal shield_granted(target: CharacterUnit, amount: int)
 
 enum Phase { IDLE, PLAYER_INPUT, ENEMY_TURN, RESOLVING, FINISHED }
 
@@ -129,7 +132,9 @@ func perform_action(skill: SkillData, target: CharacterUnit) -> bool:
 				break
 			if skill.effect_type == SkillData.EffectType.SHIELD:
 				var amount := roundi(actor.attack * skill.attack_multiplier) + skill.flat_value
-				message_logged.emit("  %s · 실드 +%d" % [recipient.display_name, recipient.add_shield(amount)])
+				var gained := recipient.add_shield(amount)
+				shield_granted.emit(recipient, gained)
+				message_logged.emit("  %s · 실드 +%d" % [recipient.display_name, gained])
 			else:
 				apply_hit(recipient, skill)
 	action_resolved.emit(actor, targets, skill)
@@ -140,10 +145,12 @@ func perform_action(skill: SkillData, target: CharacterUnit) -> bool:
 func apply_hit(recipient: CharacterUnit, skill: SkillData) -> void:
 	var roll := DamageCalculator.roll(actor, recipient, skill, rng)
 	if roll.miss:
+		hit_missed.emit(recipient)
 		message_logged.emit("  %s · 빗나감" % recipient.display_name)
 		return
 	var old_shield := recipient.current_shield
 	var hp_damage := recipient.receive_damage(roll.damage)
+	hit_resolved.emit(recipient, hp_damage, old_shield - recipient.current_shield, roll.critical)
 	message_logged.emit("  %s · HP −%d / 실드 −%d%s" % [recipient.display_name, hp_damage, old_shield - recipient.current_shield, " / 치명타" if roll.critical else ""])
 	if not recipient.is_alive():
 		message_logged.emit("  %s · 전투 불능" % recipient.display_name)
