@@ -83,7 +83,7 @@ func build() -> void:
 	var titles := VBoxContainer.new()
 	titles.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(titles)
-	FantasyTheme.label(titles, "OATH OF EMBERS   ·   CHAPTER I", 12, FantasyTheme.TRIM)
+	FantasyTheme.label(titles, "OATH OF EMBERS   ·   CHAPTER I", 14, FantasyTheme.TRIM)
 	var title := FantasyTheme.label(titles, "잿빛 고갯길  ·  여정 지도", 32, Color("f4e2b8"), true)
 	FantasyTheme.glow(title, Color("ff8a2a"), 10)
 	FantasyTheme.button(header, "메인 메뉴", func(): SceneRouter.go(get_tree(), SceneRouter.MAIN_MENU))
@@ -112,14 +112,14 @@ func build() -> void:
 	canvas.node_chosen.connect(choose)
 	canvas.node_hovered.connect(describe)
 	body.add_child(legend_panel())
-	info = FantasyTheme.label(page, "", 15, FantasyTheme.TEXT)
+	info = FantasyTheme.label(page, "", 17, FantasyTheme.TEXT)
 	describe(-1)
 	scroll_to_party.call_deferred()
 
 
 func party_panel() -> PanelContainer:
 	var panel := PanelContainer.new()
-	panel.custom_minimum_size.x = 230
+	panel.custom_minimum_size.x = 240
 	panel.add_theme_stylebox_override("panel", FantasyTheme.panel())
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation", 12)
@@ -128,18 +128,18 @@ func party_panel() -> PanelContainer:
 	for hero in run.party:
 		FantasyTheme.hero_row(column, hero)
 	column.add_child(HSeparator.new())
-	FantasyTheme.label(column, "골드   %d" % run.gold, 16, FantasyTheme.GOLD, true)
+	FantasyTheme.label(column, "골드   %d" % run.gold, 18, FantasyTheme.GOLD, true)
 	var floor_text := "출발 전" if run.current_floor() < 0 else "%d층 / %d층" % [run.current_floor() + 1, RunMap.FLOORS]
-	FantasyTheme.label(column, "위치   %s" % floor_text, 14, FantasyTheme.TEXT)
-	FantasyTheme.label(column, "승리한 전투   %d" % run.battles_won, 14, FantasyTheme.TEXT)
+	FantasyTheme.label(column, "위치   %s" % floor_text, 16, FantasyTheme.TEXT)
+	FantasyTheme.label(column, "승리한 전투   %d" % run.battles_won, 16, FantasyTheme.TEXT)
 	if run.ward > 0:
-		FantasyTheme.label(column, "축복   다음 전투 보호막 +%d" % run.ward, 13, Color("9fc6ff"))
+		FantasyTheme.label(column, "축복   다음 전투 보호막 +%d" % run.ward, 15, Color("9fc6ff"))
 	return panel
 
 
 func legend_panel() -> PanelContainer:
 	var panel := PanelContainer.new()
-	panel.custom_minimum_size.x = 200
+	panel.custom_minimum_size.x = 220
 	panel.add_theme_stylebox_override("panel", FantasyTheme.panel())
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation", 8)
@@ -149,10 +149,10 @@ func legend_panel() -> PanelContainer:
 	for type in RunMap.NodeType.values():
 		var line := VBoxContainer.new()
 		column.add_child(line)
-		FantasyTheme.label(line, RunMap.TYPE_NAMES[type], 15, Color("f4e6c4"), true)
-		FantasyTheme.label(line, notes[type], 12, FantasyTheme.MUTED)
+		FantasyTheme.label(line, RunMap.TYPE_NAMES[type], 17, Color("f4e6c4"), true)
+		FantasyTheme.label(line, notes[type], 14, FantasyTheme.MUTED)
 	column.add_child(HSeparator.new())
-	var hint := FantasyTheme.label(column, "빛나는 노드를 클릭해 다음 목적지를 고릅니다. 한 번 고른 길은 되돌릴 수 없습니다.", 12, FantasyTheme.MUTED)
+	var hint := FantasyTheme.label(column, "빛나는 노드를 클릭해 다음 목적지를 고릅니다. 한 번 고른 길은 되돌릴 수 없습니다.", 14, FantasyTheme.MUTED)
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	return panel
 

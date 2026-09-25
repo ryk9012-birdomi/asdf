@@ -6,7 +6,7 @@ extends Control
 signal unit_clicked(unit: CharacterUnit)
 
 const RANGED := [&"wizard", &"goblin_archer", &"ember_priest"]
-const SPACING := 190.0
+const SPACING := 200.0
 const MISSILE_COLORS := {
 	SkillData.DamageType.PHYSICAL: Color("e8dcc0"),
 	SkillData.DamageType.ARCANE: Color("b48cff"),
@@ -163,7 +163,7 @@ func layout() -> void:
 		var index: int = side_units.size() - 1 - side_units.find(unit)
 		var slot := mini(index, 2)
 		var extra := index - slot
-		var reach := 95.0 + slot * SPACING + extra * 70.0
+		var reach := 100.0 + slot * SPACING + extra * 70.0
 		var x := center - fighter.facing * reach - FighterView.WIDTH / 2.0
 		var y := ground_y() - FighterView.HEIGHT - slot * 16.0 + extra * 30.0
 		fighter.home = Vector2(x, y)

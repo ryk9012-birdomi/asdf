@@ -254,8 +254,9 @@ func test_ui() -> void:
 	var foe_view: FighterView = scene.view.fighters[scene.battle.enemies[0]]
 	check(arena.fighters.size() == 6, "2D arena draws a figure for every combatant")
 	check(hero_view.home.x < foe_view.home.x, "Party stands on the left, enemies on the right")
-	check(hero_view.hp_text.text == "HP 10 / 10" and hero_view.mp_pips.get_child_count() == 5, "Overhead readout shows HP and MP")
-	check(foe_view.info.text.begins_with("예고"), "Enemy intent shows above the enemy")
+	check(hero_view.hp_text.text == "HP 10 / 10" and hero_view.mp_text.text == "MP 5 / 5" and hero_view.mp_bar.max_value == 5, "Overhead readout shows HP and a blue MP bar")
+	check(hero_view.shields.amount == 2, "Shield points show as shield icons")
+	check(foe_view.info.text.begins_with("▸"), "Enemy intent shows above the enemy")
 	check(hero_view.kind == &"paladin" and foe_view.kind == &"goblin_raider", "Each unit gets its own drawing")
 	scene.view.skill_row.get_child(0).pressed.emit()
 	var front: CharacterUnit = scene.battle.enemies[0]

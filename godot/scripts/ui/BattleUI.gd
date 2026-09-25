@@ -115,14 +115,14 @@ func _ready() -> void:
 	var turn_strip := HBoxContainer.new()
 	turn_strip.add_theme_constant_override("separation", 12)
 	content.add_child(turn_strip)
-	turn_label = label(turn_strip, "", 16, GOLD)
+	turn_label = label(turn_strip, "", 19, GOLD)
 	turn_label.theme_type_variation = "HeadingLabel"
 	glow_text(turn_label, GOLD, 6)
 	turn_row = HBoxContainer.new()
 	turn_row.add_theme_constant_override("separation", 6)
 	turn_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	turn_strip.add_child(turn_row)
-	var rules := label(turn_strip, "판정 2d6 + 명중 − 방어 · 7+ 스침 · 10+ 명중", 12, MUTED)
+	var rules := label(turn_strip, "판정 2d6 + 명중 − 방어 · 7+ 스침 · 10+ 명중", 14, MUTED)
 	rules.tooltip_text = "주사위 두 개의 합에 공격자 명중을 더하고 대상 방어를 뺍니다.\n6 이하 빗나감 · 7~9 스침(피해 절반) · 10 이상 명중\n보정 전 눈의 합이 치명 기준 이상이면 치명타(피해 2배)\n보호막이 피해를 먼저 흡수하고, 자기 차례마다 MP +1"
 	rules.mouse_filter = Control.MOUSE_FILTER_PASS
 	arena = BattleArena.new()
@@ -163,20 +163,20 @@ func _ready() -> void:
 	var command_body := VBoxContainer.new()
 	command_body.add_theme_constant_override("separation", 8)
 	command.add_child(command_body)
-	prompt = label(command_body, "", 15)
+	prompt = label(command_body, "", 18)
 	prompt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	skill_row = row(command_body)
-	skill_row.custom_minimum_size.y = 56
+	skill_row.custom_minimum_size.y = 64
 	var log_panel := PanelContainer.new()
-	log_panel.custom_minimum_size.x = 440
+	log_panel.custom_minimum_size.x = 470
 	log_panel.add_theme_stylebox_override("panel", panel_style(Color("5e4526"), 0.8, 12))
 	bottom.add_child(log_panel)
 	var log_body := VBoxContainer.new()
 	log_panel.add_child(log_body)
-	label(log_body, "모험 일지  ·  ADVENTURE LOG", 12, TRIM)
+	label(log_body, "모험 일지  ·  ADVENTURE LOG", 14, TRIM)
 	log_box = RichTextLabel.new()
-	log_box.custom_minimum_size.y = 84
-	log_box.add_theme_font_size_override("normal_font_size", 12)
+	log_box.custom_minimum_size.y = 96
+	log_box.add_theme_font_size_override("normal_font_size", 15)
 	log_box.add_theme_color_override("default_color", Color("d6c7a8"))
 	log_box.scroll_following = true
 	log_body.add_child(log_box)
@@ -216,10 +216,10 @@ func refresh() -> void:
 				caption = "%s\n%s" % [skill.skill_name, reason]
 			var skill_button := button(skill_row, caption, func(): select_skill(skill), battle.actor.character_data.display_color)
 			skill_button.disabled = not reason.is_empty()
-			skill_button.custom_minimum_size = Vector2(170, 56)
+			skill_button.custom_minimum_size = Vector2(200, 64)
 			skill_button.tooltip_text = skill.description + "\n재사용 대기: %d턴" % skill.cooldown
 		pass_button = button(skill_row, "대기\n턴 넘기기", func(): pass_requested.emit())
-		pass_button.custom_minimum_size = Vector2(110, 56)
+		pass_button.custom_minimum_size = Vector2(130, 64)
 	elif finished:
 		prompt.text = "결과를 확인하고 길을 이어 가세요." if run_mode else "전투 재시작으로 다시 도전하거나 메인 메뉴로 돌아갈 수 있습니다."
 	elif battle.phase == BattleManager.Phase.ENEMY_TURN:
@@ -252,7 +252,7 @@ func refresh_turn_order() -> void:
 			style.shadow_size = 8
 		chip.add_theme_stylebox_override("panel", style)
 		turn_row.add_child(chip)
-		label(chip, unit.display_name, 13, TEXT if first else color.lightened(0.2))
+		label(chip, unit.display_name, 15, TEXT if first else color.lightened(0.2))
 		first = false
 
 
@@ -289,11 +289,11 @@ func forecast(attacker: CharacterUnit, defender: CharacterUnit, skill: SkillData
 	if skill.effect_type == SkillData.EffectType.SHIELD:
 		return "보호막 +%d" % base
 	var odds := DamageCalculator.odds(attacker, defender, skill)
-	var hits := " × %d회" % skill.hit_count if skill.hit_count > 1 else ""
+	var hits := "×%d" % skill.hit_count if skill.hit_count > 1 else ""
 	if skill.auto_hit:
-		return "적중 100%% (자동 명중)  ·  피해 %d%s" % [base, hits]
-	return "적중 %d%% (명중 %d · 스침 %d · 치명 %d)  ·  피해 %d%s" % [
-		percent(odds.land), percent(odds.hit), percent(odds.glance), percent(odds.critical), base, hits]
+		return "적중 100%% · 피해 %d%s\n자동 명중" % [base, hits]
+	return "적중 %d%% · 피해 %d%s\n명중 %d · 스침 %d · 치명 %d" % [
+		percent(odds.land), base, hits, percent(odds.hit), percent(odds.glance), percent(odds.critical)]
 
 
 ## Full breakdown for the target card's tooltip.
@@ -311,13 +311,13 @@ func intent_text(enemy: EnemyUnit) -> String:
 	var before_turn: bool = enemy != battle.actor or battle.phase != BattleManager.Phase.ENEMY_TURN
 	var intent: SkillData = enemy.intended_skill(before_turn)
 	if intent == null:
-		return "예고 ▸ 대기"
+		return "▸ 대기"
 	var targets := TargetRules.legal_targets(enemy, intent, battle.enemies, battle.party)
 	if intent.effect_type == SkillData.EffectType.SHIELD or targets.is_empty():
-		return "예고 ▸ %s · 보호막 %d" % [intent.skill_name, DamageCalculator.base_damage(enemy, intent)]
+		return "▸ %s\n보호막 +%d" % [intent.skill_name, DamageCalculator.base_damage(enemy, intent)]
 	var odds := DamageCalculator.odds(enemy, targets[0], intent)
 	var aimed_at: String = "일행 전체" if intent.target_type == SkillData.TargetType.ALL_ENEMIES else targets[0].display_name
-	return "예고 ▸ %s → %s  ·  적중 %d%%  ·  피해 %d" % [intent.skill_name, aimed_at, percent(odds.land), DamageCalculator.base_damage(enemy, intent)]
+	return "▸ %s → %s\n적중 %d%% · 피해 %d" % [intent.skill_name, aimed_at, percent(odds.land), DamageCalculator.base_damage(enemy, intent)]
 
 
 func percent(chance: float) -> int:
@@ -696,7 +696,7 @@ func build_theme() -> Theme:
 	var font := SystemFont.new()
 	font.font_names = PackedStringArray(["Malgun Gothic", "Noto Sans CJK KR", "sans-serif"])
 	ui_theme.default_font = font
-	ui_theme.default_font_size = 14
+	ui_theme.default_font_size = 17
 	var serif := SystemFont.new()
 	serif.font_names = PackedStringArray(SERIF)
 	serif.font_weight = 600

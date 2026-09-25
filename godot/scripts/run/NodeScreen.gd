@@ -22,16 +22,16 @@ func _ready() -> void:
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(center)
 	var panel := PanelContainer.new()
-	panel.custom_minimum_size = Vector2(760, 0)
+	panel.custom_minimum_size = Vector2(860, 0)
 	panel.add_theme_stylebox_override("panel", FantasyTheme.panel(FantasyTheme.TRIM, 0.9, 30))
 	center.add_child(panel)
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation", 16)
 	panel.add_child(column)
-	FantasyTheme.label(column, "%d층   ·   %s" % [map_node.floor + 1, RunMap.TYPE_NAMES[map_node.type]], 13, FantasyTheme.TRIM)
+	FantasyTheme.label(column, "%d층   ·   %s" % [map_node.floor + 1, RunMap.TYPE_NAMES[map_node.type]], 15, FantasyTheme.TRIM)
 	var title := FantasyTheme.label(column, "", 34, Color("f4e2b8"), true)
 	FantasyTheme.glow(title, Color("ff8a2a"), 10)
-	story = FantasyTheme.label(column, "", 16, FantasyTheme.TEXT)
+	story = FantasyTheme.label(column, "", 19, FantasyTheme.TEXT)
 	story.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	party_box = VBoxContainer.new()
 	party_box.add_theme_constant_override("separation", 10)
@@ -105,8 +105,8 @@ func show_party() -> void:
 			row.add_child(slot)
 			FantasyTheme.hero_row(slot, hero)
 		if run.ward > 0:
-			FantasyTheme.label(party_box, "축복: 다음 전투 시작 시 모두 보호막 +%d" % run.ward, 13, Color("9fc6ff"))
-		FantasyTheme.label(party_box, "골드 %d" % run.gold, 13, FantasyTheme.GOLD)
+			FantasyTheme.label(party_box, "축복: 다음 전투 시작 시 모두 보호막 +%d" % run.ward, 15, Color("9fc6ff"))
+		FantasyTheme.label(party_box, "골드 %d" % run.gold, 15, FantasyTheme.GOLD)
 
 
 func take_rest() -> void:

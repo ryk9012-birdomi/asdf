@@ -3,8 +3,9 @@ extends Button
 ## One combatant on the 2D battlefield: a hand-drawn side-view figure with its HP / MP
 ## readout overhead. Clicking it picks it as a target. Presentation only.
 
-const WIDTH := 176.0
-const HEIGHT := 400.0
+const WIDTH := 196.0
+const HEIGHT := 440.0
+const HUD_HEIGHT := 150.0
 const ART_SCALE := 1.4
 const FEET := 34.0
 const OUTLINE := Color("1a0f08")
@@ -19,8 +20,9 @@ var name_label: Label
 var hp_bar: ProgressBar
 var hp_trail: ProgressBar
 var hp_text: Label
-var shield_text: Label
-var mp_pips: HBoxContainer
+var mp_bar: ProgressBar
+var mp_text: Label
+var shields: ShieldRow
 var info: Label
 var hud: VBoxContainer
 var marker: int = 0
@@ -30,7 +32,39 @@ var bar_tween: Tween
 ## While a blow is in flight the readout keeps the old HP, so it drops on impact.
 var hp_frozen: bool = false
 ## The figure moves; the overhead readout and click area stay put.
-var stance: Vector2 = Vector2(-20, 110)
+var stance: Vector2 = Vector2(-20, HUD_HEIGHT)
+
+
+class ShieldRow extends Control:
+	## Shield points as little kite shields; beyond six, one shield and a count.
+	var amount: int = 0
+
+	func _draw() -> void:
+		if amount <= 0:
+			return
+		var shown := mini(amount, 6)
+		var step := 19.0
+		var font := get_theme_default_font()
+		var extra := "×%d" % amount if amount > 6 else ""
+		var extra_width := font.get_string_size(extra, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x + 4.0 if amount > 6 else 0.0
+		var x := (size.x - shown * step - extra_width) / 2.0 + step / 2.0
+		for index in shown:
+			shield(Vector2(x + index * step, size.y / 2.0))
+		if amount > 6:
+			draw_string_outline(font, Vector2(x + shown * step - 6.0, size.y / 2.0 + 5.0), extra, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, 4, FighterView.OUTLINE)
+			draw_string(font, Vector2(x + shown * step - 6.0, size.y / 2.0 + 5.0), extra, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color("cfe0ff"))
+
+	func shield(center: Vector2) -> void:
+		var outline := PackedVector2Array([Vector2(-8, -9), Vector2(8, -9), Vector2(8, 1), Vector2(0, 10), Vector2(-8, 1)])
+		var face := PackedVector2Array()
+		for point in outline:
+			face.append(center + point)
+		draw_colored_polygon(face, Color("4f86f7"))
+		var rim := face.duplicate()
+		rim.append(face[0])
+		draw_polyline(rim, FighterView.OUTLINE, 2.0, true)
+		draw_colored_polygon(PackedVector2Array([center + Vector2(-5, -6), center + Vector2(0, -6), center + Vector2(0, 6), center + Vector2(-5, 0.5)]), Color("9fc2ff"))
+		draw_line(center + Vector2(0, -7), center + Vector2(0, 7), Color("dce8ff"), 1.5)
 
 
 class Figure extends Control:
@@ -87,72 +121,64 @@ func setup(combatant: CharacterUnit, facing_right: bool) -> void:
 	figure.phase = randf() * TAU
 	figure.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	figure.position = stance
-	figure.size = Vector2(WIDTH + 40, HEIGHT - 110)
+	figure.size = Vector2(WIDTH + 40, HEIGHT - HUD_HEIGHT)
 	figure.pivot_offset = Vector2(figure.size.x / 2.0, figure.size.y - FEET)
 	figure.scale = Vector2(facing, 1.0)
 	add_child(figure)
 	hud = VBoxContainer.new()
 	hud.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	hud.position = Vector2(8, 0)
-	hud.size = Vector2(WIDTH - 16, 108)
-	hud.add_theme_constant_override("separation", 2)
+	hud.position = Vector2(6, 0)
+	hud.size = Vector2(WIDTH - 12, HUD_HEIGHT)
+	hud.add_theme_constant_override("separation", 3)
 	add_child(hud)
-	name_label = small_label(15, Color("f4e6c4"))
+	name_label = small_label(19, Color("f4e6c4"))
 	name_label.theme_type_variation = "HeadingLabel"
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	name_label.add_theme_color_override("font_outline_color", OUTLINE)
-	name_label.add_theme_constant_override("outline_size", 5)
-	var bars := Control.new()
-	bars.custom_minimum_size.y = 15
-	bars.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	hud.add_child(bars)
-	hp_trail = make_bar(bars, Color("f3dcb0"), Color(0.08, 0.05, 0.03, 0.9))
-	hp_bar = make_bar(bars, Color("c0392b") if facing < 0 else Color("4caf50"), Color(0, 0, 0, 0))
-	hp_text = Label.new()
-	hp_text.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	hp_text.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	hp_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	hp_text.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	hp_text.add_theme_font_size_override("font_size", 11)
-	hp_text.add_theme_color_override("font_color", Color.WHITE)
-	hp_text.add_theme_color_override("font_outline_color", OUTLINE)
-	hp_text.add_theme_constant_override("outline_size", 4)
-	bars.add_child(hp_text)
-	var resources := HBoxContainer.new()
-	resources.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	resources.alignment = BoxContainer.ALIGNMENT_CENTER
-	resources.add_theme_constant_override("separation", 3)
-	hud.add_child(resources)
-	var mp_label := Label.new()
-	mp_label.text = "MP"
-	mp_label.add_theme_font_size_override("font_size", 10)
-	mp_label.add_theme_color_override("font_color", Color("8fb4ff"))
-	resources.add_child(mp_label)
-	mp_pips = HBoxContainer.new()
-	mp_pips.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	mp_pips.add_theme_constant_override("separation", 2)
-	resources.add_child(mp_pips)
-	for _index in unit.max_energy:
-		var pip := Panel.new()
-		pip.custom_minimum_size = Vector2(9, 9)
-		pip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		pip.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		mp_pips.add_child(pip)
-	shield_text = Label.new()
-	shield_text.add_theme_font_size_override("font_size", 11)
-	shield_text.add_theme_color_override("font_color", Color("9fc6ff"))
-	shield_text.add_theme_color_override("font_outline_color", OUTLINE)
-	shield_text.add_theme_constant_override("outline_size", 3)
-	resources.add_child(shield_text)
-	info = small_label(11, Color("e8dcc0"))
+	name_label.add_theme_constant_override("outline_size", 6)
+	var hp_row := bar_row(20)
+	hp_trail = make_bar(hp_row, Color("f3dcb0"), Color(0.08, 0.05, 0.03, 0.9))
+	hp_bar = make_bar(hp_row, Color("c0392b") if facing < 0 else Color("4caf50"), Color(0, 0, 0, 0))
+	hp_text = bar_text(hp_row, 14)
+	var mp_row := bar_row(15)
+	mp_bar = make_bar(mp_row, Color("3f7bff"), Color(0.05, 0.07, 0.16, 0.9))
+	mp_bar.max_value = maxi(1, unit.max_energy)
+	mp_text = bar_text(mp_row, 12)
+	shields = ShieldRow.new()
+	shields.custom_minimum_size.y = 22
+	shields.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	hud.add_child(shields)
+	info = small_label(14, Color("e8dcc0"))
 	info.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	info.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	info.add_theme_color_override("font_outline_color", OUTLINE)
-	info.add_theme_constant_override("outline_size", 4)
+	info.add_theme_constant_override("outline_size", 5)
 	hp_bar.max_value = unit.max_hp
 	hp_trail.max_value = unit.max_hp
 	hp_bar.value = unit.current_hp
 	hp_trail.value = unit.current_hp
+
+
+func bar_row(height: int) -> Control:
+	var row := Control.new()
+	row.custom_minimum_size.y = height
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	hud.add_child(row)
+	return row
+
+
+func bar_text(row: Control, font_size: int) -> Label:
+	var text := Label.new()
+	text.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	text.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	text.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	text.add_theme_font_size_override("font_size", font_size)
+	text.add_theme_color_override("font_color", Color.WHITE)
+	text.add_theme_color_override("font_outline_color", OUTLINE)
+	text.add_theme_constant_override("outline_size", 4)
+	row.add_child(text)
+	return text
 
 
 func small_label(font_size: int, color: Color) -> Label:
@@ -189,13 +215,8 @@ func refresh(active: bool, targetable: bool, line: String) -> void:
 	disabled = not targetable
 	name_label.text = ("▶ " if active and alive else "") + unit.display_name
 	name_label.add_theme_color_override("font_color", Color("7ee89a") if targetable else (Color("ffd27a") if active else Color("f4e6c4")))
-	for index in mp_pips.get_child_count():
-		var pip_style := StyleBoxFlat.new()
-		pip_style.set_corner_radius_all(5)
-		pip_style.border_color = Color("2b3f73")
-		pip_style.set_border_width_all(1)
-		pip_style.bg_color = Color("6f9bff") if index < unit.current_energy else Color(0.07, 0.08, 0.14, 0.9)
-		mp_pips.get_child(index).add_theme_stylebox_override("panel", pip_style)
+	mp_bar.value = unit.current_energy
+	mp_text.text = "MP %d / %d" % [unit.current_energy, unit.max_energy]
 	info.text = line if alive else "쓰러짐"
 	if not hp_frozen:
 		show_hp()
@@ -216,7 +237,8 @@ func thaw_hp() -> void:
 
 func show_hp() -> void:
 	hp_text.text = "HP %d / %d" % [unit.current_hp, unit.max_hp]
-	shield_text.text = "  ◆ %d" % unit.current_shield if unit.current_shield > 0 else ""
+	shields.amount = unit.current_shield
+	shields.queue_redraw()
 	update_hp()
 
 

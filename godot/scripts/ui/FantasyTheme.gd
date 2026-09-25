@@ -16,7 +16,7 @@ static func build() -> Theme:
 	var sans := SystemFont.new()
 	sans.font_names = PackedStringArray(["Malgun Gothic", "Noto Sans CJK KR", "sans-serif"])
 	ui_theme.default_font = sans
-	ui_theme.default_font_size = 14
+	ui_theme.default_font_size = 17
 	ui_theme.set_color("font_color", "Label", TEXT)
 	var serif := SystemFont.new()
 	serif.font_names = PackedStringArray(SERIF)
@@ -119,9 +119,9 @@ static func hero_row(parent: Node, hero: RunState.HeroState) -> void:
 	var color := hero.definition.display_color
 	var title := HBoxContainer.new()
 	row.add_child(title)
-	var name_label := label(title, hero.definition.character_name, 16, Color("f4e6c4"), true)
+	var name_label := label(title, hero.definition.character_name, 18, Color("f4e6c4"), true)
 	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	label(title, "HP %d/%d" % [hero.current_hp, hero.max_hp()], 13, TEXT if hero.is_alive() else BLOOD)
+	label(title, "HP %d/%d" % [hero.current_hp, hero.max_hp()], 15, TEXT if hero.is_alive() else BLOOD)
 	var bar := ProgressBar.new()
 	bar.show_percentage = false
 	bar.custom_minimum_size.y = 8
@@ -136,4 +136,4 @@ static func hero_row(parent: Node, hero: RunState.HeroState) -> void:
 	bar.add_theme_stylebox_override("fill", fill)
 	bar.add_theme_stylebox_override("background", back)
 	row.add_child(bar)
-	label(row, hero.definition.class_name_label, 11, color)
+	label(row, hero.definition.class_name_label, 13, color)
