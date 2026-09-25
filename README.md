@@ -4,7 +4,7 @@
 
 - 엔진: **Godot 4.7.2 stable** / GDScript / Compatibility(OpenGL) 렌더러
 - 프로젝트 루트: [`godot/project.godot`](godot/project.godot) (이 폴더가 `res://`)
-- 현재 단계: **로드맵 1단계 완료**. 실행하면 메인 메뉴가 뜨고, 새 여정으로 3 대 3 턴제 전투를 합니다. 다음은 슬레이 더 스파이어식 맵입니다([로드맵](godot/docs/ROADMAP.md)).
+- 현재 단계: **로드맵 2단계 완료**. 메인 메뉴와 3 대 3 턴제 전투가 동작합니다. 맵 생성·여정 상태 로직은 완성됐고, 다음 단계에서 맵 화면에 연결합니다([로드맵](godot/docs/ROADMAP.md)).
 
 ## 실행
 
@@ -24,6 +24,7 @@ godot --headless --path godot --editor --import                      # 최초 1�
 godot --headless --path godot --script res://tests/test_character_system.gd
 godot --headless --path godot --script res://tests/test_battle.gd
 godot --headless --path godot --script res://tests/test_flow.gd
+godot --headless --path godot --script res://tests/test_run.gd
 ```
 
 ## 메인 메뉴
@@ -56,7 +57,7 @@ godot --headless --path godot --script res://tests/test_flow.gd
 godot/
 ├─ project.godot
 ├─ scenes/     battle(전투), main(메인 메뉴·야영지), ui(카드/전투 UI)
-├─ scripts/    core(화면 전환), battle(규칙), characters(유닛/데이터), skills, ui(표시·연출)
+├─ scripts/    core(화면 전환), run(맵 생성·여정 상태), battle(규칙), characters(유닛/데이터), skills, ui(표시·연출)
 ├─ data/       classes · enemies · skills  (.tres 데이터)
 ├─ tests/      헤드리스 자동 검증
 └─ docs/       단계별 개발 문서
