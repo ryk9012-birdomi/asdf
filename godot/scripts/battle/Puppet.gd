@@ -22,6 +22,8 @@ class Bone:
 	var parent: StringName
 	var joint: Vector2
 	var sprite: Sprite2D
+	## Stretches the part (and moves its children's joints with it), for proportions.
+	var stretch: Vector2 = Vector2.ONE
 
 
 ## Damped spring for hanging cloth and plumes that trail behind the body.
@@ -95,11 +97,13 @@ func solve() -> void:
 	var shrink := Transform2D(0.0, Vector2.ONE / TEXTURE_SCALE, 0.0, Vector2.ZERO)
 	for id in order:
 		var entry: Bone = bones[id]
-		var local := Transform2D(angles[id], entry.joint)
-		var xform: Transform2D = (placed[entry.parent] * local) if entry.parent != &"" else Transform2D(angles[id], root + entry.joint)
+		var parent: Bone = bones.get(entry.parent)
+		var joint := entry.joint * (parent.stretch if parent != null else Vector2.ONE)
+		var local := Transform2D(angles[id], joint)
+		var xform: Transform2D = (placed[entry.parent] * local) if parent != null else Transform2D(angles[id], root + joint)
 		placed[id] = xform
 		if entry.sprite != null:
-			entry.sprite.transform = xform * shrink
+			entry.sprite.transform = xform * Transform2D(0.0, entry.stretch / TEXTURE_SCALE, 0.0, Vector2.ZERO) if entry.stretch != Vector2.ONE else xform * shrink
 
 
 ## Forward speed of the figure in its own facing, in pixels per second.

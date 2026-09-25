@@ -1307,6 +1307,30 @@ GROUPS = [
 ]
 
 
+def use_lines(ink, width, thin):
+    """Outline style for everything drawn after this call (the parts read these globals)."""
+    global INK, SW, THIN
+    INK = ink
+    SW = f'stroke="{INK}" stroke-width="{width}" stroke-linejoin="round"'
+    THIN = f'stroke="{INK}" stroke-width="{thin}" stroke-linejoin="round"'
+
+
+## Semi-realistic look test: the same parts with thin, warm-brown outlines instead of
+## heavy black ink, written to art/prototypes/<id>/.
+PROTOTYPES = [("moon_knight", VARIANTS, build), ("shade", ROGUES, rogue_parts),
+              ("starlight", WIZARDS, wizard_parts), ("goblin_raider", ENEMIES, enemy_parts)]
+
+
+def build_prototypes():
+    saved = (INK, SW, THIN)
+    use_lines("#3a2618", 0.8, 0.5)
+    for pick, variants, make in PROTOTYPES:
+        for k in variants:
+            if k["id"] == pick:
+                make(k, os.path.join(ROOT, "art", "prototypes", pick))
+    use_lines(saved[0], 1.5, 0.9)
+
+
 def main():
     gallery = []
     for folder, title, style, variants, make in GROUPS:
@@ -1325,6 +1349,7 @@ def main():
                 if k["id"] == pick:
                     make(k, os.path.join(ROOT, "art", "heroes", hero))
     build_gear()
+    build_prototypes()
     with open(os.path.join(ROOT, "art", "gallery.json"), "w", encoding="utf-8") as f:
         json.dump(gallery, f, ensure_ascii=False, indent=1)
     print(", ".join("%d %s" % (len(v), t) for _f, t, _s, v, _m in GROUPS))

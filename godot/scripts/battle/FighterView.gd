@@ -64,6 +64,57 @@ class ShieldRow extends Control:
 		draw_line(center + Vector2(0, -7), center + Vector2(0, 7), Color("dce8ff"), 1.5)
 
 
+## Lighting for a figure rendered on its own: torch rim light on the lit side, a darker
+## shadow side, shading that rounds the forms in from their edges, a darker lower body,
+## muted colour and a little film grain. Makes the flat vector parts read as lit volumes.
+const LIT_SHADER := """
+shader_type canvas_item;
+uniform vec2 texel = vec2(0.002, 0.002);
+uniform vec2 light_dir = vec2(-0.55, -0.83);
+uniform vec3 rim_color : source_color = vec3(1.0, 0.64, 0.32);
+uniform float rim_strength = 1.1;
+
+float hash(vec2 p) {
+	return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
+}
+
+void fragment() {
+	vec4 base = texture(TEXTURE, UV);
+	if (base.a < 0.01) {
+		COLOR = vec4(0.0);
+	} else {
+		vec3 col = base.rgb;
+		// Distance from the silhouette: average alpha in two rings.
+		float inner = 0.0;
+		float outer = 0.0;
+		for (int i = 0; i < 8; i++) {
+			float a = float(i) * 0.785398;
+			vec2 d = vec2(cos(a), sin(a));
+			inner += texture(TEXTURE, UV + d * texel * 3.0).a;
+			outer += texture(TEXTURE, UV + d * texel * 12.0).a;
+		}
+		inner /= 8.0;
+		outer /= 8.0;
+		float lit_edge = clamp(base.a - texture(TEXTURE, UV + light_dir * texel * 6.0).a, 0.0, 1.0);
+		float dark_edge = clamp(base.a - texture(TEXTURE, UV - light_dir * texel * 8.0).a, 0.0, 1.0);
+		float luma = dot(col, vec3(0.299, 0.587, 0.114));
+		col = mix(vec3(luma), col, 0.74);
+		col = (col - 0.5) * 1.1 + 0.46;
+		col *= mix(0.6, 1.0, smoothstep(0.3, 1.0, outer));
+		col *= mix(0.8, 1.0, inner);
+		col *= mix(1.06, 0.66, smoothstep(0.3, 1.0, UV.y));
+		col *= 1.0 - dark_edge * 0.5;
+		col += rim_color * lit_edge * rim_strength * (0.6 + 0.4 * luma);
+		col += (hash(floor(UV / texel) + floor(TIME * 12.0)) - 0.5) * 0.035;
+		COLOR = vec4(clamp(col, 0.0, 1.0), base.a);
+	}
+}
+"""
+## Space around the figure inside its lit render, for raised weapons and falling bodies.
+const LIT_MARGIN := Vector2(120, 120)
+const LIT_RESOLUTION := 2.0
+
+
 class Figure extends Control:
 	## Draws the character around its feet at the bottom centre. Pose values are tweened.
 	var kind: StringName
@@ -78,15 +129,50 @@ class Figure extends Control:
 	var lean: float = 0.0
 	## Cut-out rig for characters that have one; the rest are drawn by FighterArt.
 	var puppet: Puppet
+	## When lit, the puppet renders into this viewport and shows through `lit_rect`.
+	var lit_view: SubViewport
+	var lit_rect: TextureRect
 
 	func _process(delta: float) -> void:
 		time += delta
 		if puppet != null:
-			puppet.position = Vector2(size.x / 2.0, size.y - FighterView.FEET - bob)
+			var feet := Vector2(size.x / 2.0, size.y - FighterView.FEET - bob)
+			var zoom := 1.0
+			if lit_view != null:
+				feet = (feet + FighterView.LIT_MARGIN) * FighterView.LIT_RESOLUTION
+				zoom = FighterView.LIT_RESOLUTION
+			puppet.position = feet
 			puppet.rotation = fallen * -PI / 2.0 * 0.95
-			puppet.scale = Vector2.ONE * FighterView.ART_SCALE * puppet.size
+			puppet.scale = Vector2.ONE * FighterView.ART_SCALE * puppet.size * zoom
 			puppet.drive(self, delta)
 		queue_redraw()
+
+	## Moves the puppet into its own render with the lighting shader on top.
+	func light() -> void:
+		if puppet == null or lit_view != null:
+			return
+		var box := size + FighterView.LIT_MARGIN * Vector2(2, 1)
+		lit_view = SubViewport.new()
+		lit_view.transparent_bg = true
+		lit_view.size = Vector2i(box * FighterView.LIT_RESOLUTION)
+		lit_view.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+		lit_view.canvas_item_default_texture_filter = Viewport.DEFAULT_CANVAS_ITEM_TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+		add_child(lit_view)
+		puppet.get_parent().remove_child(puppet)
+		lit_view.add_child(puppet)
+		lit_rect = TextureRect.new()
+		lit_rect.texture = lit_view.get_texture()
+		lit_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		lit_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		lit_rect.stretch_mode = TextureRect.STRETCH_SCALE
+		lit_rect.position = -FighterView.LIT_MARGIN
+		var material := ShaderMaterial.new()
+		material.shader = Shader.new()
+		material.shader.code = FighterView.LIT_SHADER
+		material.set_shader_parameter("texel", Vector2.ONE / Vector2(lit_view.size))
+		lit_rect.material = material
+		add_child(lit_rect)
+		lit_rect.size = box
 
 	func _draw() -> void:
 		var feet := Vector2(size.x / 2.0, size.y - FighterView.FEET)

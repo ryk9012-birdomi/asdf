@@ -65,7 +65,12 @@ const RIGS := {
 const GEAR_PARTS := {"weapon": [&"sword"], "armor": [&"armor"], "sleeve": [&"sleeve_f", &"sleeve_b"],
 	"cape": [&"cape"], "charm": [&"charm"], "feather": [&"feather"]}
 
+## Semi-realistic body: a smaller head on longer limbs (about 5 heads tall, not 3.5).
+const REALISTIC := {"head": 0.72, "legs": 1.2, "arms": 1.1, "torso": 1.06}
+
 var style: Dictionary
+## Standing hip height; grows with longer legs.
+var hip_height: float = 60.0
 ## Textures the part set came with, restored when gear comes off.
 var bare: Dictionary = {}
 ## slot -> item id currently shown.
@@ -136,6 +141,27 @@ func _init(art: String, style_id: StringName = &"knight", head_margins: Array = 
 		&"lower_f", &"sword", &"glow", &"hand_f"])
 
 
+## Reshapes the figure: head size and limb/torso lengths as factors (see REALISTIC).
+func proportion(shape: Dictionary) -> void:
+	var legs: float = shape.get("legs", 1.0)
+	var arms: float = shape.get("arms", 1.0)
+	var head_scale: float = shape.get("head", 1.0)
+	for id in [&"thigh_b", &"shin_b", &"thigh_f", &"shin_f"]:
+		bones[id].stretch = Vector2(1.0, legs)
+	for id in [&"upper_b", &"lower_b", &"upper_f", &"lower_f"]:
+		bones[id].stretch = Vector2(1.0, arms)
+	bones[&"torso"].stretch = Vector2(1.0, shape.get("torso", 1.0))
+	bones[&"head"].stretch = Vector2.ONE * head_scale
+	# Worn overlays follow the part they cover.
+	for id in [&"sleeve_b", &"sleeve_f"]:
+		bones[id].stretch = Vector2(1.0, arms)
+	for id in [&"armor", &"charm"]:
+		bones[id].stretch = bones[&"torso"].stretch
+	for id in [&"plume", &"feather"]:
+		bones[id].stretch = Vector2.ONE * head_scale
+	hip_height = 60.0 * legs
+
+
 ## Dresses the figure in its equipment (slot -> item id): a weapon replaces the one in
 ## hand, armor and sleeves go over the body, a cloak replaces the cape, trinkets hang on.
 func wear(equipment: Dictionary) -> void:
@@ -172,7 +198,7 @@ func drive(figure: Control, delta: float) -> void:
 	angles.thigh_b = (0.3 + step * 0.55 * walk) * alive
 	angles.shin_f = (0.26 + maxf(0.0, -step) * 0.7 * walk) * alive
 	angles.shin_b = (0.08 + maxf(0.0, step) * 0.7 * walk) * alive
-	root = Vector2(0, -60 + 3.0 * alive + breathe * 0.6 - absf(step) * 2.5 * walk + hurt * 2.0)
+	root = Vector2(0, -hip_height + 3.0 * alive + breathe * 0.6 - absf(step) * 2.5 * walk + hurt * 2.0)
 
 	# Body: leans into swings and dashes, rocks back when struck.
 	var swing := clampf(arm, 0.0, 1.5)
