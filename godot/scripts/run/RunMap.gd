@@ -122,7 +122,7 @@ func assign_types(rng: RandomNumberGenerator) -> void:
 	for floor_index in FLOORS:
 		for current in floor_nodes(floor_index):
 			if floor_index == 0:
-				current.type = NodeType.BATTLE
+				current.type = NodeType.EVENT
 			elif floor_index == TREASURE_FLOOR:
 				current.type = NodeType.TREASURE
 			elif floor_index == REST_FLOOR:
@@ -138,6 +138,9 @@ func pick_type(current: MapNode, rng: RandomNumberGenerator) -> NodeType:
 	# Rest is kept off early floors and off the floor right below the all-rest floor.
 	if current.floor < REST_FROM or current.floor == REST_FLOOR - 1:
 		banned.append(NodeType.REST)
+	# The journey opens with an event; the first fight comes right after it.
+	if current.floor == 1:
+		banned.append(NodeType.EVENT)
 	for parent_id in current.previous:
 		var parent := nodes[parent_id]
 		if parent.type in [NodeType.ELITE, NodeType.REST]:

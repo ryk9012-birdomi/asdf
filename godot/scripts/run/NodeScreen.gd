@@ -1,5 +1,5 @@
 extends Control
-## Non-combat map nodes: rest at a campfire, open a chest, or (until stage 4) a quiet event.
+## Non-combat map nodes: rest at a campfire, open a chest, or face a story event.
 
 var run: RunState
 var map_node: RunMap.MapNode
@@ -52,10 +52,38 @@ func _ready() -> void:
 			story.text = "무너진 순례자 초소 안쪽, 녹슨 자물쇠가 달린 상자가 먼지를 뒤집어쓰고 있다."
 			option("상자를 연다", open_chest)
 		_:
-			title.text = "고요한 갈림길"
-			story.text = "낡은 이정표에 교단의 표식이 긁혀 있다. 바람 소리 말고는 아무것도 들리지 않는다. (이벤트는 4단계에서 채워집니다.)"
-			option("표식을 지나 계속 걷는다", func(): finish("아무 일도 일어나지 않았다. 적어도 지금은."))
+			var event := Events.for_node(run, map_node)
+			title.text = event.title
+			story.text = event.text
+			for choice in event.choices:
+				var caption: String = choice.label
+				var odds := Events.describe_check(run, choice)
+				if not odds.is_empty():
+					caption += "\n      " + odds
+				var item := option(caption, func(): choose(choice))
+				item.disabled = not Events.affordable(run, choice)
+				if item.disabled:
+					item.tooltip_text = "골드가 부족합니다 (보유 %d)" % run.gold
 	show_party()
+
+
+func choose(choice: Dictionary) -> void:
+	var result := Events.resolve(run, map_node, choice)
+	var lines := PackedStringArray()
+	if not result.roll.is_empty():
+		AudioDirector.sfx("dice", 0.08)
+		var roll: Dictionary = result.roll
+		lines.append("2d6 [%d+%d]%s = %d  (목표 %d)  →  %s" % [roll.dice[0], roll.dice[1], (" %+d" % roll.bonus) if roll.bonus != 0 else "", roll.total, roll.target, "성공" if roll.passed else "실패"])
+	var effects: Dictionary = result.effects
+	if int(effects.get("gold", 0)) > 0:
+		AudioDirector.sfx("coin", 0.02)
+	if int(effects.get("heal", 0)) > 0 or int(effects.get("ward", 0)) > 0:
+		AudioDirector.sfx("heal" if int(effects.get("heal", 0)) > 0 else "shield", 0.0)
+	if effects.has("hurt"):
+		AudioDirector.sfx("hit")
+	lines.append(result.text)
+	show_party()
+	finish("\n".join(lines))
 
 
 func option(caption: String, callback: Callable) -> Button:
@@ -67,7 +95,7 @@ func option(caption: String, callback: Callable) -> Button:
 func show_party() -> void:
 	for child in party_box.get_children():
 		child.queue_free()
-	if map_node.type == RunMap.NodeType.REST:
+	if map_node.type in [RunMap.NodeType.REST, RunMap.NodeType.EVENT]:
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 20)
 		party_box.add_child(row)
@@ -76,6 +104,9 @@ func show_party() -> void:
 			slot.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			row.add_child(slot)
 			FantasyTheme.hero_row(slot, hero)
+		if run.ward > 0:
+			FantasyTheme.label(party_box, "축복: 다음 전투 시작 시 모두 보호막 +%d" % run.ward, 13, Color("9fc6ff"))
+		FantasyTheme.label(party_box, "골드 %d" % run.gold, 13, FantasyTheme.GOLD)
 
 
 func take_rest() -> void:

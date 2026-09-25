@@ -23,6 +23,7 @@ func run_tests() -> void:
 	test_determinism_and_saves()
 	test_travel()
 	test_party_persistence()
+	test_events()
 	print("Run system: %d checks, %d failures" % [checks, failures])
 	AudioDirector.shutdown()
 	# Let the audio thread drop its playbacks before the leak check at exit.
@@ -92,7 +93,10 @@ func rule_violations(map: RunMap) -> Array[String]:
 				found.append("repeat")
 		match current.floor:
 			0:
-				if current.type != RunMap.NodeType.BATTLE:
+				if current.type != RunMap.NodeType.EVENT:
+					found.append("fixed floors")
+			1:
+				if current.type == RunMap.NodeType.EVENT:
 					found.append("fixed floors")
 			RunMap.TREASURE_FLOOR:
 				if current.type != RunMap.NodeType.TREASURE:
@@ -210,3 +214,32 @@ func test_party_persistence() -> void:
 	check(boss_run.finished and boss_run.victory, "Beating the boss wins the run")
 	for unit in units:
 		unit.free()
+
+
+func test_events() -> void:
+	var run := RunState.begin(31, heroes())
+	for map_node in run.map.start_nodes():
+		check(Events.for_node(run, map_node) in Events.OPENING, "Floor 1 draws from the opening events")
+	var deeper: RunMap.MapNode = run.map.nodes.filter(func(candidate): return candidate.floor > 0 and candidate.type == RunMap.NodeType.EVENT)[0]
+	check(Events.for_node(run, deeper) in Events.JOURNEY, "Later events draw from the journey pool")
+	for event in Events.OPENING + Events.JOURNEY:
+		check(event.choices.size() >= 2, "Event %s offers a real choice" % event.id)
+		for choice in event.choices:
+			if choice.has("check"):
+				var odds := Events.chance(run, choice.check)
+				check(odds > 0.0 and odds < 1.0 and choice.has("success") and choice.has("failure"), "Check in %s can go either way (%d%%)" % [event.id, roundi(odds * 100)])
+	var gamble: Dictionary = Events.JOURNEY.filter(func(event): return event.id == "goblin_gambler")[0].choices[0]
+	check(is_equal_approx(Events.chance(run, gamble.check), 15 / 36.0), "Plain 2d6 >= 8 is 15/36")
+	run.gold = 5
+	check(not Events.affordable(run, gamble), "A bet needs the gold up front")
+	for hero in run.party:
+		hero.current_hp = 2
+	Events.apply(run, {"hurt": [Events.ALL, 5]})
+	check(run.party.all(func(hero): return hero.current_hp == 1), "Events wound but never kill")
+	Events.apply(run, {"heal": 3, "gold": -99, "ward": 2})
+	check(run.party[0].current_hp == 4 and run.gold == 0 and run.ward == 2, "Heal, gold floor at zero and ward stack up")
+	var cart: Dictionary = Events.OPENING.filter(func(event): return event.id == "broken_cart")[0]
+	var start := run.map.start_nodes()[0]
+	var first := Events.resolve(RunState.begin(31, heroes()), start, cart.choices[0])
+	var second := Events.resolve(RunState.begin(31, heroes()), start, cart.choices[0])
+	check(first.roll.dice == second.roll.dice and first.roll.total == first.roll.dice[0] + first.roll.dice[1] + 1, "Event rolls are seeded and add the hero's bonus")

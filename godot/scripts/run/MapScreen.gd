@@ -132,6 +132,8 @@ func party_panel() -> PanelContainer:
 	var floor_text := "출발 전" if run.current_floor() < 0 else "%d층 / %d층" % [run.current_floor() + 1, RunMap.FLOORS]
 	FantasyTheme.label(column, "위치   %s" % floor_text, 14, FantasyTheme.TEXT)
 	FantasyTheme.label(column, "승리한 전투   %d" % run.battles_won, 14, FantasyTheme.TEXT)
+	if run.ward > 0:
+		FantasyTheme.label(column, "축복   다음 전투 보호막 +%d" % run.ward, 13, Color("9fc6ff"))
 	return panel
 
 
@@ -143,7 +145,7 @@ func legend_panel() -> PanelContainer:
 	column.add_theme_constant_override("separation", 8)
 	panel.add_child(column)
 	FantasyTheme.label(column, "범례", 18, FantasyTheme.TRIM, true)
-	var notes := ["고블린 무리와 전투", "강력한 정예. 골드 더 많음", "모닥불. HP 40% 회복", "알 수 없는 조우", "보물 상자", "잿불 사제. 막의 끝"]
+	var notes := ["고블린 무리와 전투", "강력한 정예. 골드 더 많음", "모닥불. HP 40% 회복", "선택지와 2d6 판정. 여정은 이벤트로 시작", "보물 상자", "잿불 사제. 막의 끝"]
 	for type in RunMap.NodeType.values():
 		var line := VBoxContainer.new()
 		column.add_child(line)

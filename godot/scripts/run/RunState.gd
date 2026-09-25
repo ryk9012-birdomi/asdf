@@ -20,6 +20,8 @@ var victory: bool = false
 ## False from arriving at a node until its screen is done, so a reload re-enters it.
 var node_resolved: bool = true
 var battles_won: int = 0
+## Shield every hero starts the next battle with (event blessings); spent by that battle.
+var ward: int = 0
 
 
 class HeroState:

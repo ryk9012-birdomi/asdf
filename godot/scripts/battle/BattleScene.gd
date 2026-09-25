@@ -34,6 +34,7 @@ func _ready() -> void:
 			return
 		if run != null:
 			unit.current_hp = run.party[players.size()].current_hp
+			unit.current_shield += run.ward
 		unit.formation_slot = mini(players.size(), 2) as CharacterUnit.FormationSlot
 		players.append(unit)
 	for definition in enemy_definitions:
@@ -44,6 +45,8 @@ func _ready() -> void:
 			return
 		unit.formation_slot = mini(foes.size(), 2) as CharacterUnit.FormationSlot
 		foes.append(unit)
+	if run != null:
+		run.ward = 0
 	# Number look-alikes only ("고블린 약탈자 01"), so a lone boss keeps its name.
 	for foe in foes:
 		if foes.filter(func(other): return other.character_data.id == foe.character_data.id).size() > 1:
