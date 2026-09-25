@@ -105,6 +105,7 @@ static func button(parent: Node, caption: String, callback: Callable, large: boo
 		item.theme_type_variation = "MenuButtonLarge"
 		item.custom_minimum_size = Vector2(320, 52)
 		item.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	item.pressed.connect(func(): AudioDirector.sfx("ui_click", 0.1, -6.0))
 	item.pressed.connect(callback)
 	parent.add_child(item)
 	return item

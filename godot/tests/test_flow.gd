@@ -65,6 +65,8 @@ func run_tests() -> void:
 	check(menu.new_run_button.text == "새 여정" and not menu.new_run_button.disabled, "New journey is available")
 	check(menu.continue_button.disabled, "Continue is disabled without a journey")
 	check(menu.camp_button.text == "야영지" and menu.quit_button.text == "종료", "Camp and quit entries exist")
+	check(AudioDirector.instance != null and AudioDirector.instance.current_track == "menu", "Main menu plays the menu theme")
+	check(menu.music_slider != null and menu.sfx_slider != null, "Menu offers music and effect volume sliders")
 	menu.camp_button.pressed.emit()
 	await settle()
 	check(current_scene.name == "CharacterLab", "Menu opens the camp")
@@ -76,11 +78,13 @@ func run_tests() -> void:
 	await settle()
 	var run := RunState.active
 	check(run != null and current_scene.name == "MapScreen", "New journey opens the map")
+	check(AudioDirector.instance.current_track == "map", "Map plays the travel theme")
 	check(current_scene.canvas.positions.size() == run.map.nodes.size(), "Map draws every node")
 	var start: RunMap.MapNode = run.available_nodes()[0]
 	current_scene.canvas.node_chosen.emit(start.id)
 	await settle()
 	check(current_scene.name == "BattleScene", "Choosing a floor-1 node starts its battle")
+	check(AudioDirector.instance.current_track == "battle" and "step" in AudioDirector.instance.played, "Travel steps into the battle theme")
 	var view = current_scene.view
 	check(not view.restart_button.visible and not view.lab_button.visible, "Run battles offer no restart or camp detour")
 	check(view.title_label.text.begins_with("1층"), "Battle title names the floor")
@@ -88,6 +92,7 @@ func run_tests() -> void:
 	fight_out(current_scene.battle, true)
 	await settle()
 	check(current_scene.battle.victory and view.continue_button.visible, "Victory offers the way back to the map")
+	check(AudioDirector.instance.current_track == "victory", "Victory jingle plays")
 	check(run.node_resolved and run.battles_won == 1 and run.gold > 0, "Victory resolves the node and pays gold")
 	var carried: Array[int] = []
 	for unit in current_scene.players:
@@ -138,4 +143,7 @@ func run_tests() -> void:
 	var veils := root.get_children().filter(func(node): return node is CanvasLayer)
 	check(veils.is_empty(), "Transition veils clean themselves up")
 	print("Game flow: %d checks, %d failures" % [checks, failures])
+	AudioDirector.shutdown()
+	# Let the audio thread drop its playbacks before the leak check at exit.
+	await create_timer(0.35).timeout
 	quit(0 if failures == 0 else 1)

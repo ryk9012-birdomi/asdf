@@ -24,6 +24,9 @@ func run_tests() -> void:
 	test_travel()
 	test_party_persistence()
 	print("Run system: %d checks, %d failures" % [checks, failures])
+	AudioDirector.shutdown()
+	# Let the audio thread drop its playbacks before the leak check at exit.
+	await create_timer(0.35).timeout
 	quit(0 if failures == 0 else 1)
 
 

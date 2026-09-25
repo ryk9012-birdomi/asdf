@@ -72,6 +72,9 @@ func _ready() -> void:
 		push_error("Encounter requires 1–3 heroes and 1–5 enemies.")
 		return
 	view.bind(battle)
+	var boss_fight := run != null and run.current_node().type == RunMap.NodeType.BOSS
+	AudioDirector.music("boss" if boss_fight else "battle")
+	battle.battle_finished.connect(func(victory: bool): AudioDirector.music("victory" if victory else "defeat"))
 	if run != null:
 		var map_node := run.current_node()
 		var kind: String = "보스 · 잿불 사제" if map_node.type == RunMap.NodeType.BOSS else RunMap.TYPE_NAMES[map_node.type]

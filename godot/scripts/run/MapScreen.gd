@@ -66,6 +66,7 @@ func _ready() -> void:
 
 func build() -> void:
 	theme = FantasyTheme.build()
+	AudioDirector.music("map")
 	add_child(EmberBackdrop.new())
 	var margin := MarginContainer.new()
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -175,6 +176,7 @@ func describe(node_id: int) -> void:
 
 func choose(node_id: int) -> void:
 	if run.travel(node_id):
+		AudioDirector.sfx("step")
 		enter_current()
 
 

@@ -77,6 +77,7 @@ var arena: BattleArena
 ## Effects of the action being resolved; played when the 3D blow lands.
 var pending_fx: Array[Callable] = []
 var missed_now: Array[CharacterUnit] = []
+var last_turn_actor: CharacterUnit
 
 
 func _ready() -> void:
@@ -202,6 +203,10 @@ func refresh() -> void:
 	for child in skill_row.get_children():
 		skill_row.remove_child(child)
 		child.queue_free()
+	if battle.phase == BattleManager.Phase.PLAYER_INPUT and battle.actor != last_turn_actor:
+		AudioDirector.sfx("turn", 0.0, -6.0)
+	if battle.phase in [BattleManager.Phase.PLAYER_INPUT, BattleManager.Phase.ENEMY_TURN]:
+		last_turn_actor = battle.actor
 	if battle.phase == BattleManager.Phase.PLAYER_INPUT:
 		prompt.text = "%s의 차례 · 사용할 스킬을 선택하세요." % battle.actor.display_name
 		for skill in battle.actor.character_data.skills:
@@ -321,6 +326,14 @@ func percent(chance: float) -> int:
 
 func animate_action(actor: CharacterUnit, targets: Array[CharacterUnit], skill: SkillData) -> void:
 	var impact := arena.perform(actor, targets, skill, missed_now)
+	match skill.damage_type if skill.effect_type == SkillData.EffectType.DAMAGE else -1:
+		SkillData.DamageType.FIRE:
+			AudioDirector.sfx("fire")
+		SkillData.DamageType.ARCANE:
+			AudioDirector.sfx("arcane")
+		SkillData.DamageType.PHYSICAL:
+			if fighters.has(actor) and fighters[actor].kind == &"goblin_archer":
+				AudioDirector.sfx("arrow")
 	missed_now = []
 	var effects := pending_fx
 	pending_fx = []
@@ -349,6 +362,7 @@ func impact_fx(actor: CharacterUnit, targets: Array[CharacterUnit], skill: Skill
 			continue
 		var to := anchor_of(target)
 		if skill.effect_type == SkillData.EffectType.SHIELD:
+			AudioDirector.sfx("shield")
 			spawn_ring(to, WARD)
 			spawn_ring(to, TRIM, 0.12)
 			fighters[target].flash(WARD)
@@ -365,9 +379,11 @@ func impact_fx(actor: CharacterUnit, targets: Array[CharacterUnit], skill: Skill
 						spawn_beam(from, to, Color("b48cff"), 6.0, 0.08 + bolt * 0.16, bolt * 0.09)
 				spawn_burst(to, Color("c9a8ff"), 24)
 			SkillData.DamageType.RADIANT:
+				AudioDirector.sfx("radiant", 0.03, -3.0)
 				spawn_pillar(to, Color("ffe08a"))
 			_:
 				if skill.target_type == SkillData.TargetType.FRONT_ENEMY:
+					AudioDirector.sfx("slash")
 					spawn_slash(to, Color("f2efe6"), skill.hit_count)
 				elif arena == null:
 					spawn_beam(from, to, Color("e8dcc0"), 4.0, 0.02)
@@ -390,6 +406,7 @@ func show_hit(target: CharacterUnit, health_damage: int, shield_damage: int, cri
 	if not fighters.has(target):
 		return
 	defer_fx(func() -> void:
+		AudioDirector.sfx("crit" if critical else "hit")
 		fighters[target].flash(Color("ffb09a"), 9.0 if critical else 5.0)
 		spawn_burst(anchor_of(target), Color("ffcf6b") if critical else Color("e0503f"), 34 if critical else 18)
 		if shield_damage > 0:
@@ -404,6 +421,7 @@ func show_hit(target: CharacterUnit, health_damage: int, shield_damage: int, cri
 func show_dice(target: CharacterUnit, roll: Dictionary) -> void:
 	if not fighters.has(target) or roll.auto:
 		return
+	AudioDirector.sfx("dice", 0.08, -4.0)
 	var frame := Engine.get_process_frames()
 	var stack: Array = dice_stacks.get(target, [frame, 0])
 	if stack[0] != frame:
@@ -454,7 +472,9 @@ func show_dice(target: CharacterUnit, roll: Dictionary) -> void:
 
 func show_miss(target: CharacterUnit) -> void:
 	missed_now.append(target)
-	defer_fx(func() -> void: spawn_popup(target, "빗나감", Color("c9bda5"), 20))
+	defer_fx(func() -> void:
+		AudioDirector.sfx("miss")
+		spawn_popup(target, "빗나감", Color("c9bda5"), 20))
 
 
 func show_shield(target: CharacterUnit, amount: int) -> void:
@@ -466,6 +486,7 @@ func on_unit_down(unit: CharacterUnit) -> void:
 	if not fighters.has(unit):
 		return
 	defer_fx(func() -> void:
+		AudioDirector.sfx("death", 0.03)
 		spawn_burst(anchor_of(unit), unit.character_data.display_color, 60)
 		spawn_ring(anchor_of(unit), RED)
 		shake_screen(10.0))
@@ -760,6 +781,7 @@ func row(parent: Node) -> HBoxContainer:
 func button(parent: Node, text_value: String, callback: Callable, accent: Color = TRIM) -> Button:
 	var item := Button.new()
 	item.text = text_value
+	item.pressed.connect(func(): AudioDirector.sfx("ui_click", 0.1, -6.0))
 	item.pressed.connect(callback)
 	if accent != TRIM:
 		for state in ["normal", "hover", "pressed", "disabled"]:

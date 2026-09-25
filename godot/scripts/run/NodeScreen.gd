@@ -16,6 +16,7 @@ func _ready() -> void:
 		return
 	map_node = run.current_node()
 	theme = FantasyTheme.build()
+	AudioDirector.music("map")
 	add_child(EmberBackdrop.new())
 	var center := CenterContainer.new()
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -79,12 +80,14 @@ func show_party() -> void:
 
 func take_rest() -> void:
 	var healed := run.rest()
+	AudioDirector.sfx("heal", 0.0)
 	show_party()
 	finish("따뜻한 불 곁에서 상처를 돌봤다. 일행 HP %d 회복." % healed)
 
 
 func open_chest() -> void:
 	var gold := Encounters.gold_for(run, map_node)
+	AudioDirector.sfx("coin", 0.02)
 	run.gold += gold
 	finish("상자 안에는 교단이 빼돌린 금화가 들어 있었다. 골드 +%d (보유 %d)" % [gold, run.gold])
 

@@ -62,6 +62,9 @@ func run_tests() -> void:
 	test_endings()
 	await test_ui()
 	print("Battle system: %d checks, %d failures" % [checks, failures])
+	AudioDirector.shutdown()
+	# Let the audio thread drop its playbacks before the leak check at exit.
+	await create_timer(0.35).timeout
 	quit(0 if failures == 0 else 1)
 
 
@@ -267,6 +270,8 @@ func test_ui() -> void:
 	scene.view.fighters[front].pressed.emit()
 	check(scene.battle.phase == BattleManager.Phase.RESOLVING and scene.view.selected_skill == null, "Target click resolves and locks commands")
 	check(arena.animation_time_left() > 0.5, "Melee strike plays out on the battlefield")
+	check(AudioDirector.instance != null and "dice" in AudioDirector.instance.played, "Dice rattle when the attack is rolled")
+	check(AudioDirector.instance.current_track == "battle", "Battle theme plays")
 	await create_timer(0.15).timeout
 	check(scene.battle.actor == scene.battle.party[2], "Scene timer advances to next hero")
 	for enemy in scene.battle.enemies:

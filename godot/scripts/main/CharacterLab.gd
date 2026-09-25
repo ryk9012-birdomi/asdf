@@ -7,6 +7,7 @@ var messages: PackedStringArray = []
 
 
 func _ready() -> void:
+	AudioDirector.music("menu")
 	var backdrop := EmberBackdrop.new()
 	add_child(backdrop)
 	move_child(backdrop, 0)

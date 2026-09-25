@@ -15,6 +15,7 @@ func _ready() -> void:
 	column.add_theme_constant_override("separation", 14)
 	add_child(column)
 	var won := run != null and run.victory
+	AudioDirector.music("victory" if won else "defeat")
 	var title := centered(column, "여정 완수" if won else "여정의 끝", 64, Color("f4e2b8") if won else Color("e0503f"), true)
 	FantasyTheme.glow(title, Color("ff8a2a") if won else Color("8e1c12"), 16)
 	var line := "잿불 사제가 쓰러지고, 고갯길 성소의 불꽃이 꺼졌다." if won else "잿빛 고갯길에 또 하나의 맹세가 묻혔다."

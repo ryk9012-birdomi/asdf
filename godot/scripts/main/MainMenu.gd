@@ -9,6 +9,8 @@ var new_run_button: Button
 var continue_button: Button
 var camp_button: Button
 var quit_button: Button
+var music_slider: HSlider
+var sfx_slider: HSlider
 
 
 class Sigil extends Control:
@@ -43,6 +45,7 @@ class Sigil extends Control:
 
 func _ready() -> void:
 	theme = FantasyTheme.build()
+	AudioDirector.music("menu")
 	add_child(EmberBackdrop.new())
 	var sigil := Sigil.new()
 	sigil.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -73,7 +76,16 @@ func _ready() -> void:
 	if continue_button.disabled:
 		continue_button.tooltip_text = "진행 중인 여정이 없습니다."
 	camp_button = menu_button(column, "야영지", "일행의 능력치와 상태를 살펴봅니다.", func(): SceneRouter.go(get_tree(), SceneRouter.CAMP))
-	quit_button = menu_button(column, "종료", "게임을 끝냅니다.", func(): get_tree().quit())
+	quit_button = menu_button(column, "종료", "게임을 끝냅니다.", quit_game)
+	var sound_gap := Control.new()
+	sound_gap.custom_minimum_size.y = 18
+	column.add_child(sound_gap)
+	var sound := HBoxContainer.new()
+	sound.alignment = BoxContainer.ALIGNMENT_CENTER
+	sound.add_theme_constant_override("separation", 12)
+	column.add_child(sound)
+	music_slider = volume_slider(sound, "음악", "Music")
+	sfx_slider = volume_slider(sound, "효과음", "SFX")
 	var footer := Label.new()
 	footer.text = "MVP 1 프로토타입   ·   Godot 4.7   ·   Enter / 방향키로도 선택할 수 있습니다"
 	footer.add_theme_font_size_override("font_size", 12)
@@ -86,6 +98,32 @@ func _ready() -> void:
 	new_run_button.grab_focus.call_deferred()
 	column.modulate.a = 0.0
 	create_tween().tween_property(column, "modulate:a", 1.0, 0.8).set_trans(Tween.TRANS_SINE)
+
+
+func volume_slider(parent: Node, caption: String, bus: String) -> HSlider:
+	var name_label := Label.new()
+	name_label.text = caption
+	name_label.add_theme_color_override("font_color", MUTED)
+	parent.add_child(name_label)
+	var slider := HSlider.new()
+	slider.custom_minimum_size = Vector2(140, 20)
+	slider.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	slider.min_value = 0.0
+	slider.max_value = 1.0
+	slider.step = 0.05
+	slider.value = AudioDirector.volume(bus)
+	slider.value_changed.connect(func(level: float):
+		AudioDirector.set_volume(bus, level)
+		if bus == "SFX":
+			AudioDirector.sfx("ui_click", 0.0))
+	parent.add_child(slider)
+	return slider
+
+
+func quit_game() -> void:
+	AudioDirector.shutdown()
+	await get_tree().create_timer(0.35).timeout
+	get_tree().quit()
 
 
 func start_new_run() -> void:
@@ -117,6 +155,7 @@ func menu_button(parent: Node, caption: String, hint: String, callback: Callable
 	item.custom_minimum_size = Vector2(320, 52)
 	item.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	item.theme_type_variation = "MenuButtonLarge"
+	item.pressed.connect(func(): AudioDirector.sfx("ui_click", 0.1, -4.0))
 	item.pressed.connect(callback)
 	parent.add_child(item)
 	return item

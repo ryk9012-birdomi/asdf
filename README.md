@@ -68,14 +68,36 @@ godot --headless --path godot --script res://tests/test_run.gd
 - **MP:** 스킬 비용입니다. 자기 차례마다 1씩 차오릅니다. 코드에서는 `energy`라는 이름입니다.
 - **HP 규모:** 레벨 1~2 유닛은 HP 10 이하(알데릭 10, 시엔 8, 엘로웬 6, 고블린 6), 레벨 5 이상의 정예·보스는 20 이상으로 설계합니다.
 
+## 음악과 효과음
+
+외부 음원 없이 모두 직접 합성했습니다. [`tools/generate_audio.py`](tools/generate_audio.py)가 류트(뜯는 현), 피리, 현악 합주, 금관, 합창 패드, 북 소리를 사인파와 필터를 거친 노이즈로 만들고, 작곡된 악보대로 배치해 반복 재생되는 곡을 씁니다.
+
+| 곡 | 쓰이는 곳 | 분위기 |
+|---|---|---|
+| `menu` | 메인 메뉴·야영지 | D 도리안, 느린 류트 아르페지오와 외로운 피리 (53초) |
+| `map` | 여정 지도·휴식·보물 | A 에올리안, 류트 스트럼과 프레임 드럼, 리코더 선율 (38초) |
+| `battle` | 일반·정예 전투 | D 단조 132bpm, 현악 오스티나토, 타이코, 금관 (29초) |
+| `boss` | 보스전 | C 단조 140bpm, 더 무거운 북과 합창 (27초) |
+| `victory` / `defeat` | 전투·여정 종료 | 짧은 팡파르 / 하강하는 애가 |
+
+**효과음 16종:** 주사위 굴림, 베기, 타격, 치명타, 빗나감(휙), 보호막, 화염, 비전, 화살, 광휘, 쓰러짐, 금화, 치유, 발걸음, 내 차례 알림, 버튼 클릭
+
+**재생과 설정**
+- 화면이 바뀌면 음악이 교차 페이드됩니다.
+- 공격 효과음은 2D 연출과 같은 순간(주사위 굴림 → 공격이 닿는 순간)에 납니다.
+- 메인 메뉴의 **음악 / 효과음 슬라이더**로 볼륨을 조절할 수 있고, 설정은 `user://settings.cfg`에 저장됩니다.
+
+**다시 만들기:** `pip install numpy soundfile` 후 `python3 tools/generate_audio.py`를 실행하면 `godot/assets/audio/`가 다시 생성됩니다.
+
 ## 폴더
 
 ```text
 godot/
 ├─ project.godot
 ├─ scenes/     battle(전투), main(메인 메뉴·야영지), run(지도·노드·결과), ui(카드/전투 UI)
-├─ scripts/    core(화면 전환), run(지도 생성·여정 상태·전투 구성·지도 화면), battle(규칙), characters(유닛/데이터), skills, ui(테마·표시·연출)
+├─ scripts/    core(화면 전환·오디오), run(지도 생성·여정 상태·전투 구성·지도 화면), battle(규칙), characters(유닛/데이터), skills, ui(테마·표시·연출)
 ├─ data/       classes · enemies · skills  (.tres 데이터)
+├─ assets/     audio/music(.ogg) · audio/sfx(.wav)  — tools/generate_audio.py로 생성
 ├─ tests/      헤드리스 자동 검증
 └─ docs/       단계별 개발 문서
 ```
