@@ -54,6 +54,12 @@ func node_at(point: Vector2) -> int:
 	return -1
 
 
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_MOUSE_EXIT and hovered >= 0:
+		hovered = -1
+		node_hovered.emit(-1)
+
+
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
 		var id := node_at(event.position)

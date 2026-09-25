@@ -97,6 +97,12 @@ func run_tests() -> void:
 	check(current_scene.canvas.positions.size() == run.map.nodes.size(), "Map draws every node")
 	var opening: RunMap.MapNode = run.available_nodes()[0]
 	check(opening.type == RunMap.NodeType.EVENT, "The journey opens with an event")
+	var bubble = current_scene.bubble
+	current_scene.canvas.node_hovered.emit(opening.id)
+	check(bubble.visible and bubble.title.text == "1층 · 이벤트" and bubble.state.text == "갈 수 있음", "Hovering a node pops a bubble describing it")
+	check(bubble.position.y + bubble.size.y < current_scene.canvas.positions[opening.id].y, "The bubble sits above the node")
+	current_scene.canvas.node_hovered.emit(-1)
+	check(not bubble.visible, "Leaving the node hides the bubble")
 	current_scene.canvas.node_chosen.emit(opening.id)
 	await settle()
 	check(current_scene.name == "NodeScreen", "Choosing the first node opens its event")
