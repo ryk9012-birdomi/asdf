@@ -520,13 +520,17 @@ func show_rewards(note: String, options: Array[String], picked: Callable) -> voi
 			AudioDirector.sfx("coin", 0.02)
 			picked.call(item_id), GOLD)
 		card.name = "Reward_%s" % item_id
-		card.custom_minimum_size = Vector2(190, 100)
+		card.custom_minimum_size = Vector2(190, 150)
 		card.tooltip_text = info.flavor
+		card.icon = load("res://art/items/%s.svg" % item_id)
+		card.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
+		card.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		card.add_theme_constant_override("icon_max_width", 52)
 	var skip := button(reward_row, "건너뛰기", func():
 		reward_row.visible = false
 		picked.call(""))
 	skip.name = "RewardSkip"
-	skip.custom_minimum_size = Vector2(110, 100)
+	skip.custom_minimum_size = Vector2(110, 150)
 	reward_row.visible = true
 
 

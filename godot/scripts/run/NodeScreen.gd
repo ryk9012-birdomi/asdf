@@ -133,6 +133,8 @@ func show_chest() -> void:
 		var pick := option("[%s]  %s  —  %s" % [Items.SLOT_NAMES[info.slot], info.name, Items.describe(item_id)], func(): take_item(item_id, gold))
 		pick.name = "Reward_%s" % item_id
 		pick.tooltip_text = info.flavor
+		pick.icon = load("res://art/items/%s.svg" % item_id)
+		pick.add_theme_constant_override("icon_max_width", 40)
 	option("아무것도 챙기지 않는다", func(): finish("금화만 챙겨 상자를 닫았다. 골드 +%d (보유 %d)" % [gold, run.gold]))
 
 

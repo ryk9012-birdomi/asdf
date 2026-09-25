@@ -178,8 +178,40 @@ func run_tests() -> void:
 	while "lucky_coin" in run.stash:
 		run.stash.erase("lucky_coin")
 	run.stash.append("lucky_coin")
-	current_scene.find_child("Equip_lucky_coin_0", true, false).pressed.emit()
+	run.stash.append("eagle_feather")
+	var camp := current_scene
+	camp.refresh()
+	var stash_cells: Array = camp.stash_grid.get_children()
+	check(stash_cells.any(func(cell): return cell.item_id == "lucky_coin") and stash_cells.size() >= 24, "The stash grid shows every stored item")
+	var coin := {"item": "lucky_coin", "hero": -1}
+	var trinket_0 = camp.find_child("Slot_0_trinket", true, false)
+	var armor_0 = camp.find_child("Slot_0_armor", true, false)
+	check(trinket_0._can_drop_data(Vector2.ZERO, coin) and not armor_0._can_drop_data(Vector2.ZERO, coin), "A trinket only fits the trinket slot")
+	check(not stash_cells[0]._can_drop_data(Vector2.ZERO, coin), "Stash items cannot be dropped back on the stash")
+	camp.find_child("Slot_0_trinket", true, false)._drop_data(Vector2.ZERO, {"item": "eagle_feather", "hero": -1})
+	await process_frame
+	check(run.party[0].equipment.get("trinket") == "eagle_feather" and trinket_0.item_id == "eagle_feather", "Dropping on a slot wears the item")
+	check(camp.heroes[0].figure.puppet.worn.get("trinket") == "eagle_feather", "The paper doll wears it at once")
+	camp.find_child("Slot_1_trinket", true, false)._drop_data(Vector2.ZERO, coin)
+	await process_frame
+	camp.find_child("Slot_0_trinket", true, false)._drop_data(Vector2.ZERO, {"item": "lucky_coin", "hero": 1})
+	await process_frame
+	check(run.party[0].equipment.get("trinket") == "lucky_coin" and run.party[1].equipment.get("trinket") == "eagle_feather", "Dragging between heroes trades their items")
+	stash_cells[5]._drop_data(Vector2.ZERO, {"item": "eagle_feather", "hero": 1})
+	await process_frame
+	check(not run.party[1].equipment.has("trinket") and "eagle_feather" in run.stash, "Dragging to the stash takes an item off")
+	var right_click := InputEventMouseButton.new()
+	right_click.button_index = MOUSE_BUTTON_RIGHT
+	right_click.pressed = true
+	camp.find_child("Slot_0_trinket", true, false)._gui_input(right_click)
+	await process_frame
+	check(not run.party[0].equipment.has("trinket"), "Right-clicking a worn item takes it off")
+	camp.find_child("Slot_0_trinket", true, false)._drop_data(Vector2.ZERO, coin)
+	await process_frame
 	check(run.party[0].equipment.get("trinket") == "lucky_coin" and "lucky_coin" not in run.stash, "Camp puts a trinket on Aldric")
+	var card: Control = camp.item_tooltip("lucky_coin")
+	check(card != null and card.get_child(0).get_child_count() >= 4, "Items show a tooltip card")
+	card.free()
 	run.gold = 40
 	var strike: SkillData = run.party[0].definition.skills[0]
 	current_scene.find_child("Upgrade_0_%s" % strike.id, true, false).pressed.emit()
@@ -198,6 +230,7 @@ func run_tests() -> void:
 	check(current_scene.name == "BattleScene" and run.current_node_id == fight.id, "Continuing mid-node re-enters that battle")
 	var aldric: CharacterUnit = current_scene.players[0]
 	check(aldric.crit_threshold == 11, "Worn gear changes battle stats")
+	check(current_scene.view.fighters[aldric].figure.puppet.worn.get("trinket") == "lucky_coin", "Worn gear shows on the battle figure")
 	var upgraded_strike: SkillData = aldric.character_data.skills[0]
 	check(upgraded_strike.flat_value == 1 and run.party[0].definition.skills[0].flat_value == 0, "Upgraded skill fights harder without touching shared data")
 	fight_out(current_scene.battle, false)

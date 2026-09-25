@@ -61,7 +61,15 @@ const RIGS := {
 	&"orc_berserker": {"art": "res://art/enemies/orc_berserker/", "style": &"knight", "size": 1.16, "head": [16, 24]},
 }
 
+## Gear parts an item may carry (art/gear/<item>/<part>.svg) and the bones they dress.
+const GEAR_PARTS := {"weapon": [&"sword"], "armor": [&"armor"], "sleeve": [&"sleeve_f", &"sleeve_b"],
+	"cape": [&"cape"], "charm": [&"charm"], "feather": [&"feather"]}
+
 var style: Dictionary
+## Textures the part set came with, restored when gear comes off.
+var bare: Dictionary = {}
+## slot -> item id currently shown.
+var worn: Dictionary = {}
 
 var faces: Dictionary = {}
 var head: Sprite2D
@@ -108,15 +116,41 @@ func _init(art: String, style_id: StringName = &"knight", head_margins: Array = 
 	bone(&"hand_f", fist, Vector2(8, 2), &"lower_f", Vector2(0, 18))
 	bone(&"sword", load(art + "weapon.svg"), Vector2(14, 90), &"hand_f", Vector2(0, 7))
 	glow = bone(&"glow", load(art + "glow.svg"), Vector2(32, 32), &"sword", style.glow)
+	# Empty slots for worn gear, drawn over the body parts they belong to.
+	bone(&"armor", null, Vector2(24, 64), &"torso", Vector2.ZERO, true)
+	bone(&"charm", null, Vector2(24, 64), &"torso", Vector2.ZERO, true)
+	bone(&"sleeve_f", null, Vector2(14, 7), &"upper_f", Vector2.ZERO, true)
+	bone(&"sleeve_b", null, Vector2(14, 7), &"upper_b", Vector2.ZERO, true)
+	bone(&"feather", null, Vector2(4, 26), &"head", Vector2(-7, -33), true)
+	for id in [&"sword", &"cape"]:
+		bare[id] = bones[id].sprite.texture
 	var additive := CanvasItemMaterial.new()
 	additive.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
 	glow.material = additive
 	ward = bone(&"ward", glow.texture, Vector2(32, 32), &"shield", Vector2(0, 2))
 	ward.material = additive
-	for far in [&"thigh_b", &"shin_b", &"upper_b", &"lower_b", &"hand_b"]:
+	for far in [&"thigh_b", &"shin_b", &"upper_b", &"sleeve_b", &"lower_b", &"hand_b"]:
 		bones[far].sprite.self_modulate = FAR_SIDE
-	layer([&"cape", &"thigh_b", &"shin_b", &"upper_b", &"lower_b", &"thigh_f", &"shin_f", &"torso",
-		&"plume", &"head", &"hand_b", &"shield", &"ward", &"upper_f", &"lower_f", &"sword", &"glow", &"hand_f"])
+	layer([&"cape", &"thigh_b", &"shin_b", &"upper_b", &"sleeve_b", &"lower_b", &"thigh_f", &"shin_f", &"torso",
+		&"armor", &"charm", &"plume", &"head", &"feather", &"hand_b", &"shield", &"ward", &"upper_f", &"sleeve_f",
+		&"lower_f", &"sword", &"glow", &"hand_f"])
+
+
+## Dresses the figure in its equipment (slot -> item id): a weapon replaces the one in
+## hand, armor and sleeves go over the body, a cloak replaces the cape, trinkets hang on.
+func wear(equipment: Dictionary) -> void:
+	for id in bare:
+		bones[id].sprite.texture = bare[id]
+	for id in [&"armor", &"charm", &"sleeve_f", &"sleeve_b", &"feather"]:
+		bones[id].sprite.texture = null
+	worn = equipment.duplicate()
+	for slot in equipment:
+		var folder := "res://art/gear/%s/" % equipment[slot]
+		for part in GEAR_PARTS:
+			var path: String = folder + part + ".svg"
+			if ResourceLoader.exists(path):
+				for id in GEAR_PARTS[part]:
+					bones[id].sprite.texture = load(path)
 
 
 func drive(figure: Control, delta: float) -> void:
@@ -165,6 +199,7 @@ func drive(figure: Control, delta: float) -> void:
 	# Cloth trails the motion and settles with a little overshoot.
 	var drift := clampf(speed / 300.0, -0.5, 0.8)
 	angles.cape = cape.step(0.05 + sin(t * 1.4) * 0.04 + drift * 0.6 + hurt * 0.15, delta) - angles.torso * 0.7
+	angles.feather = -1.15 + sin(t * 2.3) * 0.05 - hurt * 0.2
 	angles.plume = plume.step(sin(t * 1.9) * 0.08 + drift * 0.5 + hurt * 0.3, delta, 90.0, 7.0) - angles.head * 0.5
 
 	# Light gathers on the weapon for a prayer or spell and on the shield for a guard; a

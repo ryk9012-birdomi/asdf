@@ -156,6 +156,10 @@
 
 **영웅 상태 (`RunState.HeroState`).** 장비(`equipment`)와 기술 레벨(`skill_levels`)을 가집니다. `battle_definition()`은 기본 `CharacterData`를 복제한 뒤 장비 보너스와 강화된 기술 복사본을 넣어 전투용 정의를 만듭니다. 원본 `.tres`는 바뀌지 않습니다.
 
+**야영지 화면 (`scripts/run/CampScreen.gd`).** 영웅마다 인형 액자(무기·방어구·장신구 칸)와 공용 보관함 격자가 있습니다. 칸은 모두 `ItemCell`이고 Godot 기본 끌어다 놓기(`_get_drag_data`, `_can_drop_data`, `_drop_data`)를 씁니다. 규칙은 `can_place`/`place` 두 함수에 모았습니다. 보관함→칸은 착용, 칸→다른 영웅 칸은 넘겨주기(받는 쪽 장비는 보낸 쪽으로 가서 맞바꿈), 칸→보관함 또는 오른쪽 클릭은 해제입니다. 끄는 동안 `NOTIFICATION_DRAG_BEGIN/END`로 칸 테두리를 초록/빨강으로 칠하고, 툴팁은 `_make_custom_tooltip`으로 만든 아이템 카드입니다.
+
+**장비 그림.** `tools/generate_hero_art.py`가 아이템마다 아이콘(`art/items/<id>.svg`)과 인형용 부품(`art/gear/<id>/`)을 만듭니다. 부품 이름이 쓰임새를 정합니다. `weapon`은 무기를 바꾸고, `armor`는 몸통 위, `sleeve`는 양 윗팔 위, `cape`는 망토 교체, `charm`은 몸통에 거는 장신구, `feather`는 머리 옆에 꽂힙니다. `HeroPuppet.wear(equipment)`가 있는 부품만 입히고, 원래 무기·망토는 기억해 두었다가 벗을 때 되돌립니다. 전투에서는 `battle_definition()`이 전투용 데이터의 `gear`에 장비를 담고, `FighterView`가 그것을 입힙니다.
+
 **기술 강화.** Lv2는 15골드, Lv3는 30골드입니다. 레벨마다 `flat_value` +1이고, Lv3에서는 MP −1입니다.
 
 **전리품 (`Encounters.reward_options`).** 전투·정예·보물 노드마다 고정 시드로 서로 다른 장비 3개를 제시합니다. 전투에서는 승리 배너에서 고르고(배너가 전장을 어둡게 덮음), 보물 상자에서는 골드와 함께 고릅니다.

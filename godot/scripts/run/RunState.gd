@@ -81,6 +81,7 @@ class HeroState:
 		for skill in definition.skills:
 			skills.append(upgraded(skill))
 		fighter.skills = skills
+		fighter.gear = equipment.duplicate()
 		return fighter
 
 	func is_alive() -> bool:

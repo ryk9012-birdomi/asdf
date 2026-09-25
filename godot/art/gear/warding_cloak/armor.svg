@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="52" height="72" viewBox="0 0 52 72">
+<defs><linearGradient id="cloak" x1="1" y1="0" x2="0" y2="0.2">
+<stop offset="0" stop-color="#0e3a3e"/><stop offset="0.55" stop-color="#1f6f72"/><stop offset="1" stop-color="#0c2e32"/></linearGradient></defs>
+<path d="M14 14 Q25 9.6 37 14 L36 19.4 Q25 16 15 19.4 Z" fill="url(#cloak)" stroke="#1a0f08" stroke-width="1.5" stroke-linejoin="round"/><circle cx="33" cy="17.4" r="2.6" fill="#8ff0ff" stroke="#1a0f08" stroke-width="0.8"/><circle cx="32.4" cy="16.6" r="0.9" fill="#ffffff"/>
+</svg>

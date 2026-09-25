@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="52" height="72" viewBox="0 0 52 72">
+<defs><radialGradient id="mana" cx="0.4" cy="0.35" r="0.65">
+<stop offset="0" stop-color="#eaf6ff"/><stop offset="0.5" stop-color="#5aa8ff"/><stop offset="1" stop-color="#1a3aa8"/></radialGradient>
+<linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#fbe39a"/><stop offset="0.55" stop-color="#e0a93e"/><stop offset="1" stop-color="#8e5c17"/></linearGradient></defs>
+<path d="M20 15 Q24 26 31 29 Q36 25 37 15" fill="none" stroke="url(#gold)" stroke-width="0.9"/><path d="M31 27 L34.4 31.4 L31 36.6 L27.6 31.4 Z" fill="url(#mana)" stroke="#1a0f08" stroke-width="0.8"/><circle cx="31" cy="31.4" r="4.4" fill="#5aa8ff" opacity="0.25"/>
+</svg>

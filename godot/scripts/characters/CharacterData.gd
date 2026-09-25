@@ -27,6 +27,9 @@ extends Resource
 
 @export_group("Loadout")
 @export var skills: Array[SkillData] = []
+## What the hero wears on a journey (slot -> item id), for the figure to show. Set on the
+## battle copy by RunState.HeroState.battle_definition(); not saved with the class data.
+var gear: Dictionary = {}
 
 
 func get_validation_errors() -> PackedStringArray:

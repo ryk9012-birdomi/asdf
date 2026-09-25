@@ -52,12 +52,13 @@ static func hero(art: String, style_id: StringName = &"knight", scale_by: float 
 
 
 ## Declares a bone. Parents come first. `pivot` is the joint inside the part's own drawing;
-## `joint` is where it pins onto the parent, measured from the parent's pivot.
-func bone(id: StringName, texture: Texture2D, pivot: Vector2, parent: StringName = &"", joint: Vector2 = Vector2.ZERO) -> Sprite2D:
+## `joint` is where it pins onto the parent, measured from the parent's pivot. A `slot`
+## bone gets a sprite even without a texture, for gear that may be worn later.
+func bone(id: StringName, texture: Texture2D, pivot: Vector2, parent: StringName = &"", joint: Vector2 = Vector2.ZERO, slot: bool = false) -> Sprite2D:
 	var entry := Bone.new()
 	entry.parent = parent
 	entry.joint = joint
-	if texture != null:
+	if texture != null or slot:
 		entry.sprite = Sprite2D.new()
 		entry.sprite.name = String(id)
 		entry.sprite.texture = texture

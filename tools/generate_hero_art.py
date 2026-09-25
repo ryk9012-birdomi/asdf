@@ -1140,6 +1140,163 @@ def enemy_parts(k, folder):
         greataxe(folder)
 
 
+# ================================================================ gear
+# Every item has an inventory icon (art/items/<id>.svg, 64x64) and the parts it adds to a
+# puppet (art/gear/<id>/): weapon.svg replaces the weapon, armor.svg is drawn over the
+# torso (torso pivot 24,64), sleeve.svg over each upper arm (pivot 14,7), cape.svg
+# replaces the cape, charm.svg hangs on the torso and feather.svg is tucked into the
+# side of the head (pivot 4,26 at the feather's quill). HeroPuppet.wear() picks up
+# whichever files an item has.
+
+GEAR_KIT = gradients(dict(steel="silver", trim="gold", tabard=("#6a4a2a", "#3a2414")))
+
+
+def gear_part(item, name, w, h, defs, body):
+    write(os.path.join(ROOT, "art", "gear", item), name, w, h, defs, body)
+
+
+def icon(item, defs, body):
+    """64x64 inventory picture with a soft backdrop glow."""
+    write(os.path.join(ROOT, "art", "items"), item, 64, 64, defs + ['''<radialGradient id="halo" cx="0.5" cy="0.5" r="0.5">
+<stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></radialGradient>'''],
+          '<circle cx="32" cy="32" r="30" fill="url(#halo)"/>' + body)
+
+
+def gear_sword():
+    blade = '''<linearGradient id="blade" x1="0" y1="0" x2="1" y2="0">
+<stop offset="0" stop-color="#9fb2d6"/><stop offset="0.48" stop-color="#ffffff"/><stop offset="0.52" stop-color="#dfe8ff"/><stop offset="1" stop-color="#8698c0"/></linearGradient>'''
+    body = (f'<path d="M14 24 L17.8 32 L17.4 81 L10.6 81 L10.2 32 Z" fill="url(#blade)" {SW}/>'
+            '<path d="M14 32 L14 78" stroke="#4a6ab8" stroke-width="1"/>'
+            + "".join(f'<path d="M12.6 {y} L15.4 {y + 2}" stroke="#7fb4ff" stroke-width="0.9"/>' for y in (44, 54, 64))
+            + f'<path d="M4.6 79.8 Q14 77.4 23.4 79.8 L22.6 84 Q14 82.4 5.4 84 Z" fill="url(#gold)" {SW}/>'
+            f'<circle cx="14" cy="81.6" r="1.8" fill="#4a8aff" stroke="{INK}" stroke-width="0.5"/>'
+            f'<rect x="11.8" y="84" width="4.4" height="11" rx="1" fill="#2a3a6a" {THIN}/>'
+            '<path d="M11.8 86 L16.2 88 M11.8 89.4 L16.2 91.4" stroke="#8aa0d0" stroke-width="0.7"/>'
+            f'<path d="M14 95.4 L17 98.6 L14 101.8 L11 98.6 Z" fill="url(#gold)" stroke="{INK}" stroke-width="0.9"/>')
+    defs = [blade, GEAR_KIT["gold"]]
+    gear_part("honed_sword", "weapon", 28, 110, defs, body)
+    icon("honed_sword", defs, f'<g transform="translate(32,32) rotate(45) scale(0.66) translate(-14,-63)">{body}</g>')
+
+
+def gear_dagger():
+    blade = '''<linearGradient id="blade" x1="0" y1="0" x2="1" y2="0">
+<stop offset="0" stop-color="#1c1d22"/><stop offset="0.48" stop-color="#6a6f7c"/><stop offset="0.52" stop-color="#3a3d46"/><stop offset="1" stop-color="#15161a"/></linearGradient>'''
+    body = (f'<path d="M14 50 Q20 58 17.4 81 L10.8 81 Q10.4 62 14 50 Z" fill="url(#blade)" {SW}/>'
+            '<path d="M13.4 60 Q15.6 66 15 79" fill="none" stroke="#9aa3ad" stroke-width="0.6"/>'
+            f'<path d="M7.6 79.6 Q14 78.2 20.4 79.6 L20 83.4 Q14 82.2 8 83.4 Z" fill="#3a3d46" {SW}/>'
+            f'<rect x="12" y="83.4" width="4" height="10" rx="1" fill="#1c1a18" {THIN}/>'
+            f'<circle cx="14" cy="95.4" r="2.2" fill="#b8321f" stroke="{INK}" stroke-width="0.8"/>')
+    defs = [blade]
+    gear_part("keen_dagger", "weapon", 28, 110, defs, body)
+    icon("keen_dagger", defs, f'<g transform="translate(32,32) rotate(40) scale(1.05) translate(-14,-74)">{body}</g>')
+
+
+def gear_staff():
+    wood = '''<linearGradient id="wood" x1="0" y1="0" x2="1" y2="0">
+<stop offset="0" stop-color="#3a2a14"/><stop offset="0.5" stop-color="#9a7040"/><stop offset="1" stop-color="#2e200e"/></linearGradient>'''
+    gem = '''<radialGradient id="gem" cx="0.38" cy="0.35" r="0.65">
+<stop offset="0" stop-color="#f0ffe0"/><stop offset="0.5" stop-color="#8fe06a"/><stop offset="1" stop-color="#2a7a2a"/></radialGradient>'''
+    body = (f'<path d="M12.2 108 Q11 84 12.8 60 Q11.4 40 13 22 L15.6 22 Q16.8 40 15.4 60 Q16.8 84 15.8 108 Z" fill="url(#wood)" {SW}/>'
+            '<path d="M13 34 Q15.6 38 13.4 44 M14.6 64 Q12.4 70 14.4 76 M13.2 92 Q15.4 96 13.6 100" fill="none" stroke="#1e1408" stroke-width="0.8"/>'
+            f'<path d="M12 22 Q4 18 5 8 Q9 14 12.4 15 Z M16 22 Q24 18 23 8 Q19 14 15.6 15 Z" fill="url(#wood)" {THIN}/>'
+            f'<path d="M15.4 30 Q22 26 24 30 Q20 33 15.6 32 Z M12.6 50 Q6 47 4 51 Q8 54 12.4 52 Z" fill="#4a8a2a" {THIN}/>'
+            f'<ellipse cx="14" cy="11" rx="5" ry="6" fill="url(#gem)" stroke="{INK}" stroke-width="1.1"/>'
+            '<ellipse cx="12.4" cy="9" rx="1.4" ry="2" fill="#ffffff" opacity="0.8"/>')
+    defs = [wood, gem]
+    gear_part("oak_staff", "weapon", 28, 110, defs, body)
+    icon("oak_staff", defs, f'<g transform="translate(32,32) rotate(38) scale(0.56) translate(-14,-56)">{body}</g>')
+
+
+def gear_vest():
+    leather = '''<linearGradient id="vest" x1="0" y1="0" x2="1" y2="0.2">
+<stop offset="0" stop-color="#4a2e18"/><stop offset="0.45" stop-color="#9a6a3e"/><stop offset="1" stop-color="#3e2614"/></linearGradient>'''
+    body = (f'<path d="M13.6 21 Q15.4 15 24.6 14 Q36 14 40 20.6 Q43.4 31 40.2 45 L39.4 49 L12.8 49 Q9.8 36 13.6 21 Z" fill="url(#vest)" {SW}/>'
+            '<path d="M16 18 Q24.4 16 31 18 L30 48 L28 48 Z" fill="#000000" opacity="0.18"/>'
+            f'<path d="M30.6 18.6 Q33.6 32 32.4 48" fill="none" stroke="{INK}" stroke-width="1"/>'
+            + "".join(f'<path d="M30.2 {y} L34.2 {y + 2} M34.2 {y} L30.2 {y + 2}" stroke="#e8d8b0" stroke-width="0.7"/>' for y in (22, 27, 32, 37, 42))
+            + '<path d="M15 23 L15.6 45 M38.6 23 L38.4 45" stroke="#e8d8b0" stroke-width="0.7" stroke-dasharray="1.6 1.4"/>'
+            f'<rect x="19" y="31" width="5" height="5" rx="0.8" fill="#6a4a2a" stroke="{INK}" stroke-width="0.6"/>')
+    defs = [leather]
+    gear_part("leather_vest", "armor", 52, 72, defs, body)
+    icon("leather_vest", defs, f'<g transform="translate(32,34) scale(1.35) translate(-27,-32)">{body}</g>')
+
+
+def gear_chain():
+    mail = '''<linearGradient id="chain" x1="0" y1="0" x2="1" y2="0">
+<stop offset="0" stop-color="#4a5058"/><stop offset="0.5" stop-color="#b8c0ca"/><stop offset="1" stop-color="#40464e"/></linearGradient>'''
+    body = (f'<path d="M12.8 20.6 Q14.8 14 24.6 13.2 Q37 13 41 20 Q44.4 31 41 45 L42.4 58 Q26 61 9.6 58 L11.6 45 Q8.6 34 12.8 20.6 Z" fill="url(#chain)" {SW}/>'
+            + mail_rows(12, 41, 17, 57, 2.4) +
+            f'<path d="M9.8 56.6 Q26 59.4 42.2 56.6" fill="none" stroke="url(#gold)" stroke-width="1.4"/>'
+            f'<path d="M15 14.6 Q25 11 35.4 14.6" fill="none" stroke="url(#gold)" stroke-width="1.2"/>')
+    sleeve = (f'<path d="M7.6 8 L20.6 8 L20 22 L8.2 22 Z" fill="url(#chain)" {SW}/>' + mail_rows(8.4, 19.8, 10.4, 21, 2.4))
+    defs = [mail, GEAR_KIT["gold"]]
+    gear_part("chain_shirt", "armor", 52, 72, defs, body)
+    gear_part("chain_shirt", "sleeve", 30, 30, defs, sleeve)
+    icon("chain_shirt", defs, f'<g transform="translate(32,32) scale(1.1) translate(-26,-36)">{body}</g>')
+
+
+def gear_cloak():
+    cloth = '''<linearGradient id="cloak" x1="1" y1="0" x2="0" y2="0.2">
+<stop offset="0" stop-color="#0e3a3e"/><stop offset="0.55" stop-color="#1f6f72"/><stop offset="1" stop-color="#0c2e32"/></linearGradient>'''
+    runes = "".join(f'<path d="M{x} {y} l2 -3 l2 3 l-2 3 Z" fill="none" stroke="#8ff0ff" stroke-width="0.8" opacity="0.9"/>' for x, y in ((18, 30), (23, 46), (15, 62), (22, 76), (12, 82)))
+    cape = (f'<path d="M18 2 Q29 -0.4 31 6 L29.4 40 Q29 66 32.4 92 Q20 95 9 91 Q1.4 88.6 0.4 84 Q5.4 52 10 20 Q12 6 18 2 Z" fill="url(#cloak)" {SW}/>'
+            '<path d="M0.4 84 Q5.4 52 10 20 Q9.6 52 5.2 86 Z" fill="#3a2a5a"/>'
+            '<path d="M20 12 Q18 50 16 88 M25.6 12 Q25 52 25.6 90" fill="none" stroke="#082426" stroke-width="1.1"/>'
+            + runes +
+            '<path d="M9 91 Q20 95 32.4 92" fill="none" stroke="#8ff0ff" stroke-width="1.2" opacity="0.8"/>')
+    clasp = (f'<path d="M14 14 Q25 9.6 37 14 L36 19.4 Q25 16 15 19.4 Z" fill="url(#cloak)" {SW}/>'
+             f'<circle cx="33" cy="17.4" r="2.6" fill="#8ff0ff" stroke="{INK}" stroke-width="0.8"/>'
+             '<circle cx="32.4" cy="16.6" r="0.9" fill="#ffffff"/>')
+    defs = [cloth]
+    gear_part("warding_cloak", "cape", 36, 96, defs, cape)
+    gear_part("warding_cloak", "armor", 52, 72, defs, clasp)
+    icon("warding_cloak", defs, f'<g transform="translate(32,33) scale(0.62) translate(-16,-48)">{cape}</g>')
+
+
+def gear_coin():
+    coin = (f'<path d="M17 50 L16 54.4" stroke="#6a4a2a" stroke-width="0.8"/>'
+            f'<circle cx="16" cy="57" r="3.2" fill="url(#gold)" stroke="{INK}" stroke-width="0.8"/>'
+            '<path d="M14.6 56 L17.4 56 M14.6 58 L17.4 58" stroke="#8e5c17" stroke-width="0.6"/>')
+    gear_part("lucky_coin", "charm", 52, 72, [GEAR_KIT["gold"]], coin)
+    icon("lucky_coin", [GEAR_KIT["gold"]], f'''
+<circle cx="32" cy="32" r="17" fill="url(#gold)" stroke="{INK}" stroke-width="2"/>
+<circle cx="32" cy="32" r="12.6" fill="none" stroke="#8e5c17" stroke-width="1.2"/>
+<path d="M32 22 Q39 24 38 31 Q37 36 32 38 Q27 36 26 31 Q25 24 32 22 Z M28 42 L36 42" fill="none" stroke="#8e5c17" stroke-width="1.6"/>
+<path d="M22 24 Q26 18 34 17" fill="none" stroke="#ffffff" stroke-width="1.6" opacity="0.6"/>''')
+
+
+def gear_pendant():
+    gem = '''<radialGradient id="mana" cx="0.4" cy="0.35" r="0.65">
+<stop offset="0" stop-color="#eaf6ff"/><stop offset="0.5" stop-color="#5aa8ff"/><stop offset="1" stop-color="#1a3aa8"/></radialGradient>'''
+    charm = (f'<path d="M20 15 Q24 26 31 29 Q36 25 37 15" fill="none" stroke="url(#gold)" stroke-width="0.9"/>'
+             f'<path d="M31 27 L34.4 31.4 L31 36.6 L27.6 31.4 Z" fill="url(#mana)" stroke="{INK}" stroke-width="0.8"/>'
+             '<circle cx="31" cy="31.4" r="4.4" fill="#5aa8ff" opacity="0.25"/>')
+    defs = [gem, GEAR_KIT["gold"]]
+    gear_part("mana_pendant", "charm", 52, 72, defs, charm)
+    icon("mana_pendant", defs, f'''
+<path d="M16 10 Q22 34 32 38 Q42 34 48 10" fill="none" stroke="url(#gold)" stroke-width="2"/>
+<circle cx="32" cy="44" r="13" fill="#5aa8ff" opacity="0.25"/>
+<path d="M32 32 L41 44 L32 58 L23 44 Z" fill="url(#mana)" stroke="{INK}" stroke-width="1.6"/>
+<path d="M32 32 L32 58 M23 44 L41 44" stroke="#ffffff" stroke-width="0.8" opacity="0.5"/>''')
+
+
+def gear_feather():
+    vane = '''<linearGradient id="vane" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="#f4ecd6"/><stop offset="0.45" stop-color="#8a5a32"/><stop offset="1" stop-color="#3a2414"/></linearGradient>'''
+    # Quill at (4,26), sweeping up and forward; the rig tilts it back over the head.
+    feather = (f'<path d="M4 26 Q10 12 24 2 Q22 10 18 16 Q14 22 6 27 Z" fill="url(#vane)" {SW}/>'
+               '<path d="M4.6 25.6 Q12 14 23 3" fill="none" stroke="#2a1a0a" stroke-width="0.8"/>'
+               '<path d="M10 18 L14 17 M13 14 L17 13.4 M16 10.6 L20 10" stroke="#3a2414" stroke-width="0.6"/>')
+    defs = [vane]
+    gear_part("eagle_feather", "feather", 28, 30, defs, feather)
+    icon("eagle_feather", defs, f'<g transform="translate(8,4) scale(2)">{feather}</g>')
+
+
+def build_gear():
+    for make in (gear_sword, gear_dagger, gear_staff, gear_vest, gear_chain, gear_cloak, gear_coin, gear_pendant, gear_feather):
+        make()
+
+
 ## Which example each class wears in battle.
 DEFAULTS = {"paladin": "moon_knight", "rogue": "shade", "wizard": "starlight"}
 GROUPS = [
@@ -1167,6 +1324,7 @@ def main():
             for k in variants:
                 if k["id"] == pick:
                     make(k, os.path.join(ROOT, "art", "heroes", hero))
+    build_gear()
     with open(os.path.join(ROOT, "art", "gallery.json"), "w", encoding="utf-8") as f:
         json.dump(gallery, f, ensure_ascii=False, indent=1)
     print(", ".join("%d %s" % (len(v), t) for _f, t, _s, v, _m in GROUPS))

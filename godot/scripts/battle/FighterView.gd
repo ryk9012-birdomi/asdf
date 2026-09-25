@@ -136,6 +136,8 @@ func setup(combatant: CharacterUnit, facing_right: bool) -> void:
 	figure.puppet = Puppet.create(kind)
 	if figure.puppet != null:
 		figure.puppet.phase = figure.phase
+		if figure.puppet is HeroPuppet and not unit.character_data.gear.is_empty():
+			figure.puppet.wear(unit.character_data.gear)
 		figure.add_child(figure.puppet)
 	add_child(figure)
 	hud = VBoxContainer.new()
