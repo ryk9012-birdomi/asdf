@@ -20,6 +20,7 @@ var actor: CharacterUnit
 var phase: Phase = Phase.IDLE
 var victory: bool = false
 var rng := RandomNumberGenerator.new()
+var opening_line: String = "주도권 굴림! 고블린 약탈자들이 고갯길을 막아섰습니다."
 
 
 func start_battle(players: Array[CharacterUnit], foes: Array[CharacterUnit], battle_seed: int = -1) -> bool:
@@ -43,7 +44,7 @@ func start_battle(players: Array[CharacterUnit], foes: Array[CharacterUnit], bat
 	actor = null
 	turns.reset(all_units)
 	phase = Phase.RESOLVING
-	message_logged.emit("주도권 굴림! 고블린 약탈자들이 고갯길을 막아섰습니다.")
+	message_logged.emit(opening_line)
 	advance_turn()
 	return true
 

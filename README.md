@@ -4,7 +4,7 @@
 
 - 엔진: **Godot 4.7.2 stable** / GDScript / Compatibility(OpenGL) 렌더러
 - 프로젝트 루트: [`godot/project.godot`](godot/project.godot) (이 폴더가 `res://`)
-- 현재 단계: **로드맵 2단계 완료**. 메인 메뉴와 3 대 3 턴제 전투가 동작합니다. 맵 생성·여정 상태 로직은 완성됐고, 다음 단계에서 맵 화면에 연결합니다([로드맵](godot/docs/ROADMAP.md)).
+- 현재 단계: **로드맵 3단계 완료**. 메인 메뉴 → 슬레이 더 스파이어식 여정 지도 → 전투·정예·휴식·보물 → 보스까지 한 막을 끝까지 플레이할 수 있습니다([로드맵](godot/docs/ROADMAP.md)).
 
 ## 실행
 
@@ -29,11 +29,17 @@ godot --headless --path godot --script res://tests/test_run.gd
 
 ## 메인 메뉴
 
-- **새 여정**: 전투를 시작합니다. 3단계 이후에는 맵으로 이동합니다.
-- **이어하기**: 저장 기능(5단계) 전까지 비활성입니다.
+- **새 여정**: 새 지도를 만들고 여정을 시작합니다.
+- **이어하기**: 진행 중인 여정으로 돌아갑니다. 게임을 끄면 사라지며, 파일 저장은 5단계에서 추가합니다.
 - **야영지**: 일행의 능력치와 상태를 확인합니다.
 - **종료**
 - 전투와 야영지 화면에도 `메인 메뉴` 버튼이 있습니다. 화면이 바뀔 때마다 어둠이 걷히는 전환 효과가 공통으로 적용됩니다.
+
+## 여정 지도
+
+- 10층짜리 갈림길 지도에서 금빛으로 빛나는 다음 층 노드를 클릭해 길을 고릅니다. 한 번 고른 길은 되돌릴 수 없습니다.
+- 노드 종류: 전투 · 정예(홉고블린 대장) · 휴식(HP 40% 회복) · 이벤트 · 보물(골드) · 보스(잿불 사제 모르간)
+- 전투 사이에 HP가 이어집니다. 전투에서 이기면 쓰러진 동료는 HP 1로 일어나고, 파티가 전멸하면 여정이 끝납니다.
 
 ## 전투 화면
 
@@ -56,8 +62,8 @@ godot --headless --path godot --script res://tests/test_run.gd
 ```text
 godot/
 ├─ project.godot
-├─ scenes/     battle(전투), main(메인 메뉴·야영지), ui(카드/전투 UI)
-├─ scripts/    core(화면 전환), run(맵 생성·여정 상태), battle(규칙), characters(유닛/데이터), skills, ui(표시·연출)
+├─ scenes/     battle(전투), main(메인 메뉴·야영지), run(지도·노드·결과), ui(카드/전투 UI)
+├─ scripts/    core(화면 전환), run(지도 생성·여정 상태·전투 구성·지도 화면), battle(규칙), characters(유닛/데이터), skills, ui(테마·표시·연출)
 ├─ data/       classes · enemies · skills  (.tres 데이터)
 ├─ tests/      헤드리스 자동 검증
 └─ docs/       단계별 개발 문서

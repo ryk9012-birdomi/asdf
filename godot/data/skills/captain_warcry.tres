@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/skills/SkillData.gd" id="1_skill"]
+
+[resource]
+script = ExtResource("1_skill")
+id = &"captain_warcry"
+skill_name = "전투 함성"
+description = "자신에게 보호막 4를 두릅니다."
+target_type = 0
+damage_type = 0
+effect_type = 1
+attack_multiplier = 0.00
+flat_value = 4
+hit_count = 1
+energy_cost = 0
+cooldown = 0

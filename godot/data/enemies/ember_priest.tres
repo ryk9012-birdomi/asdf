@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/characters/EnemyData.gd" id="1_data"]
+[ext_resource type="Script" path="res://scripts/skills/SkillData.gd" id="2_type"]
+[ext_resource type="Resource" path="res://data/skills/ember_lash.tres" id="3_skill"]
+[ext_resource type="Resource" path="res://data/skills/flame_wave.tres" id="4_skill"]
+[ext_resource type="Resource" path="res://data/skills/cult_ward.tres" id="5_skill"]
+
+[resource]
+script = ExtResource("1_data")
+id = &"ember_priest"
+character_name = "잿불 사제 모르간"
+class_id = &"cult"
+class_name_label = "Ember Priest"
+description = "용의 교단 고갯길 성소를 지키는 사제. 잿불을 불러 일행 전체를 태운다. 보스."
+display_color = Color(0.86, 0.30, 0.40, 1)
+level = 6
+max_hp = 24
+starting_shield = 4
+max_energy = 6
+speed = 11
+attack = 3
+defense = 2
+hit_bonus = 3
+crit_threshold = 12
+skills = Array[ExtResource("2_type")]([ExtResource("3_skill"), ExtResource("4_skill"), ExtResource("5_skill")])
+action_pattern = Array[int]([0, 2, 0, 1])

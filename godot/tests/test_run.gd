@@ -158,12 +158,15 @@ func test_travel() -> void:
 	check(not run.travel(upper.id), "Cannot skip the first floor")
 	check(run.travel(starts[0].id) and run.current_floor() == 0, "Travel to a start node")
 	check(run.visited == [starts[0].id], "Visited path is recorded")
+	check(run.available_nodes().is_empty(), "Cannot move on before the node is resolved")
+	run.resolve_current()
 	var off_path := run.map.nodes.filter(func(candidate): return candidate.floor == 1 and candidate.id not in starts[0].next)
 	if not off_path.is_empty():
 		check(not run.travel(off_path[0].id), "Cannot jump to an unconnected node")
 	check(not run.travel(starts[0].id), "Cannot stay on the same node")
 	while run.current_node().type != RunMap.NodeType.BOSS:
 		check(run.travel(run.available_nodes()[0].id), "Climb floor %d" % (run.current_floor() + 1))
+		run.resolve_current()
 	check(run.visited.size() == RunMap.FLOORS + 1, "A full climb visits one node per floor plus the boss")
 	check(run.available_nodes().is_empty(), "Nothing lies beyond the boss")
 	check(run.encounter_seed(5) == RunState.begin(2024, heroes()).encounter_seed(5), "Encounter seeds are reproducible")
@@ -186,8 +189,8 @@ func test_party_persistence() -> void:
 	check(run.party[2].current_hp == 1, "Downed hero gets up with 1 HP after a victory")
 	check(not run.finished, "Winning an ordinary battle keeps the run going")
 	var healed := run.rest()
-	check(run.party[0].current_hp == 10 and run.party[2].current_hp == 3, "Rest heals 30% of max HP, rounded up and capped")
-	check(healed == 5, "Rest reports total healing")
+	check(run.party[0].current_hp == 10 and run.party[2].current_hp == 4, "Rest heals 40% of max HP, rounded up and capped")
+	check(healed == 6, "Rest reports total healing")
 	for unit in units:
 		unit.receive_damage(99)
 	run.record_battle(units, false)
@@ -196,6 +199,8 @@ func test_party_persistence() -> void:
 	var boss_run := RunState.begin(9, heroes())
 	while boss_run.current_node() == null or boss_run.current_node().type != RunMap.NodeType.BOSS:
 		boss_run.travel(boss_run.available_nodes()[0].id)
+		if boss_run.current_node().type != RunMap.NodeType.BOSS:
+			boss_run.resolve_current()
 	for unit in units:
 		unit.initialize(unit.character_data)
 	boss_run.record_battle(units, true)

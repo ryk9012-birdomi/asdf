@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/skills/SkillData.gd" id="1_skill"]
+
+[resource]
+script = ExtResource("1_skill")
+id = &"ember_lash"
+skill_name = "잿불 채찍"
+description = "전열의 적 하나에게 공격력 100%의 화염 피해."
+target_type = 5
+damage_type = 2
+effect_type = 0
+attack_multiplier = 1.00
+flat_value = 0
+hit_count = 1
+energy_cost = 0
+cooldown = 0

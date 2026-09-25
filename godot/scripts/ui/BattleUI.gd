@@ -6,6 +6,7 @@ signal pass_requested
 signal restart_requested
 signal lab_requested
 signal menu_requested
+signal continue_requested
 
 const CARD_SCRIPT = preload("res://scripts/ui/CombatantView.gd")
 const STAGGER := 40
@@ -69,6 +70,12 @@ class DicePair extends Control:
 			for pip in PIPS[faces[index]]:
 				draw_circle(rect.get_center() + pip * SIDE * 0.26, 3.4, Color("5a1d14"))
 var screen_tween: Tween
+var title_label: Label
+var lab_button: Button
+var restart_button: Button
+var continue_button: Button
+var result_note: Label
+var run_mode: bool = false
 
 
 func _ready() -> void:
@@ -97,13 +104,13 @@ func _ready() -> void:
 	var header := HBoxContainer.new()
 	header.add_theme_constant_override("separation", 10)
 	content.add_child(header)
-	var title := label(header, "잿불 서약  ·  고갯길 매복", 34, Color("f4e2b8"))
-	title.theme_type_variation = "HeadingLabel"
-	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	glow_text(title, Color("ff9a3c"), 10)
+	title_label = label(header, "잿불 서약  ·  고갯길 매복", 34, Color("f4e2b8"))
+	title_label.theme_type_variation = "HeadingLabel"
+	title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	glow_text(title_label, Color("ff9a3c"), 10)
 	button(header, "메인 메뉴", func(): menu_requested.emit())
-	button(header, "야영지", func(): lab_requested.emit())
-	button(header, "전투 재시작", func(): restart_requested.emit())
+	lab_button = button(header, "야영지", func(): lab_requested.emit())
+	restart_button = button(header, "전투 재시작", func(): restart_requested.emit())
 	var turn_strip := HBoxContainer.new()
 	turn_strip.add_theme_constant_override("separation", 12)
 	content.add_child(turn_strip)
@@ -118,11 +125,21 @@ func _ready() -> void:
 	result_banner.add_theme_stylebox_override("panel", panel_style(GOLD, 0.92, 18))
 	result_banner.visible = false
 	content.add_child(result_banner)
-	result_label = label(result_banner, "", 30, GOLD)
+	var result_body := VBoxContainer.new()
+	result_body.add_theme_constant_override("separation", 8)
+	result_banner.add_child(result_body)
+	result_label = label(result_body, "", 30, GOLD)
 	result_label.theme_type_variation = "HeadingLabel"
 	result_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	glow_text(result_label, GOLD, 14)
 	result_label.visible = false
+	result_note = label(result_body, "", 15, TEXT)
+	result_note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	result_note.visible = false
+	continue_button = button(result_body, "", func(): continue_requested.emit())
+	continue_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	continue_button.custom_minimum_size = Vector2(260, 44)
+	continue_button.visible = false
 	var command := PanelContainer.new()
 	command.add_theme_stylebox_override("panel", panel_style(Color("7a5c2e"), 0.86))
 	content.add_child(command)
@@ -241,7 +258,7 @@ func refresh() -> void:
 		pass_button = button(skill_row, "대기\n턴 넘기기", func(): pass_requested.emit())
 		pass_button.custom_minimum_size = Vector2(110, 56)
 	elif finished:
-		prompt.text = "전투 재시작으로 다시 도전하거나 메인 메뉴로 돌아갈 수 있습니다."
+		prompt.text = "결과를 확인하고 길을 이어 가세요." if run_mode else "전투 재시작으로 다시 도전하거나 메인 메뉴로 돌아갈 수 있습니다."
 	elif battle.phase == BattleManager.Phase.ENEMY_TURN:
 		prompt.text = "%s · 행동 준비 중…" % battle.actor.display_name
 	else:
@@ -326,7 +343,8 @@ func intent_text(enemy: EnemyUnit) -> String:
 	if intent.effect_type == SkillData.EffectType.SHIELD or targets.is_empty():
 		return "예고 ▸ %s · 보호막 %d" % [intent.skill_name, DamageCalculator.base_damage(enemy, intent)]
 	var odds := DamageCalculator.odds(enemy, targets[0], intent)
-	return "예고 ▸ %s → %s\n적중 %d%% · 피해 %d" % [intent.skill_name, targets[0].display_name, percent(odds.land), DamageCalculator.base_damage(enemy, intent)]
+	var aimed_at: String = "일행 전체" if intent.target_type == SkillData.TargetType.ALL_ENEMIES else targets[0].display_name
+	return "예고 ▸ %s → %s\n적중 %d%% · 피해 %d" % [intent.skill_name, aimed_at, percent(odds.land), DamageCalculator.base_damage(enemy, intent)]
 
 
 func percent(chance: float) -> int:
@@ -443,6 +461,22 @@ func on_unit_down(unit: CharacterUnit) -> void:
 	spawn_burst(card_center(unit), unit.character_data.display_color, 60)
 	spawn_ring(card_center(unit), RED)
 	shake_screen(10.0)
+
+
+## In a run there is no retry or detour: the only way out of a finished fight is onward.
+func set_run_mode(heading: String) -> void:
+	run_mode = true
+	title_label.text = heading
+	lab_button.visible = false
+	restart_button.visible = false
+
+
+func show_run_result(note: String, onward: String) -> void:
+	result_note.text = note
+	result_note.visible = not note.is_empty()
+	continue_button.text = onward
+	continue_button.visible = true
+	continue_button.grab_focus.call_deferred()
 
 
 func reveal_result() -> void:

@@ -6,7 +6,8 @@ extends RefCounted
 ## The journey in progress, shared by every screen. Null on the main menu before a run.
 static var active: RunState
 
-const REST_HEAL_FRACTION := 0.3
+const REST_HEAL_FRACTION := 0.4
+const DEFAULT_PARTY := ["res://data/classes/paladin.tres", "res://data/classes/rogue.tres", "res://data/classes/wizard.tres"]
 
 var seed_value: int = 0
 var map: RunMap
@@ -16,6 +17,9 @@ var gold: int = 0
 var party: Array[HeroState] = []
 var finished: bool = false
 var victory: bool = false
+## False from arriving at a node until its screen is done, so a reload re-enters it.
+var node_resolved: bool = true
+var battles_won: int = 0
 
 
 class HeroState:
@@ -43,6 +47,13 @@ static func begin(run_seed: int, heroes: Array[CharacterData]) -> RunState:
 	return run
 
 
+static func begin_default(run_seed: int) -> RunState:
+	var heroes: Array[CharacterData] = []
+	for path in DEFAULT_PARTY:
+		heroes.append(load(path))
+	return begin(run_seed, heroes)
+
+
 func current_node() -> RunMap.MapNode:
 	return map.node(current_node_id)
 
@@ -53,6 +64,8 @@ func current_floor() -> int:
 
 func available_nodes() -> Array[RunMap.MapNode]:
 	if finished:
+		return []
+	if not node_resolved:
 		return []
 	if current_node_id < 0:
 		return map.start_nodes()
@@ -71,7 +84,19 @@ func travel(node_id: int) -> bool:
 		return false
 	current_node_id = node_id
 	visited.append(node_id)
+	node_resolved = false
 	return true
+
+
+func resolve_current() -> void:
+	node_resolved = true
+
+
+func hero_definitions() -> Array[CharacterData]:
+	var result: Array[CharacterData] = []
+	for hero in party:
+		result.append(hero.definition)
+	return result
 
 
 ## Same run seed and node always replay the same dice.
@@ -87,7 +112,10 @@ func record_battle(units: Array[CharacterUnit], won: bool) -> void:
 			party[index].current_hp = 1
 	if not won:
 		finish(false)
-	elif current_node() != null and current_node().type == RunMap.NodeType.BOSS:
+		return
+	battles_won += 1
+	resolve_current()
+	if current_node() != null and current_node().type == RunMap.NodeType.BOSS:
 		finish(true)
 
 

@@ -1,10 +1,9 @@
 extends Control
-## Title screen. Owns navigation only; a run starts in the battle until the map exists.
+## Title screen. Starts or resumes a run; owns navigation only.
 
-const SERIF := ["Batang", "Noto Serif CJK KR", "Noto Serif KR", "Nanum Myeongjo", "serif"]
-const TRIM := Color("d8b25a")
-const TEXT := Color("eadcc0")
-const MUTED := Color("a8977a")
+const TRIM := FantasyTheme.TRIM
+const TEXT := FantasyTheme.TEXT
+const MUTED := FantasyTheme.MUTED
 
 var new_run_button: Button
 var continue_button: Button
@@ -43,7 +42,7 @@ class Sigil extends Control:
 
 
 func _ready() -> void:
-	theme = build_theme()
+	theme = FantasyTheme.build()
 	add_child(EmberBackdrop.new())
 	var sigil := Sigil.new()
 	sigil.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -67,9 +66,12 @@ func _ready() -> void:
 	var gap := Control.new()
 	gap.custom_minimum_size.y = 36
 	column.add_child(gap)
-	new_run_button = menu_button(column, "새 여정", "고갯길에서 새 모험을 시작합니다.", func(): SceneRouter.go(get_tree(), SceneRouter.BATTLE))
-	continue_button = menu_button(column, "이어하기", "저장된 여정이 없습니다.", func(): pass)
-	continue_button.disabled = true
+	new_run_button = menu_button(column, "새 여정", "고갯길에서 새 모험을 시작합니다.", start_new_run)
+	continue_button = menu_button(column, "이어하기", "진행 중인 여정으로 돌아갑니다.", func(): SceneRouter.go(get_tree(), SceneRouter.MAP))
+	var run := RunState.active
+	continue_button.disabled = run == null or run.finished
+	if continue_button.disabled:
+		continue_button.tooltip_text = "진행 중인 여정이 없습니다."
 	camp_button = menu_button(column, "야영지", "일행의 능력치와 상태를 살펴봅니다.", func(): SceneRouter.go(get_tree(), SceneRouter.CAMP))
 	quit_button = menu_button(column, "종료", "게임을 끝냅니다.", func(): get_tree().quit())
 	var footer := Label.new()
@@ -84,6 +86,11 @@ func _ready() -> void:
 	new_run_button.grab_focus.call_deferred()
 	column.modulate.a = 0.0
 	create_tween().tween_property(column, "modulate:a", 1.0, 0.8).set_trans(Tween.TRANS_SINE)
+
+
+func start_new_run() -> void:
+	RunState.begin_default(randi())
+	SceneRouter.go(get_tree(), SceneRouter.MAP)
 
 
 func centered(parent: Node, text_value: String, font_size: int, color: Color) -> Label:
@@ -113,45 +120,3 @@ func menu_button(parent: Node, caption: String, hint: String, callback: Callable
 	item.pressed.connect(callback)
 	parent.add_child(item)
 	return item
-
-
-func build_theme() -> Theme:
-	var ui_theme := Theme.new()
-	var sans := SystemFont.new()
-	sans.font_names = PackedStringArray(["Malgun Gothic", "Noto Sans CJK KR", "sans-serif"])
-	ui_theme.default_font = sans
-	ui_theme.default_font_size = 14
-	var serif := SystemFont.new()
-	serif.font_names = PackedStringArray(SERIF)
-	serif.font_weight = 600
-	ui_theme.set_type_variation("HeadingLabel", "Label")
-	ui_theme.set_font("font", "HeadingLabel", serif)
-	ui_theme.set_type_variation("MenuButtonLarge", "Button")
-	ui_theme.set_font("font", "MenuButtonLarge", serif)
-	ui_theme.set_font_size("font_size", "MenuButtonLarge", 22)
-	ui_theme.set_color("font_color", "MenuButtonLarge", TEXT)
-	ui_theme.set_color("font_hover_color", "MenuButtonLarge", Color("fff3d6"))
-	ui_theme.set_color("font_focus_color", "MenuButtonLarge", Color("fff3d6"))
-	ui_theme.set_color("font_disabled_color", "MenuButtonLarge", Color("5f5446"))
-	for state in ["normal", "hover", "pressed", "disabled", "focus"]:
-		var style := StyleBoxFlat.new()
-		style.bg_color = Color(0.1, 0.07, 0.04, 0.82)
-		style.border_color = Color("6e5431")
-		style.set_border_width_all(1)
-		style.border_width_top = 2
-		style.border_width_bottom = 2
-		style.set_corner_radius_all(3)
-		match state:
-			"hover", "focus":
-				style.bg_color = Color(0.2, 0.13, 0.07, 0.92)
-				style.border_color = TRIM
-				style.shadow_color = Color(1.0, 0.6, 0.2, 0.35)
-				style.shadow_size = 14
-			"pressed":
-				style.bg_color = Color("4a3016")
-				style.border_color = Color("ffd98a")
-			"disabled":
-				style.bg_color = Color(0.07, 0.05, 0.03, 0.7)
-				style.border_color = Color("3b2f22")
-		ui_theme.set_stylebox(state, "MenuButtonLarge", style)
-	return ui_theme
