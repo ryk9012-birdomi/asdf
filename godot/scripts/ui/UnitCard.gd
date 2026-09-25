@@ -61,14 +61,14 @@ func _ready() -> void:
 	content.add_child(HSeparator.new())
 	add_label("주문과 기술", 12, Color("b8a88a"))
 	for skill in character_data.skills:
-		var entry := add_label("%s   ·   기력 %d / 대기 %d" % [skill.skill_name, skill.energy_cost, skill.cooldown], 14)
+		var entry := add_label("%s   ·   MP %d / 대기 %d" % [skill.skill_name, skill.energy_cost, skill.cooldown], 14)
 		entry.tooltip_text = "%s\n대상: %s\n피해 유형: %s" % [skill.description, SkillData.TargetType.keys()[skill.target_type], SkillData.DamageType.keys()[skill.damage_type]]
 	content.add_child(HSeparator.new())
 	add_label("상태 시험", 12, Color("b8a88a"))
 	var actions := GridContainer.new()
 	actions.columns = 2
 	content.add_child(actions)
-	var labels := ["피해 3", "치유 2", "보호막 +2", "기력 −2", "기력 +2", "치명상"]
+	var labels := ["피해 3", "치유 2", "보호막 +2", "MP −2", "MP +2", "치명상"]
 	var ids: Array[StringName] = [&"damage", &"heal", &"shield", &"spend", &"restore", &"lethal"]
 	for index in ids.size():
 		var button := Button.new()
@@ -90,7 +90,7 @@ func refresh() -> void:
 	health_label.text = "HP   %d / %d" % [unit.current_hp, unit.max_hp]
 	health_bar.max_value = unit.max_hp
 	health_bar.value = unit.current_hp
-	resource_label.text = "보호막 %d     ·     기력 %d / %d" % [unit.current_shield, unit.current_energy, unit.max_energy]
+	resource_label.text = "보호막 %d     ·     MP %d / %d" % [unit.current_shield, unit.current_energy, unit.max_energy]
 	energy_bar.max_value = maxi(1, unit.max_energy)
 	energy_bar.value = unit.current_energy
 	state_label.text = "●  모험 가능" if unit.is_alive() else "×  쓰러짐 · 긴 휴식으로 복구"

@@ -41,9 +41,9 @@ func on_action_requested(unit: CharacterUnit, action: StringName) -> void:
 		&"shield":
 			result = "보호막 %d 획득" % unit.add_shield(2)
 		&"spend":
-			result = "기력 2 사용" if unit.spend_energy(2) else "기력 부족: 상태 변화 없음"
+			result = "MP 2 사용" if unit.spend_energy(2) else "MP 부족: 상태 변화 없음"
 		&"restore":
-			result = "기력 %d 회복" % unit.restore_energy(2)
+			result = "MP %d 회복" % unit.restore_energy(2)
 		&"lethal":
 			unit.receive_damage(unit.current_hp + unit.current_shield)
 			result = "치명상 테스트 완료"
@@ -57,7 +57,7 @@ func on_unit_died(unit: CharacterUnit) -> void:
 func reset_party() -> void:
 	for card in party.get_children():
 		card.unit.reset_to_starting_state()
-	log_message("긴 휴식 · HP, 보호막, 기력을 원본 Resource의 시작 값으로 복구했습니다.")
+	log_message("긴 휴식 · HP, 보호막, MP를 원본 Resource의 시작 값으로 복구했습니다.")
 
 
 func log_message(message: String) -> void:

@@ -46,7 +46,7 @@ CharacterLab의 `모험 떠나기` 버튼은 BattleScene으로, 전투의 `야�
 | `res://scripts/battle/TargetRules.gd` | 여덟 가지 대상 유형, 살아 있는 전열/후열 판정 |
 | `res://scripts/battle/BattleScene.gd` | 유닛 생성, 타이머, 화면 이동 연결 |
 | `res://scripts/ui/BattleUI.gd` | 상태 표시, 스킬/대상 선택, 로그, 결과 화면 |
-| `res://scripts/ui/CombatantView.gd` | 문장(紋章) 방패, 금테 장식, HP 잔상 바·보호막 바·기력 구슬, 행동/대상 발광, 타격 흔들림, 전투 불능 표시 |
+| `res://scripts/battle/BattleArena.gd`, `FighterView.gd`, `FighterArt.gd` | 2D 전장, 캐릭터 그림·머리 위 HP/MP 표시·동작 (카드 패널은 제거됨) |
 | `res://scripts/ui/EmberBackdrop.gd` | 전투·야영지 공용 횃불빛 연기와 불씨 배경 셰이더 |
 | `res://scenes/battle/EnemyUnit.tscn` | EnemyUnit 스크립트가 붙은 Node |
 | `res://scenes/battle/BattleManager.tscn` | BattleManager와 TurnManager 연결 |
@@ -70,7 +70,7 @@ CharacterLab의 `모험 떠나기` 버튼은 BattleScene으로, 전투의 `야�
 - [TargetRules.gd](../scripts/battle/TargetRules.gd)
 - [EnemyData.gd](../scripts/characters/EnemyData.gd), [EnemyUnit.gd](../scripts/characters/EnemyUnit.gd)
 - [BattleScene.gd](../scripts/battle/BattleScene.gd)
-- [BattleUI.gd](../scripts/ui/BattleUI.gd), [CombatantView.gd](../scripts/ui/CombatantView.gd)
+- [BattleUI.gd](../scripts/ui/BattleUI.gd), [BattleArena.gd](../scripts/battle/BattleArena.gd), [FighterView.gd](../scripts/battle/FighterView.gd)
 - [자동 검증 전체 코드](../tests/test_battle.gd)
 
 **전투 상태:** `IDLE → PLAYER_INPUT 또는 ENEMY_TURN → RESOLVING → 다음 행동 또는 FINISHED`. 입력 가능한 상태에서만 플레이어의 요청을 받습니다. 스킬 소유권·비용·쿨다운·대상이 유효한지 먼저 검사하고 비용을 지불합니다. 잘못된 대상, 비용 부족, 재사용 대기 중 클릭, 행동 처리 중 연속 클릭은 상태와 자원을 바꾸지 않습니다. 플레이어 입력은 `player_action()`과 `player_pass()`를 사용합니다.

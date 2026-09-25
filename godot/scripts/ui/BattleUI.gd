@@ -8,7 +8,6 @@ signal lab_requested
 signal menu_requested
 signal continue_requested
 
-const CARD_SCRIPT = preload("res://scripts/ui/CombatantView.gd")
 const STAGGER := 40
 const TRIM := Color("d8b25a")
 const GOLD := Color("ffc15a")
@@ -20,9 +19,7 @@ const SERIF := ["Batang", "Noto Serif CJK KR", "Noto Serif KR", "Nanum Myeongjo"
 
 var battle: BattleManager
 var selected_skill: SkillData
-var cards: Dictionary = {}
-var party_column: VBoxContainer
-var enemy_column: VBoxContainer
+var fighters: Dictionary = {}
 var skill_row: HBoxContainer
 var turn_row: HBoxContainer
 var turn_label: Label
@@ -76,7 +73,7 @@ var restart_button: Button
 var continue_button: Button
 var result_note: Label
 var run_mode: bool = false
-var stage: BattleStage
+var arena: BattleArena
 ## Effects of the action being resolved; played when the 3D blow lands.
 var pending_fx: Array[Callable] = []
 var missed_now: Array[CharacterUnit] = []
@@ -125,17 +122,21 @@ func _ready() -> void:
 	turn_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	turn_strip.add_child(turn_row)
 	var rules := label(turn_strip, "판정 2d6 + 명중 − 방어 · 7+ 스침 · 10+ 명중", 12, MUTED)
-	rules.tooltip_text = "주사위 두 개의 합에 공격자 명중을 더하고 대상 방어를 뺍니다.\n6 이하 빗나감 · 7~9 스침(피해 절반) · 10 이상 명중\n보정 전 눈의 합이 치명 기준 이상이면 치명타(피해 2배)\n보호막이 피해를 먼저 흡수하고, 자기 차례마다 기력 +1"
+	rules.tooltip_text = "주사위 두 개의 합에 공격자 명중을 더하고 대상 방어를 뺍니다.\n6 이하 빗나감 · 7~9 스침(피해 절반) · 10 이상 명중\n보정 전 눈의 합이 치명 기준 이상이면 치명타(피해 2배)\n보호막이 피해를 먼저 흡수하고, 자기 차례마다 MP +1"
 	rules.mouse_filter = Control.MOUSE_FILTER_PASS
-	stage = BattleStage.new()
-	stage.custom_minimum_size = Vector2(0, 280)
-	stage.unit_clicked.connect(choose_target)
-	content.add_child(stage)
-	content.add_child(build_battlefield())
+	arena = BattleArena.new()
+	arena.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	arena.custom_minimum_size = Vector2(0, 560)
+	arena.unit_clicked.connect(choose_target)
+	content.add_child(arena)
 	result_banner = PanelContainer.new()
 	result_banner.add_theme_stylebox_override("panel", panel_style(GOLD, 0.92, 18))
 	result_banner.visible = false
-	content.add_child(result_banner)
+	result_banner.custom_minimum_size.x = 560
+	arena.add_child(result_banner)
+	result_banner.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
+	result_banner.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	result_banner.position.y = 150
 	var result_body := VBoxContainer.new()
 	result_body.add_theme_constant_override("separation", 8)
 	result_banner.add_child(result_body)
@@ -180,74 +181,13 @@ func _ready() -> void:
 	log_body.add_child(log_box)
 
 
-func build_battlefield() -> Control:
-	var field := HBoxContainer.new()
-	field.add_theme_constant_override("separation", 10)
-	field.custom_minimum_size.y = 0
-	party_column = side_column(field, "일행  ·  잿불 서약단", TRIM, HORIZONTAL_ALIGNMENT_LEFT)
-	var divider := VBoxContainer.new()
-	divider.custom_minimum_size.x = 64
-	divider.alignment = BoxContainer.ALIGNMENT_CENTER
-	field.add_child(divider)
-	divider.add_child(beam_rule())
-	var versus := label(divider, "VS", 28, Color("f4e2b8"))
-	versus.theme_type_variation = "HeadingLabel"
-	versus.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	glow_text(versus, Color("ff8a2a"), 14)
-	divider.add_child(beam_rule())
-	enemy_column = side_column(field, "적대  ·  예고 적중률은 2d6 판정 기준", RED, HORIZONTAL_ALIGNMENT_RIGHT)
-	return field
-
-
-func side_column(parent: Node, heading: String, color: Color, align: HorizontalAlignment) -> VBoxContainer:
-	var column := VBoxContainer.new()
-	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	column.add_theme_constant_override("separation", 6)
-	parent.add_child(column)
-	var caption := label(column, heading, 12, color)
-	caption.horizontal_alignment = align
-	return column
-
-
-func beam_rule() -> TextureRect:
-	var gradient := Gradient.new()
-	gradient.set_color(0, Color(0.85, 0.7, 0.35, 0.0))
-	gradient.set_color(1, Color(1.0, 0.55, 0.2, 0.9))
-	var texture := GradientTexture2D.new()
-	texture.gradient = gradient
-	texture.fill_from = Vector2(0, 0)
-	texture.fill_to = Vector2(0, 1)
-	texture.width = 2
-	texture.height = 64
-	var rule := TextureRect.new()
-	rule.texture = texture
-	rule.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	rule.stretch_mode = TextureRect.STRETCH_SCALE
-	rule.custom_minimum_size = Vector2(2, 60)
-	rule.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	rule.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	return rule
-
-
 func bind(manager: BattleManager) -> void:
 	battle = manager
-	for unit in battle.party + battle.enemies:
-		var hostile := unit in battle.enemies
-		var card := Button.new()
-		card.set_script(CARD_SCRIPT)
-		# Front line sits closest to the centre divider on both sides.
-		var lane := MarginContainer.new()
-		var inset := (2 - int(unit.formation_slot)) * STAGGER
-		lane.add_theme_constant_override("margin_right" if hostile else "margin_left", inset)
-		lane.add_theme_constant_override("margin_left" if hostile else "margin_right", 2 * STAGGER - inset)
-		(enemy_column if hostile else party_column).add_child(lane)
-		lane.add_child(card)
-		card.setup(unit, hostile, stage != null)
-		card.pressed.connect(func(): choose_target(unit))
+	arena.setup(battle.party, battle.enemies)
+	fighters = arena.fighters
+	for unit in fighters:
 		unit.unit_died.connect(func(_unit: CharacterUnit): on_unit_down(unit))
-		cards[unit] = card
-	stage.setup(battle.party, battle.enemies)
-	battle.battle_finished.connect(stage.celebrate)
+	battle.battle_finished.connect(arena.celebrate)
 	refresh()
 
 
@@ -266,7 +206,7 @@ func refresh() -> void:
 		prompt.text = "%s의 차례 · 사용할 스킬을 선택하세요." % battle.actor.display_name
 		for skill in battle.actor.character_data.skills:
 			var reason := battle.skill_block_reason(skill)
-			var caption := "%s\n기력 %d  ·  대기 %d턴" % [skill.skill_name, skill.energy_cost, skill.cooldown]
+			var caption := "%s\nMP %d  ·  대기 %d턴" % [skill.skill_name, skill.energy_cost, skill.cooldown]
 			if not reason.is_empty():
 				caption = "%s\n%s" % [skill.skill_name, reason]
 			var skill_button := button(skill_row, caption, func(): select_skill(skill), battle.actor.character_data.display_color)
@@ -281,7 +221,7 @@ func refresh() -> void:
 		prompt.text = "%s · 행동 준비 중…" % battle.actor.display_name
 	else:
 		prompt.text = "행동 처리 중…"
-	refresh_cards()
+	refresh_fighters()
 
 
 func refresh_turn_order() -> void:
@@ -316,7 +256,7 @@ func select_skill(skill: SkillData) -> void:
 		return
 	selected_skill = skill
 	prompt.text = "%s · %s  /  초록빛 대상을 클릭하세요." % [skill.skill_name, skill.description]
-	refresh_cards()
+	refresh_fighters()
 
 
 func choose_target(unit: CharacterUnit) -> void:
@@ -324,20 +264,18 @@ func choose_target(unit: CharacterUnit) -> void:
 		skill_requested.emit(selected_skill, unit)
 
 
-func refresh_cards() -> void:
+func refresh_fighters() -> void:
 	var legal: Array[CharacterUnit] = []
 	if selected_skill != null and battle.phase == BattleManager.Phase.PLAYER_INPUT:
 		legal = battle.available_targets(selected_skill)
-	for unit in cards:
-		var detail := "ATK %d  ·  방어 %d  ·  명중 %+d  ·  SPD %d" % [unit.attack, unit.defense, unit.hit_bonus, unit.speed]
+	for unit in fighters:
+		var line := ""
 		if unit in legal:
-			detail = forecast(battle.actor, unit, selected_skill)
-		elif unit is EnemyUnit and unit.is_alive():
-			detail = intent_text(unit)
-		cards[unit].refresh(unit == battle.actor and battle.phase != BattleManager.Phase.FINISHED, unit in legal, detail)
-		if unit in legal:
-			cards[unit].tooltip_text = forecast_detail(battle.actor, unit, selected_skill)
-	stage.set_marks(battle.actor if battle.phase != BattleManager.Phase.FINISHED else null, legal)
+			line = forecast(battle.actor, unit, selected_skill)
+		elif unit is EnemyUnit and unit.is_alive() and battle.phase != BattleManager.Phase.FINISHED:
+			line = intent_text(unit)
+		fighters[unit].refresh(unit == battle.actor and battle.phase != BattleManager.Phase.FINISHED, unit in legal, line)
+		fighters[unit].tooltip_text = forecast_detail(battle.actor, unit, selected_skill) if unit in legal else "%s\n%s" % [unit.display_name, unit.character_data.description]
 
 
 ## Exact outcome chances of `skill` from `attacker` against `defender`, as card text.
@@ -382,12 +320,12 @@ func percent(chance: float) -> int:
 
 
 func animate_action(actor: CharacterUnit, targets: Array[CharacterUnit], skill: SkillData) -> void:
-	var impact := stage.perform(actor, targets, skill, missed_now) if stage != null else 0.0
+	var impact := arena.perform(actor, targets, skill, missed_now)
 	missed_now = []
 	var effects := pending_fx
 	pending_fx = []
-	if cards.has(actor):
-		cards[actor].flash(actor.character_data.display_color)
+	if fighters.has(actor):
+		fighters[actor].flash(actor.character_data.display_color)
 	var land := func() -> void:
 		impact_fx(actor, targets, skill)
 		for effect in effects:
@@ -402,27 +340,27 @@ func animate_action(actor: CharacterUnit, targets: Array[CharacterUnit], skill: 
 
 ## Seconds of 3D choreography still playing; the scene waits this long between actions.
 func animation_time_left() -> float:
-	return stage.animation_time_left() if stage != null else 0.0
+	return arena.animation_time_left()
 
 
 func impact_fx(actor: CharacterUnit, targets: Array[CharacterUnit], skill: SkillData) -> void:
 	for target in targets:
-		if not cards.has(target):
+		if not fighters.has(target):
 			continue
-		var to := anchor_of(target, 1.2)
+		var to := anchor_of(target)
 		if skill.effect_type == SkillData.EffectType.SHIELD:
 			spawn_ring(to, WARD)
 			spawn_ring(to, TRIM, 0.12)
-			cards[target].flash(WARD)
+			fighters[target].flash(WARD)
 			continue
-		var from := anchor_of(actor, 1.2) if cards.has(actor) else to
+		var from := anchor_of(actor) if fighters.has(actor) else to
 		match skill.damage_type:
 			SkillData.DamageType.FIRE:
-				if stage == null:
+				if arena == null:
 					spawn_beam(from, to, Color("ff7a1f"), 18.0, 0.18)
 				spawn_burst(to, Color("ffb347"), 40)
 			SkillData.DamageType.ARCANE:
-				if stage == null:
+				if arena == null:
 					for bolt in 3:
 						spawn_beam(from, to, Color("b48cff"), 6.0, 0.08 + bolt * 0.16, bolt * 0.09)
 				spawn_burst(to, Color("c9a8ff"), 24)
@@ -431,30 +369,29 @@ func impact_fx(actor: CharacterUnit, targets: Array[CharacterUnit], skill: Skill
 			_:
 				if skill.target_type == SkillData.TargetType.FRONT_ENEMY:
 					spawn_slash(to, Color("f2efe6"), skill.hit_count)
-				elif stage == null:
+				elif arena == null:
 					spawn_beam(from, to, Color("e8dcc0"), 4.0, 0.02)
 
 
-## Screen point for effects on `unit`: above its 3D figure, or its card without a stage.
-func anchor_of(unit: CharacterUnit, height: float = 2.3) -> Vector2:
-	if stage != null and stage.figures.has(unit):
-		return stage.get_global_rect().position + stage.screen_point(unit, height) - fx_layer.get_global_rect().position
-	return card_center(unit)
+## Screen point for effects on `unit`: "chest" of the figure, or "hud" above its readout.
+func anchor_of(unit: CharacterUnit, part: String = "chest") -> Vector2:
+	var local := arena.hud_top(unit) if part == "hud" else arena.chest_point(unit)
+	return arena.get_global_rect().position + local - fx_layer.get_global_rect().position
 
 
 func defer_fx(effect: Callable) -> void:
-	if stage == null:
+	if arena == null:
 		effect.call()
 	else:
 		pending_fx.append(effect)
 
 
 func show_hit(target: CharacterUnit, health_damage: int, shield_damage: int, critical: bool) -> void:
-	if not cards.has(target):
+	if not fighters.has(target):
 		return
 	defer_fx(func() -> void:
-		cards[target].flash(Color("ffb09a"), 9.0 if critical else 5.0)
-		spawn_burst(anchor_of(target, 1.2), Color("ffcf6b") if critical else Color("e0503f"), 34 if critical else 18)
+		fighters[target].flash(Color("ffb09a"), 9.0 if critical else 5.0)
+		spawn_burst(anchor_of(target), Color("ffcf6b") if critical else Color("e0503f"), 34 if critical else 18)
 		if shield_damage > 0:
 			spawn_popup(target, "−%d" % shield_damage, WARD, 18)
 		if critical:
@@ -465,7 +402,7 @@ func show_hit(target: CharacterUnit, health_damage: int, shield_damage: int, cri
 
 
 func show_dice(target: CharacterUnit, roll: Dictionary) -> void:
-	if not cards.has(target) or roll.auto:
+	if not fighters.has(target) or roll.auto:
 		return
 	var frame := Engine.get_process_frames()
 	var stack: Array = dice_stacks.get(target, [frame, 0])
@@ -492,10 +429,10 @@ func show_dice(target: CharacterUnit, roll: Dictionary) -> void:
 	verdict.position = Vector2(dice.size.x + 10, 4)
 	verdict.modulate.a = 0.0
 	holder.add_child(verdict)
-	var head := anchor_of(target, 2.7)
-	var stage_top := stage.get_global_rect().position.y - fx_layer.get_global_rect().position.y if stage != null else -INF
-	holder.position = head + Vector2(-60 + order * 200, -40)
-	holder.position.y = maxf(holder.position.y, stage_top + 6.0)
+	var top := anchor_of(target, "hud")
+	var arena_top := arena.get_global_rect().position.y - fx_layer.get_global_rect().position.y
+	holder.position = top + Vector2(-78 + order * 170, -44)
+	holder.position.y = maxf(holder.position.y, arena_top + 4.0)
 	var final_faces: Array = roll.dice
 	var spin := func(progress: float) -> void:
 		dice.rotation = sin(progress * 18.0) * 0.35 * (1.0 - progress)
@@ -526,11 +463,11 @@ func show_shield(target: CharacterUnit, amount: int) -> void:
 
 
 func on_unit_down(unit: CharacterUnit) -> void:
-	if not cards.has(unit):
+	if not fighters.has(unit):
 		return
 	defer_fx(func() -> void:
-		spawn_burst(anchor_of(unit, 1.0), unit.character_data.display_color, 60)
-		spawn_ring(anchor_of(unit, 0.3), RED)
+		spawn_burst(anchor_of(unit), unit.character_data.display_color, 60)
+		spawn_ring(anchor_of(unit), RED)
 		shake_screen(10.0))
 
 
@@ -564,13 +501,8 @@ func reveal_result() -> void:
 	reveal.parallel().tween_property(result_banner, "scale", Vector2.ONE, 0.45).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 
-func card_center(unit: CharacterUnit) -> Vector2:
-	var card: Control = cards[unit]
-	return card.get_global_rect().get_center() - fx_layer.get_global_rect().position
-
-
 func spawn_popup(unit: CharacterUnit, text_value: String, color: Color, font_size: int) -> void:
-	if not cards.has(unit):
+	if not fighters.has(unit):
 		return
 	var frame := Engine.get_process_frames()
 	var stack: Array = popup_stacks.get(unit, [frame, 0])

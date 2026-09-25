@@ -75,7 +75,7 @@ func skill_block_reason(skill: SkillData) -> String:
 	if actor.remaining_cooldown(skill) > 0:
 		return "재사용 대기 %d턴" % actor.remaining_cooldown(skill)
 	if not actor.can_spend_energy(skill.energy_cost):
-		return "기력 부족"
+		return "MP 부족"
 	if available_targets(skill).is_empty():
 		return "유효한 대상 없음"
 	return ""

@@ -245,28 +245,28 @@ func test_ui() -> void:
 	root.add_child(scene)
 	current_scene = scene
 	await process_frame
-	check(scene.view.cards.size() == 6, "Battle UI displays six combatants")
-	var stage: BattleStage = scene.view.stage
-	check(stage.figures.size() == 6, "3D stage places a figure for every combatant")
-	var hero_figure = stage.figures[scene.battle.party[0]]
-	var foe_figure = stage.figures[scene.battle.enemies[0]]
-	check(hero_figure.home.x < 0.0 and foe_figure.home.x > 0.0, "Party stands on the left, enemies on the right")
-	check(hero_figure.player != null and hero_figure.player.current_animation != "", "Figures play an idle animation")
-	var hidden_gear: Array = hero_figure.find_children("*", "MeshInstance3D", true, false).filter(func(mesh): return mesh.name == "2H_Sword")
-	check(not hidden_gear.is_empty() and not hidden_gear[0].visible, "Unused gear is hidden from the loadout")
-	check(stage.figures[scene.battle.enemies[0]].look.has("tint"), "Goblins use a tinted model")
+	check(scene.view.fighters.size() == 6, "Battle UI displays six combatants")
+	var arena: BattleArena = scene.view.arena
+	var hero_view: FighterView = scene.view.fighters[scene.battle.party[0]]
+	var foe_view: FighterView = scene.view.fighters[scene.battle.enemies[0]]
+	check(arena.fighters.size() == 6, "2D arena draws a figure for every combatant")
+	check(hero_view.home.x < foe_view.home.x, "Party stands on the left, enemies on the right")
+	check(hero_view.hp_text.text == "HP 10 / 10" and hero_view.mp_pips.get_child_count() == 5, "Overhead readout shows HP and MP")
+	check(foe_view.info.text.begins_with("예고"), "Enemy intent shows above the enemy")
+	check(hero_view.kind == &"paladin" and foe_view.kind == &"goblin_raider", "Each unit gets its own drawing")
 	scene.view.skill_row.get_child(0).pressed.emit()
 	var front: CharacterUnit = scene.battle.enemies[0]
-	check(not scene.view.cards[front].disabled and scene.view.cards[scene.battle.enemies[1]].disabled, "Skill button highlights only legal target")
+	check(not scene.view.fighters[front].disabled and scene.view.fighters[scene.battle.enemies[1]].disabled, "Skill button highlights only legal target")
+	check(scene.view.fighters[front].info.text.begins_with("적중"), "Target shows its hit odds overhead")
 	if "--capture" in OS.get_cmdline_user_args():
 		await process_frame
 		await RenderingServer.frame_post_draw
 		DirAccess.make_dir_recursive_absolute("res://test-output")
 		check(root.get_texture().get_image().save_png("res://test-output/battle.png") == OK, "Battle screenshot saved")
-	check(stage.figures[front].ring.visible, "Legal target gets a ring on stage")
-	scene.view.cards[front].pressed.emit()
+	check(scene.view.fighters[front].marker == 2, "Legal target is marked on the ground")
+	scene.view.fighters[front].pressed.emit()
 	check(scene.battle.phase == BattleManager.Phase.RESOLVING and scene.view.selected_skill == null, "Target click resolves and locks commands")
-	check(stage.animation_time_left() > 0.5, "Melee strike plays out on stage")
+	check(arena.animation_time_left() > 0.5, "Melee strike plays out on the battlefield")
 	await create_timer(0.15).timeout
 	check(scene.battle.actor == scene.battle.party[2], "Scene timer advances to next hero")
 	for enemy in scene.battle.enemies:
@@ -277,7 +277,7 @@ func test_ui() -> void:
 	check(scene.battle.phase == BattleManager.Phase.PLAYER_INPUT and scene.battle.actor == scene.battle.party[0], "AI timer chain resolves all three enemies then returns player control")
 	check(scene.battle.party[0].current_hp < 10, "Automated enemies apply actual damage")
 	scene.view.skill_row.get_child(1).pressed.emit()
-	scene.view.cards[scene.battle.party[0]].pressed.emit()
+	scene.view.fighters[scene.battle.party[0]].pressed.emit()
 	check(scene.battle.party[0].current_shield == 3 and scene.battle.party[0].current_energy == 3, "Guard UI applies self shield and cost")
 	for _index in 1000:
 		if scene.battle.phase == BattleManager.Phase.FINISHED:
