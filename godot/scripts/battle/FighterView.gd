@@ -65,18 +65,22 @@ class ShieldRow extends Control:
 		draw_line(center + Vector2(0, -7), center + Vector2(0, 7), Color("dce8ff"), 1.5)
 
 
-## Lighting for a figure rendered on its own: torch rim light on the lit side, a darker
-## shadow side, shading that rounds the forms in from their edges, a darker lower body,
-## muted colour and a little film grain. Makes the flat vector parts read as lit volumes.
+## Watercolor finish for a figure rendered on its own: pigment pools darker where colours
+## meet and at the silhouette, colour mottles softly inside, and the paper's grain shows.
 const LIT_SHADER := """
 shader_type canvas_item;
 uniform vec2 texel = vec2(0.002, 0.002);
-uniform vec2 light_dir = vec2(-0.55, -0.83);
-uniform vec3 rim_color : source_color = vec3(1.0, 0.64, 0.32);
-uniform float rim_strength = 1.1;
 
 float hash(vec2 p) {
-	return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
+	p = fract(p * vec2(123.34, 456.21));
+	p += dot(p, p + 45.32);
+	return fract(p.x * p.y);
+}
+float noise(vec2 p) {
+	vec2 i = floor(p);
+	vec2 f = fract(p);
+	vec2 u = f * f * (3.0 - 2.0 * f);
+	return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);
 }
 
 void fragment() {
@@ -85,29 +89,23 @@ void fragment() {
 		COLOR = vec4(0.0);
 	} else {
 		vec3 col = base.rgb;
-		// Distance from the silhouette: average alpha in two rings.
-		float inner = 0.0;
-		float outer = 0.0;
+		vec3 around = vec3(0.0);
+		float solid = 0.0;
 		for (int i = 0; i < 8; i++) {
 			float a = float(i) * 0.785398;
-			vec2 d = vec2(cos(a), sin(a));
-			inner += texture(TEXTURE, UV + d * texel * 3.0).a;
-			outer += texture(TEXTURE, UV + d * texel * 12.0).a;
+			vec4 s = texture(TEXTURE, UV + vec2(cos(a), sin(a)) * texel * 3.0);
+			around += s.rgb * s.a;
+			solid += s.a;
 		}
-		inner /= 8.0;
-		outer /= 8.0;
-		float lit_edge = clamp(base.a - texture(TEXTURE, UV + light_dir * texel * 6.0).a, 0.0, 1.0);
-		float dark_edge = clamp(base.a - texture(TEXTURE, UV - light_dir * texel * 8.0).a, 0.0, 1.0);
-		float luma = dot(col, vec3(0.299, 0.587, 0.114));
-		col = mix(vec3(luma), col, 0.74);
-		col = (col - 0.5) * 1.1 + 0.46;
-		col *= mix(0.6, 1.0, smoothstep(0.3, 1.0, outer));
-		col *= mix(0.8, 1.0, inner);
-		col *= mix(1.06, 0.66, smoothstep(0.3, 1.0, UV.y));
-		col *= 1.0 - dark_edge * 0.5;
-		col += rim_color * lit_edge * rim_strength * (0.6 + 0.4 * luma);
-		col += (hash(floor(UV / texel) + floor(TIME * 12.0)) - 0.5) * 0.035;
-		COLOR = vec4(clamp(col, 0.0, 1.0), base.a);
+		around /= max(solid, 0.001);
+		float edge = clamp(length(col - around) * 1.6, 0.0, 1.0) + (1.0 - solid / 8.0) * 0.8;
+		vec2 px = UV / texel;
+		float mottle = noise(px / 22.0) * 0.6 + noise(px / 7.0) * 0.4;
+		col *= 1.0 - clamp(edge, 0.0, 1.0) * 0.14;
+		col *= 0.95 + mottle * 0.09;
+		col = mix(col, vec3(1.0, 0.98, 0.94), 0.05);
+		col *= 0.97 + hash(floor(px)) * 0.05;
+		COLOR = vec4(col, base.a);
 	}
 }
 """
@@ -227,6 +225,8 @@ func setup(combatant: CharacterUnit, facing_right: bool) -> void:
 			figure.puppet.wear(unit.character_data.gear)
 		figure.add_child(figure.puppet)
 	add_child(figure)
+	# Every figure gets the watercolor finish.
+	figure.light()
 	hud = VBoxContainer.new()
 	hud.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	hud.position = Vector2(6, 0)
@@ -250,11 +250,11 @@ func setup(combatant: CharacterUnit, facing_right: bool) -> void:
 	shields.custom_minimum_size.y = 22
 	shields.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	hud.add_child(shields)
-	info = small_label(14, Color("4a3222"))
+	info = small_label(15, Color("2a180c"))
 	info.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	info.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	info.add_theme_color_override("font_outline_color", OUTLINE)
-	info.add_theme_constant_override("outline_size", 5)
+	info.add_theme_constant_override("outline_size", 8)
 	hp_bar.max_value = unit.max_hp
 	hp_trail.max_value = unit.max_hp
 	hp_bar.value = unit.current_hp

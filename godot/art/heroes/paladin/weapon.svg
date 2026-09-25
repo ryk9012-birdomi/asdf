@@ -1,7 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="28" height="110" viewBox="0 0 28 110">
-<defs><linearGradient id="blade" x1="0" y1="0" x2="1" y2="0">
-<stop offset="0" stop-color="#9fb2d6"/><stop offset="0.48" stop-color="#ffffff"/><stop offset="0.52" stop-color="#dfe8ff"/><stop offset="1" stop-color="#8698c0"/></linearGradient>
-<linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
-<stop offset="0" stop-color="#ffffff"/><stop offset="0.55" stop-color="#c9d1dc"/><stop offset="1" stop-color="#6f7885"/></linearGradient></defs>
-<path d="M14 28 L17.4 36 L17.06 81 L10.94 81 L10.6 36 Z" fill="url(#blade)" stroke="#1a0f08" stroke-width="1.5" stroke-linejoin="round"/><path d="M14 36 L14 78" stroke="#000000" stroke-opacity="0.3" stroke-width="0.9"/><path d="M6.8 80.4 Q14 78.8 21.2 80.4 L21.2 83.6 Q14 82.6 6.8 83.6 Z" fill="url(#gold)" stroke="#1a0f08" stroke-width="1.5" stroke-linejoin="round"/><rect x="11.8" y="83.6" width="4.4" height="12.4" rx="1" fill="#5a3a22" stroke="#1a0f08" stroke-width="0.9" stroke-linejoin="round"/><path d="M11.8 86 L16.2 88 M11.8 89.4 L16.2 91.4 M11.8 92.8 L16.2 94.8" stroke="#2e1d10" stroke-width="0.8"/><circle cx="14" cy="98.6" r="3" fill="url(#gold)" stroke="#1a0f08" stroke-width="1.1"/>
+<defs><linearGradient id="skin" x1="0" y1="0" x2="1" y2="0.25"><stop offset="0.00" stop-color="#e8b090"/><stop offset="0.50" stop-color="#fde6d2"/><stop offset="1.00" stop-color="#f6cfb2"/></linearGradient>
+<linearGradient id="gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0.00" stop-color="#f6d77a"/><stop offset="0.50" stop-color="#d9a441"/><stop offset="1.00" stop-color="#a8752a"/></linearGradient>
+<linearGradient id="leather" x1="0" y1="0" x2="1" y2="0.25"><stop offset="0.00" stop-color="#5e3a20"/><stop offset="0.50" stop-color="#b07a4a"/><stop offset="1.00" stop-color="#8a5a34"/></linearGradient>
+<linearGradient id="steel" x1="0" y1="0" x2="1" y2="0.25"><stop offset="0.00" stop-color="#8e949c"/><stop offset="0.33" stop-color="#f1f2f0"/><stop offset="0.67" stop-color="#c9ccd0"/><stop offset="1.00" stop-color="#8e949c"/></linearGradient>
+<linearGradient id="steelv" x1="0" y1="0" x2="0" y2="1"><stop offset="0.00" stop-color="#f1f2f0"/><stop offset="0.50" stop-color="#c9ccd0"/><stop offset="1.00" stop-color="#8e949c"/></linearGradient>
+<linearGradient id="cream" x1="0" y1="0" x2="1" y2="0.25"><stop offset="0.00" stop-color="#d9c6a0"/><stop offset="0.50" stop-color="#fbf4e4"/><stop offset="1.00" stop-color="#f1e4c8"/></linearGradient>
+<linearGradient id="blue" x1="0" y1="0" x2="1" y2="0.25"><stop offset="0.00" stop-color="#2e467e"/><stop offset="0.50" stop-color="#4a6ab0"/><stop offset="1.00" stop-color="#34508e"/></linearGradient>
+<linearGradient id="bluev" x1="0" y1="0" x2="0" y2="1"><stop offset="0.00" stop-color="#4a6ab0"/><stop offset="1.00" stop-color="#2e467e"/></linearGradient></defs>
+<path d="M14 26 L17.6 33 L17 81 L11 81 L10.4 33 Z" fill="url(#steel)" stroke="#5a3a28" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M14 33 L14 78" stroke="#8e949c" stroke-width="0.9"/>
+<path d="M5 79.6 Q14 77 23 79.6 Q24.6 81.8 23 84 Q14 81.8 5 84 Q3.4 81.8 5 79.6 Z" fill="url(#gold)" stroke="#5a3a28" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="11.8" y="84" width="4.4" height="11" rx="1.2" fill="url(#leather)" stroke="#5a3a28" stroke-width="0.7" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="14" cy="98" r="3.2" fill="url(#gold)" stroke="#5a3a28" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round"/>
 </svg>

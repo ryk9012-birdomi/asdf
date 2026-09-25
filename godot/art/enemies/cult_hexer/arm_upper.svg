@@ -3,6 +3,6 @@
 <stop offset="0" stop-color="#221f26"/><stop offset="0.45" stop-color="#453e4c"/><stop offset="1" stop-color="#232027"/></linearGradient>
 <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
 <stop offset="0" stop-color="#f4ecd6"/><stop offset="0.55" stop-color="#cbbd98"/><stop offset="1" stop-color="#7d7056"/></linearGradient></defs>
-<path d="M7.6 4 Q14 0.6 20.6 4 L21.6 27.6 L6.6 27.6 Z" fill="url(#robe)" stroke="#1a0f08" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M7.6 4 Q14 0.6 20.6 4 L21.6 27.6 L6.6 27.6 Z" fill="url(#robe)" stroke="#5a3a28" stroke-width="1.1" stroke-linejoin="round"/>
 <path d="M11 9 Q10.4 18 10.6 26 M16.6 9 Q17.6 18 17.2 26" fill="none" stroke="#1d1a20" stroke-width="0.9"/>
 </svg>

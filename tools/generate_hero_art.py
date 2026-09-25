@@ -1297,8 +1297,6 @@ def build_gear():
         make()
 
 
-## Which example each class wears in battle.
-DEFAULTS = {"paladin": "moon_knight", "rogue": "shade", "wizard": "starlight"}
 GROUPS = [
     ("knights", "기사", "knight", VARIANTS, build),
     ("rogues", "도적", "rogue", ROGUES, rogue_parts),
@@ -1343,11 +1341,9 @@ def main():
                     entry[key] = k[key]
             entries.append(entry)
         gallery.append({"id": folder, "title": title, "style": style, "entries": entries})
-    for hero, pick in DEFAULTS.items():
-        for folder, _title, _style, variants, make in GROUPS:
-            for k in variants:
-                if k["id"] == pick:
-                    make(k, os.path.join(ROOT, "art", "heroes", hero))
+    # The battle heroes are the storybook knight, rogue and mage (tools/storybook_art.py).
+    import storybook_art
+    storybook_art.build(ROOT)
     build_gear()
     build_prototypes()
     with open(os.path.join(ROOT, "art", "gallery.json"), "w", encoding="utf-8") as f:

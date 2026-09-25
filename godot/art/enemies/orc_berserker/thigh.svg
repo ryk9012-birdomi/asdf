@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="36" viewBox="0 0 22 36">
 <defs><linearGradient id="fur" x1="0" y1="0" x2="0" y2="1">
 <stop offset="0" stop-color="#8a6a44"/><stop offset="1" stop-color="#4a3420"/></linearGradient></defs>
-<path d="M4.4 1.6 Q11 -0.4 17.6 1.6 L16.6 31.4 Q11 33.4 5.4 31.4 Z" fill="#4a3a2a" stroke="#1a0f08" stroke-width="1.5" stroke-linejoin="round"/>
-<path d="M4.6 12 L17.4 13 L17.2 16.6 L4.8 15.6 Z" fill="#2a1e14" stroke="#1a0f08" stroke-width="0.9" stroke-linejoin="round"/>
+<path d="M4.4 1.6 Q11 -0.4 17.6 1.6 L16.6 31.4 Q11 33.4 5.4 31.4 Z" fill="#4a3a2a" stroke="#5a3a28" stroke-width="1.1" stroke-linejoin="round"/>
+<path d="M4.6 12 L17.4 13 L17.2 16.6 L4.8 15.6 Z" fill="#2a1e14" stroke="#5a3a28" stroke-width="0.7" stroke-linejoin="round"/>
 </svg>

@@ -1,7 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-<defs><linearGradient id="skin" x1="0" y1="0" x2="1" y2="0">
-<stop offset="0" stop-color="#c0927a"/><stop offset="0.6" stop-color="#fbe6d6"/><stop offset="1" stop-color="#efcdb6"/></linearGradient></defs>
-<path d="M3 2.6 Q8 1 13 2.6 L13.6 11.6 Q8 14.4 2.6 11.6 Z" fill="url(#skin)" stroke="#1a0f08" stroke-width="1.5" stroke-linejoin="round"/>
-<path d="M3.4 7 L13.2 7 M3.6 9.6 L13.4 9.6" stroke="#000000" stroke-opacity="0.25" stroke-width="0.7"/>
-<path d="M12.4 3.6 Q15.2 6.4 13.2 9.6" fill="none" stroke="#1a0f08" stroke-width="0.9"/>
+<defs><linearGradient id="skin" x1="0" y1="0" x2="1" y2="0.25"><stop offset="0.00" stop-color="#e8b090"/><stop offset="0.50" stop-color="#fde6d2"/><stop offset="1.00" stop-color="#f6cfb2"/></linearGradient>
+<linearGradient id="gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0.00" stop-color="#f6d77a"/><stop offset="0.50" stop-color="#d9a441"/><stop offset="1.00" stop-color="#a8752a"/></linearGradient>
+<linearGradient id="leather" x1="0" y1="0" x2="1" y2="0.25"><stop offset="0.00" stop-color="#5e3a20"/><stop offset="0.50" stop-color="#b07a4a"/><stop offset="1.00" stop-color="#8a5a34"/></linearGradient>
+<linearGradient id="steel" x1="0" y1="0" x2="1" y2="0.25"><stop offset="0.00" stop-color="#8e949c"/><stop offset="0.33" stop-color="#f1f2f0"/><stop offset="0.67" stop-color="#c9ccd0"/><stop offset="1.00" stop-color="#8e949c"/></linearGradient>
+<linearGradient id="steelv" x1="0" y1="0" x2="0" y2="1"><stop offset="0.00" stop-color="#f1f2f0"/><stop offset="0.50" stop-color="#c9ccd0"/><stop offset="1.00" stop-color="#8e949c"/></linearGradient>
+<linearGradient id="cream" x1="0" y1="0" x2="1" y2="0.25"><stop offset="0.00" stop-color="#d9c6a0"/><stop offset="0.50" stop-color="#fbf4e4"/><stop offset="1.00" stop-color="#f1e4c8"/></linearGradient>
+<linearGradient id="red" x1="0" y1="0" x2="1" y2="0.25"><stop offset="0.00" stop-color="#8a2a26"/><stop offset="0.50" stop-color="#d45a4a"/><stop offset="1.00" stop-color="#b8423a"/></linearGradient>
+<linearGradient id="redv" x1="0" y1="0" x2="0" y2="1"><stop offset="0.00" stop-color="#d45a4a"/><stop offset="1.00" stop-color="#8a2a26"/></linearGradient></defs>
+<path d="M3 2.6 Q8 1 13 2.6 L13.6 11.6 Q8 14.4 2.6 11.6 Z" fill="url(#skin)" stroke="#5a3a28" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M12.4 3.6 Q15.2 6.4 13.2 9.6" fill="none" stroke="#5a3a28" stroke-width="0.8"/>
 </svg>

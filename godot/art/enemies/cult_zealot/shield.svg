@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="40" height="50" viewBox="0 0 40 50">
 <defs><radialGradient id="fire" cx="0.5" cy="0.7" r="0.6">
 <stop offset="0" stop-color="#fff6c0"/><stop offset="0.5" stop-color="#ffa030"/><stop offset="1" stop-color="#d8301a"/></radialGradient></defs>
-<path d="M18.6 17 L21.4 17 L22.4 46 L17.6 46 Z" fill="#5a3a22" stroke="#1a0f08" stroke-width="1.5" stroke-linejoin="round"/>
-<path d="M16.4 13 L23.6 13 L23 18 L17 18 Z" fill="#3a3a3a" stroke="#1a0f08" stroke-width="0.9" stroke-linejoin="round"/>
-<path d="M20 0 Q27 8 25 13 Q23.6 16 20 16.4 Q16 16 15 13 Q14 8 18 4 Q18 9 20 9 Q19 4 20 0 Z" fill="url(#fire)" stroke="#1a0f08" stroke-width="0.9" stroke-linejoin="round"/>
+<path d="M18.6 17 L21.4 17 L22.4 46 L17.6 46 Z" fill="#5a3a22" stroke="#5a3a28" stroke-width="1.1" stroke-linejoin="round"/>
+<path d="M16.4 13 L23.6 13 L23 18 L17 18 Z" fill="#3a3a3a" stroke="#5a3a28" stroke-width="0.7" stroke-linejoin="round"/>
+<path d="M20 0 Q27 8 25 13 Q23.6 16 20 16.4 Q16 16 15 13 Q14 8 18 4 Q18 9 20 9 Q19 4 20 0 Z" fill="url(#fire)" stroke="#5a3a28" stroke-width="0.7" stroke-linejoin="round"/>
 </svg>

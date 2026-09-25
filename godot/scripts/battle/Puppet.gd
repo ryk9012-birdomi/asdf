@@ -42,7 +42,10 @@ static func create(kind: StringName) -> Puppet:
 	if not HeroPuppet.RIGS.has(kind):
 		return null
 	var rig: Dictionary = HeroPuppet.RIGS[kind]
-	return hero(rig.art, rig.style, rig.get("size", 1.0), rig.get("head", []))
+	var puppet := hero(rig.art, rig.style, rig.get("size", 1.0), rig.get("head", []))
+	if rig.get("shape", "") == "chibi":
+		(puppet as HeroPuppet).proportion(HeroPuppet.CHIBI)
+	return puppet
 
 
 ## Any part set from tools/generate_hero_art.py, posed in that style.

@@ -142,6 +142,7 @@ func refresh(index: int) -> void:
 	figure.puppet.phase = figure.phase
 	figure.add_child(figure.puppet)
 	stage.add_child(figure)
+	figure.light()
 	slot.figure = figure
 	# A little flourish so the change reads: the new hero raises their weapon.
 	var flourish := create_tween()

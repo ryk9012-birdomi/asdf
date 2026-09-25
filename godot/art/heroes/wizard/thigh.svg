@@ -1,5 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="36" viewBox="0 0 22 36">
-<defs><linearGradient id="robe" x1="0" y1="0" x2="1" y2="0">
-<stop offset="0" stop-color="#192552"/><stop offset="0.45" stop-color="#334ba5"/><stop offset="1" stop-color="#1a2755"/></linearGradient></defs>
-<path d="M5 2 Q11 0 17 2 L16.4 31 Q11 32.6 5.6 31 Z" fill="#131c3e" stroke="#1a0f08" stroke-width="1.5" stroke-linejoin="round"/>
+<defs><linearGradient id="skin" x1="0" y1="0" x2="1" y2="0.25"><stop offset="0.00" stop-color="#e8b090"/><stop offset="0.50" stop-color="#fde6d2"/><stop offset="1.00" stop-color="#f6cfb2"/></linearGradient>
+<linearGradient id="gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0.00" stop-color="#f6d77a"/><stop offset="0.50" stop-color="#d9a441"/><stop offset="1.00" stop-color="#a8752a"/></linearGradient>
+<linearGradient id="leather" x1="0" y1="0" x2="1" y2="0.25"><stop offset="0.00" stop-color="#5e3a20"/><stop offset="0.50" stop-color="#b07a4a"/><stop offset="1.00" stop-color="#8a5a34"/></linearGradient>
+<linearGradient id="steel" x1="0" y1="0" x2="1" y2="0.25"><stop offset="0.00" stop-color="#8e949c"/><stop offset="0.33" stop-color="#f1f2f0"/><stop offset="0.67" stop-color="#c9ccd0"/><stop offset="1.00" stop-color="#8e949c"/></linearGradient>
+<linearGradient id="steelv" x1="0" y1="0" x2="0" y2="1"><stop offset="0.00" stop-color="#f1f2f0"/><stop offset="0.50" stop-color="#c9ccd0"/><stop offset="1.00" stop-color="#8e949c"/></linearGradient>
+<linearGradient id="cream" x1="0" y1="0" x2="1" y2="0.25"><stop offset="0.00" stop-color="#d9c6a0"/><stop offset="0.50" stop-color="#fbf4e4"/><stop offset="1.00" stop-color="#f1e4c8"/></linearGradient></defs>
+<path d="M4.6 1.6 Q11 -0.4 17.4 1.6 L16.6 31.4 Q11 33.4 5.4 31.4 Z" fill="#f1e4c8" stroke="#5a3a28" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M9 6 Q9.6 16 9 28" fill="none" stroke="#ffffff" stroke-width="0.9" opacity="0.25"/>
 </svg>

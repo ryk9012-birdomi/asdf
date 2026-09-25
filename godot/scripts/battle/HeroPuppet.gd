@@ -48,17 +48,17 @@ const STYLES := {
 ## Battle art per fighter kind (hero class id or enemy id). size scales the whole figure;
 ## head gives the head canvas margins [left, top] when they differ from the style's.
 const RIGS := {
-	&"paladin": {"art": "res://art/heroes/paladin/", "style": &"knight"},
-	&"rogue": {"art": "res://art/heroes/rogue/", "style": &"rogue"},
-	&"wizard": {"art": "res://art/heroes/wizard/", "style": &"wizard"},
-	&"goblin_raider": {"art": "res://art/enemies/goblin_raider/", "style": &"rogue", "size": 0.76, "head": [16, 24]},
-	&"goblin_archer": {"art": "res://art/enemies/goblin_archer/", "style": &"rogue", "size": 0.74, "head": [16, 24]},
-	&"hobgoblin_captain": {"art": "res://art/enemies/hobgoblin_captain/", "style": &"knight", "size": 1.1, "head": [16, 24]},
-	&"ember_priest": {"art": "res://art/enemies/ember_priest/", "style": &"wizard", "size": 1.12, "head": [16, 24]},
-	&"skeleton_warrior": {"art": "res://art/enemies/skeleton_warrior/", "style": &"knight", "size": 1.0, "head": [16, 24]},
-	&"cult_zealot": {"art": "res://art/enemies/cult_zealot/", "style": &"rogue", "size": 0.98},
-	&"cult_hexer": {"art": "res://art/enemies/cult_hexer/", "style": &"wizard", "size": 1.0},
-	&"orc_berserker": {"art": "res://art/enemies/orc_berserker/", "style": &"knight", "size": 1.16, "head": [16, 24]},
+	&"paladin": {"art": "res://art/heroes/paladin/", "style": &"knight", "head": [16, 30], "shape": "chibi"},
+	&"rogue": {"art": "res://art/heroes/rogue/", "style": &"rogue", "head": [16, 30], "shape": "chibi"},
+	&"wizard": {"art": "res://art/heroes/wizard/", "style": &"wizard", "head": [16, 36], "shape": "chibi"},
+	&"goblin_raider": {"art": "res://art/enemies/goblin_raider/", "style": &"rogue", "size": 0.76, "head": [16, 30], "shape": "chibi"},
+	&"goblin_archer": {"art": "res://art/enemies/goblin_archer/", "style": &"rogue", "size": 0.74, "head": [16, 30], "shape": "chibi"},
+	&"hobgoblin_captain": {"art": "res://art/enemies/hobgoblin_captain/", "style": &"knight", "size": 1.1, "head": [16, 30], "shape": "chibi"},
+	&"ember_priest": {"art": "res://art/enemies/ember_priest/", "style": &"wizard", "size": 1.12, "head": [16, 30], "shape": "chibi"},
+	&"skeleton_warrior": {"art": "res://art/enemies/skeleton_warrior/", "style": &"knight", "size": 1.0, "head": [16, 30], "shape": "chibi"},
+	&"cult_zealot": {"art": "res://art/enemies/cult_zealot/", "style": &"rogue", "size": 0.98, "head": [16, 30], "shape": "chibi"},
+	&"cult_hexer": {"art": "res://art/enemies/cult_hexer/", "style": &"wizard", "size": 1.0, "head": [16, 36], "shape": "chibi"},
+	&"orc_berserker": {"art": "res://art/enemies/orc_berserker/", "style": &"knight", "size": 1.16, "head": [16, 30], "shape": "chibi"},
 }
 
 ## Gear parts an item may carry (art/gear/<item>/<part>.svg) and the bones they dress.
@@ -67,6 +67,8 @@ const GEAR_PARTS := {"weapon": [&"sword"], "armor": [&"armor"], "sleeve": [&"sle
 
 ## Semi-realistic body: a smaller head on longer limbs (about 5 heads tall, not 3.5).
 const REALISTIC := {"head": 0.72, "legs": 1.2, "arms": 1.1, "torso": 1.06}
+## Storybook heroes: a big round head on a short body, about three heads tall.
+const CHIBI := {"head": 1.12, "legs": 0.8, "arms": 0.9, "torso": 0.88}
 
 var style: Dictionary
 ## Standing hip height; grows with longer legs.
