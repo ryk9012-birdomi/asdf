@@ -36,23 +36,20 @@ var stance: Vector2 = Vector2(-20, HUD_HEIGHT)
 
 
 class ShieldRow extends Control:
-	## Shield points as little kite shields; beyond six, one shield and a count.
+	## One shield icon with the shield points written beside it; hidden at zero.
 	var amount: int = 0
 
 	func _draw() -> void:
 		if amount <= 0:
 			return
-		var shown := mini(amount, 6)
-		var step := 19.0
 		var font := get_theme_default_font()
-		var extra := "×%d" % amount if amount > 6 else ""
-		var extra_width := font.get_string_size(extra, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x + 4.0 if amount > 6 else 0.0
-		var x := (size.x - shown * step - extra_width) / 2.0 + step / 2.0
-		for index in shown:
-			shield(Vector2(x + index * step, size.y / 2.0))
-		if amount > 6:
-			draw_string_outline(font, Vector2(x + shown * step - 6.0, size.y / 2.0 + 5.0), extra, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, 4, FighterView.OUTLINE)
-			draw_string(font, Vector2(x + shown * step - 6.0, size.y / 2.0 + 5.0), extra, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color("cfe0ff"))
+		var text := str(amount)
+		var width := font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, 17).x
+		var left := (size.x - 20.0 - 5.0 - width) / 2.0
+		shield(Vector2(left + 10.0, size.y / 2.0))
+		var baseline := Vector2(left + 25.0, size.y / 2.0 + 6.0)
+		draw_string_outline(font, baseline, text, HORIZONTAL_ALIGNMENT_LEFT, -1, 17, 5, FighterView.OUTLINE)
+		draw_string(font, baseline, text, HORIZONTAL_ALIGNMENT_LEFT, -1, 17, Color("cfe0ff"))
 
 	func shield(center: Vector2) -> void:
 		var outline := PackedVector2Array([Vector2(-8, -9), Vector2(8, -9), Vector2(8, 1), Vector2(0, 10), Vector2(-8, 1)])
