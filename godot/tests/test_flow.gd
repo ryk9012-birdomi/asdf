@@ -153,7 +153,9 @@ func run_tests() -> void:
 	current_scene.find_child("CampButton", true, false).pressed.emit()
 	await settle()
 	check(current_scene.name == "CampScreen", "The map always offers the camp")
-	run.stash.erase("lucky_coin")
+	# The chest may have handed out another coin; keep exactly one so the check is exact.
+	while "lucky_coin" in run.stash:
+		run.stash.erase("lucky_coin")
 	run.stash.append("lucky_coin")
 	current_scene.find_child("Equip_lucky_coin_0", true, false).pressed.emit()
 	check(run.party[0].equipment.get("trinket") == "lucky_coin" and "lucky_coin" not in run.stash, "Camp puts a trinket on Aldric")

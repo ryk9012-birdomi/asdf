@@ -5,7 +5,7 @@ extends RefCounted
 
 const KINDS := [&"paladin", &"rogue", &"wizard", &"goblin_raider", &"goblin_archer", &"hobgoblin_captain", &"ember_priest"]
 const INK := Color("1a0f08")
-const HEIGHTS := {&"paladin": 150.0, &"rogue": 138.0, &"wizard": 178.0, &"goblin_raider": 104.0, &"goblin_archer": 104.0, &"hobgoblin_captain": 176.0, &"ember_priest": 178.0}
+const HEIGHTS := {&"paladin": 156.0, &"rogue": 138.0, &"wizard": 178.0, &"goblin_raider": 104.0, &"goblin_archer": 104.0, &"hobgoblin_captain": 176.0, &"ember_priest": 178.0}
 
 var canvas: CanvasItem
 var breathe: float

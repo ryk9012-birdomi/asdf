@@ -74,9 +74,18 @@ class Figure extends Control:
 	var glow: float = 0.0
 	var marker: int = 0
 	var fallen: float = 0.0
+	var hurt: float = 0.0
+	var lean: float = 0.0
+	## Cut-out rig for characters that have one; the rest are drawn by FighterArt.
+	var puppet: Puppet
 
 	func _process(delta: float) -> void:
 		time += delta
+		if puppet != null:
+			puppet.position = Vector2(size.x / 2.0, size.y - FighterView.FEET - bob)
+			puppet.rotation = fallen * -PI / 2.0 * 0.95
+			puppet.scale = Vector2.ONE * FighterView.ART_SCALE
+			puppet.drive(self, delta)
 		queue_redraw()
 
 	func _draw() -> void:
@@ -88,6 +97,8 @@ class Figure extends Control:
 			2:
 				ground_ellipse(feet, Vector2(72 + pulse * 6.0, 16 + pulse), Color(0.43, 0.88, 0.55, 0.35 + 0.3 * pulse))
 		ground_ellipse(feet, Vector2(48, 10), Color(0, 0, 0, 0.45))
+		if puppet != null:
+			return
 		var breathe := sin(time * 2.2 + phase) * 2.0 * (1.0 - fallen)
 		draw_set_transform(feet + Vector2(0, -bob), fallen * -PI / 2.0 * 0.95, Vector2.ONE * FighterView.ART_SCALE)
 		var art := FighterArt.new(self, breathe, arm, glow, time)
@@ -121,6 +132,10 @@ func setup(combatant: CharacterUnit, facing_right: bool) -> void:
 	figure.size = Vector2(WIDTH + 40, HEIGHT - HUD_HEIGHT)
 	figure.pivot_offset = Vector2(figure.size.x / 2.0, figure.size.y - FEET)
 	figure.scale = Vector2(facing, 1.0)
+	figure.puppet = Puppet.create(kind)
+	if figure.puppet != null:
+		figure.puppet.phase = figure.phase
+		figure.add_child(figure.puppet)
 	add_child(figure)
 	hud = VBoxContainer.new()
 	hud.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -276,11 +291,13 @@ func lunge(spot: Vector2, swings: int) -> float:
 	var move := restart_motion()
 	move.tween_property(figure, "arm", -1.3, 0.12)
 	move.parallel().tween_property(figure, "position", stance + spot - home, 0.24).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	move.parallel().tween_property(figure, "lean", 1.0, 0.24)
 	for swing in maxi(1, swings):
 		move.tween_property(figure, "arm", 1.5, 0.09).set_trans(Tween.TRANS_BACK)
 		move.tween_property(figure, "arm", -0.6 if swing + 1 < swings else 0.0, 0.14)
 	move.tween_interval(0.12)
 	move.tween_property(figure, "position", stance, 0.3).set_trans(Tween.TRANS_SINE)
+	move.parallel().tween_property(figure, "lean", 0.0, 0.3)
 	move.tween_property(figure, "arm", 0.0, 0.1)
 	return 0.33
 
@@ -313,13 +330,17 @@ func recoil() -> void:
 		return
 	var knock := restart_motion()
 	knock.tween_property(figure, "position", stance - Vector2(14 * facing, 0), 0.06)
+	knock.parallel().tween_property(figure, "hurt", 1.0, 0.06)
 	knock.tween_property(figure, "position", stance, 0.22).set_trans(Tween.TRANS_SINE)
+	knock.parallel().tween_property(figure, "hurt", 0.0, 0.4).set_trans(Tween.TRANS_SINE)
 
 
 func dodge() -> void:
 	var hop := restart_motion()
 	hop.tween_property(figure, "position", stance - Vector2(30 * facing, 12), 0.12).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	hop.parallel().tween_property(figure, "lean", -0.8, 0.12)
 	hop.tween_property(figure, "position", stance, 0.22).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	hop.parallel().tween_property(figure, "lean", 0.0, 0.22)
 
 
 func fall() -> void:
