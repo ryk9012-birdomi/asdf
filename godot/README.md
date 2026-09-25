@@ -46,7 +46,7 @@ flowchart LR
 | --- | --- |
 | `scripts/battle/BattleManager.gd` | 유닛 등록, 행동 처리, 승패 판정. 기존 CharacterUnit 사용 |
 | `scripts/battle/TurnManager.gd` | Speed 순서와 현재 행동 유닛, 턴 Signal |
-| `scripts/battle/DamageCalculator.gd` | 명중·치명타·방어 계산 후 CharacterUnit에 최종 피해 전달 |
+| `scripts/battle/DamageCalculator.gd` | 2d6 판정(명중·스침·치명)과 확률 계산 후 CharacterUnit에 최종 피해 전달 |
 | `scripts/characters/EnemyUnit.gd`, `data/enemies/` | 공통 유닛 상태 재사용, 적 패턴 및 의도 표시 |
 | `scenes/battle/BattleScene.tscn`, `scenes/ui/BattleUI.tscn` | 3 대 3 전투와 스킬/대상 선택 |
 | `scripts/run/RunManager.gd` | 파티 수명, Credits, Inventory, Run 종료 관리 |
@@ -107,9 +107,9 @@ UnitCard의 라벨·색상 사각형·ProgressBar·버튼은 `_ready()`에서 �
 | [`res://scenes/battle/CharacterUnit.tscn`](scenes/battle/CharacterUnit.tscn) | CharacterUnit 스크립트가 연결된 Node |
 | [`res://scripts/ui/UnitCard.gd`](scripts/ui/UnitCard.gd), [`res://scenes/ui/UnitCard.tscn`](scenes/ui/UnitCard.tscn) | UI와 테스트 요청 Signal |
 | [`res://scripts/main/CharacterLab.gd`](scripts/main/CharacterLab.gd), [`res://scenes/main/CharacterLab.tscn`](scenes/main/CharacterLab.tscn) | 야영지, 테스트 버튼 처리, 상태 로그 |
-| [`res://data/classes/rogue.tres`](data/classes/rogue.tres) | 시엔 (Rogue) / HP 100, 보호막 10, 기력 5 |
-| [`res://data/classes/paladin.tres`](data/classes/paladin.tres) | 알데릭 (Paladin) / HP 140, 보호막 25, 기력 5 |
-| [`res://data/classes/wizard.tres`](data/classes/wizard.tres) | 엘로웬 (Wizard) / HP 80, 보호막 5, 기력 6 |
+| [`res://data/classes/rogue.tres`](data/classes/rogue.tres) | 시엔 (Rogue) / HP 8, 보호막 1, 기력 5 |
+| [`res://data/classes/paladin.tres`](data/classes/paladin.tres) | 알데릭 (Paladin) / HP 10, 보호막 2, 기력 5 |
+| [`res://data/classes/wizard.tres`](data/classes/wizard.tres) | 엘로웬 (Wizard) / HP 6, 보호막 0, 기력 6 |
 | `res://data/skills/*.tres` | 단검 베기, 급소 찌르기, 화염 화살, 마법 화살, 심판의 일격, 신앙의 방패 |
 | [`res://tests/test_character_system.gd`](tests/test_character_system.gd) | 독립 상태·경계값·사망·Scene/UI 통합 검증 |
 
@@ -131,7 +131,7 @@ UnitCard의 라벨·색상 사각형·ProgressBar·버튼은 `_ready()`에서 �
 | `restore_energy(amount)` | 최대 기력까지 복구, 실제 복구량 반환 |
 | `reset_to_starting_state()` | 원본 Resource의 시작 상태로 명시적 초기화 |
 
-`receive_damage()` 입력은 이미 계산된 최종 피해입니다. 따라서 야영지의 피해 30 버튼은 방어력을 적용하지 않습니다. 방어 계산을 유닛과 DamageCalculator 양쪽에서 중복하지 않도록 이 계약을 유지합니다. `bypass_shield`는 별도 옵션이며 TRUE_DAMAGE의 보호막 상호작용은 다음 전투 단계에서 규칙을 확정합니다.
+`receive_damage()` 입력은 이미 계산된 최종 피해입니다. 따라서 야영지의 피해 3 버튼은 방어를 적용하지 않습니다. 방어 계산을 유닛과 DamageCalculator 양쪽에서 중복하지 않도록 이 계약을 유지합니다. `bypass_shield`는 별도 옵션이며 TRUE_DAMAGE의 보호막 상호작용은 다음 전투 단계에서 규칙을 확정합니다.
 
 Signal은 `initialized`, `health_changed(current, maximum)`, `shield_changed(current)`, `energy_changed(current, maximum)`, `damage_received(health_damage, shield_damage)`, `unit_died(unit)`입니다. 피해 처리 시 상태 차감을 끝낸 뒤 보호막 → HP → 피해 → 사망 순서로 발생하며, HP/보호막은 실제 변화가 있을 때만 알립니다. 초기화는 모든 표시값을 다시 알립니다. 이미 사망한 유닛에 추가 피해를 주어도 사망 Signal을 반복하지 않습니다. 유닛 삭제와 전투 종료는 향후 BattleManager가 결정합니다.
 
@@ -175,7 +175,7 @@ Godot 4.x에서 생성한 `.gd.uid`는 소스와 함께 보관하고 `.godot/` �
 
 수동으로는 다음을 확인합니다.
 
-1. 시엔의 피해 30: 보호막 10 → 0, HP 100 → 80. 다른 두 캐릭터는 변화가 없습니다.
+1. 시엔의 피해 3: 보호막 1 → 0, HP 8 → 6. 다른 두 캐릭터는 변화가 없습니다.
 2. 시엔 치유 25: HP가 100에서 멈춥니다.
 3. 기력 −2를 반복: 부족하면 기력이 음수가 되지 않고 실패 로그가 나옵니다.
 4. 보호막 +20 다음 피해 30: 보호막부터 소모됩니다.

@@ -39,6 +39,7 @@ func _ready() -> void:
 	battle.action_resolved.connect(view.animate_action)
 	battle.hit_resolved.connect(view.show_hit)
 	battle.hit_missed.connect(view.show_miss)
+	battle.dice_rolled.connect(view.show_dice)
 	battle.shield_granted.connect(view.show_shield)
 	pace.timeout.connect(on_pace_timeout)
 	if not battle.start_battle(players, foes, battle_seed):

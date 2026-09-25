@@ -12,15 +12,18 @@ extends Resource
 
 @export_group("Starting Stats")
 @export_range(1, 100) var level: int = 1
-@export_range(1, 10000) var max_hp: int = 100
-@export_range(0, 10000) var starting_shield: int = 0
+## Scale guide: level 1–2 units keep HP at 10 or below; level 5+ elites and bosses start at 20 or more.
+@export_range(1, 999) var max_hp: int = 8
+@export_range(0, 999) var starting_shield: int = 0
 @export_range(0, 100) var max_energy: int = 5
 @export_range(0, 1000) var speed: int = 10
-@export_range(0, 1000) var attack: int = 20
-@export_range(0, 1000) var defense: int = 5
-@export_range(0.0, 1.0, 0.01) var accuracy: float = 0.95
-@export_range(0.0, 1.0, 0.01) var evasion: float = 0.05
-@export_range(0.0, 1.0, 0.01) var critical_chance: float = 0.1
+@export_range(0, 99) var attack: int = 2
+## Subtracted from the attacker's 2d6 total.
+@export_range(0, 12) var defense: int = 1
+## Added to this unit's own 2d6 attack total.
+@export_range(-6, 12) var hit_bonus: int = 1
+## A natural 2d6 of at least this value is a critical hit (12 = double sixes only).
+@export_range(7, 12) var crit_threshold: int = 12
 
 @export_group("Loadout")
 @export var skills: Array[SkillData] = []
@@ -34,9 +37,8 @@ func get_validation_errors() -> PackedStringArray:
 		errors.append("Invalid character starting health, shield, energy or level.")
 	if speed < 0 or attack < 0 or defense < 0:
 		errors.append("Combat stats must be nonnegative.")
-	for chance in [accuracy, evasion, critical_chance]:
-		if chance < 0.0 or chance > 1.0:
-			errors.append("Probabilities must be between zero and one.")
+	if crit_threshold < 7 or crit_threshold > 12:
+		errors.append("Critical threshold must be a natural 2d6 total from 7 to 12.")
 	var skill_ids: Array[StringName] = []
 	for skill in skills:
 		if skill == null:

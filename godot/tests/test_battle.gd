@@ -70,18 +70,37 @@ func test_damage() -> void:
 	var attacker := battle.actor
 	var target := battle.enemies[0]
 	var skill := attacker.character_data.skills[0].duplicate() as SkillData
-	attacker.attack = 20
-	attacker.accuracy = 1.0
-	attacker.critical_chance = 0.0
-	target.evasion = 0.0
-	target.defense = 4
-	check(DamageCalculator.roll(attacker, target, skill, battle.rng).damage == 16, "Armor subtracts once from normal hit")
-	attacker.critical_chance = 1.0
-	check(DamageCalculator.roll(attacker, target, skill, battle.rng).damage == 26, "Critical multiplies damage before armor")
+	attacker.attack = 3
+	attacker.hit_bonus = 2
+	attacker.crit_threshold = 12
+	target.defense = 1
+	var Outcome := DamageCalculator.Outcome
+	check(DamageCalculator.classify(2, 2, attacker, target, skill) == Outcome.MISS, "2d6 total below 7 misses")
+	check(DamageCalculator.classify(3, 3, attacker, target, skill) == Outcome.GLANCE, "2d6 total 7–9 glances")
+	check(DamageCalculator.classify(4, 5, attacker, target, skill) == Outcome.HIT, "2d6 total 10+ hits")
+	check(DamageCalculator.classify(6, 6, attacker, target, skill) == Outcome.CRITICAL, "Natural at crit threshold is critical")
+	attacker.crit_threshold = 11
+	check(DamageCalculator.classify(5, 6, attacker, target, skill) == Outcome.CRITICAL, "Lower crit threshold widens criticals")
+	attacker.crit_threshold = 12
+	check(DamageCalculator.damage_for(Outcome.GLANCE, 3) == 2 and DamageCalculator.damage_for(Outcome.HIT, 3) == 3, "Glance halves rounding up; hit deals full")
+	check(DamageCalculator.damage_for(Outcome.CRITICAL, 3) == 6 and DamageCalculator.damage_for(Outcome.MISS, 3) == 0, "Critical doubles; miss deals nothing")
+	var odds := DamageCalculator.odds(attacker, target, skill)
+	check(is_equal_approx(odds.miss + odds.glance + odds.hit + odds.critical, 1.0), "Odds cover all 36 outcomes")
+	check(is_equal_approx(odds.miss, 10 / 36.0) and is_equal_approx(odds.glance, 16 / 36.0), "+1 modifier: miss 10/36, glance 16/36")
+	check(is_equal_approx(odds.hit, 9 / 36.0) and is_equal_approx(odds.critical, 1 / 36.0), "+1 modifier: hit 9/36, critical 1/36")
 	skill.damage_type = SkillData.DamageType.TRUE_DAMAGE
-	check(DamageCalculator.roll(attacker, target, skill, battle.rng).damage == 30, "True damage ignores defense")
-	attacker.accuracy = 0.0
-	check(DamageCalculator.roll(attacker, target, skill, battle.rng).miss, "Zero accuracy reliably misses")
+	check(DamageCalculator.modifier(attacker, target, skill) == 2, "True damage ignores defence")
+	skill.damage_type = SkillData.DamageType.PHYSICAL
+	attacker.hit_bonus = 20
+	attacker.crit_threshold = 13
+	var roll := DamageCalculator.roll(attacker, target, skill, battle.rng)
+	check(roll.dice.size() == 2 and roll.outcome == Outcome.HIT and roll.damage == 3, "Seeded roll reports both dice and the hit")
+	attacker.hit_bonus = -20
+	check(DamageCalculator.roll(attacker, target, skill, battle.rng).miss, "Hopeless modifier reliably misses")
+	skill.auto_hit = true
+	roll = DamageCalculator.roll(attacker, target, skill, battle.rng)
+	check(roll.auto and roll.dice.is_empty() and roll.damage == 3, "Auto-hit skill skips the roll")
+	check(DamageCalculator.odds(attacker, target, skill).hit == 1.0, "Auto-hit odds are certain")
 	battle.free()
 
 
@@ -95,11 +114,10 @@ func test_targets_and_costs() -> void:
 	check(not battle.player_action(double, battle.enemies[2]), "Illegal rear target is rejected")
 	check(actor.current_energy == 5 and actor.cooldowns.is_empty(), "Invalid target spends no energy or cooldown")
 	check(not battle.player_action(battle.party[2].character_data.skills[0], battle.enemies[0]), "Unowned skill is rejected")
-	actor.accuracy = 1.0
-	actor.critical_chance = 0.0
-	battle.enemies[0].evasion = 0.0
+	actor.hit_bonus = 20
+	actor.crit_threshold = 13
 	check(battle.player_action(double, battle.enemies[0]), "Double slash accepted")
-	check(battle.enemies[0].current_hp == 60, "Both hits resolve separately through shield and armor")
+	check(battle.enemies[0].current_hp == 3, "Both hits resolve separately through shield")
 	check(actor.current_energy == 3 and actor.remaining_cooldown(double) == 2, "Multi-hit costs energy once and arms cooldown")
 	check(not battle.player_action(double, battle.enemies[0]), "Double click cannot cause a second action")
 	check(actor.current_energy == 3, "Rejected duplicate does not consume energy")
@@ -175,24 +193,22 @@ func test_group_skills() -> void:
 		var allied: bool = target_type in [SkillData.TargetType.ALL_ALLIES, SkillData.TargetType.ALLY, SkillData.TargetType.SELF]
 		skill.effect_type = SkillData.EffectType.SHIELD if allied else SkillData.EffectType.DAMAGE
 		skill.attack_multiplier = 0.0
-		skill.flat_value = 20
+		skill.flat_value = 2
 		definition.skills.append(skill)
 		actor.initialize(definition)
-		actor.accuracy = 1.0
-		actor.critical_chance = 0.0
-		for foe in battle.enemies:
-			foe.evasion = 0.0
+		actor.hit_bonus = 20
+		actor.crit_threshold = 13
 		var legal := battle.available_targets(skill)
 		check(battle.player_action(skill, legal[0]), "Generic target type executes: %d" % target_type)
 		check(actor.current_energy == actor.max_energy - 2, "Group/random skill charges cost once")
 		if target_type == SkillData.TargetType.ALL_ENEMIES:
-			check(battle.enemies.all(func(foe): return foe.current_hp == 70), "AoE reaches all living opponents")
+			check(battle.enemies.all(func(foe): return foe.current_hp == 5), "AoE reaches all living opponents")
 		elif target_type == SkillData.TargetType.ALL_ALLIES:
-			check(battle.party.all(func(hero): return hero.current_shield == hero.character_data.starting_shield + 20), "Party shield reaches every ally")
+			check(battle.party.all(func(hero): return hero.current_shield == hero.character_data.starting_shield + 2), "Party shield reaches every ally")
 		elif target_type == SkillData.TargetType.RANDOM_ENEMY:
 			check(battle.enemies.filter(func(foe): return foe.current_hp < foe.max_hp).size() == 1, "Random target hits exactly one opponent")
 		else:
-			check(legal[0].current_shield == legal[0].character_data.starting_shield + 20, "Single ally/self receives shield")
+			check(legal[0].current_shield == legal[0].character_data.starting_shield + 2, "Single ally/self receives shield")
 		battle.free()
 
 
@@ -242,15 +258,15 @@ func test_ui() -> void:
 	await create_timer(0.15).timeout
 	check(scene.battle.actor == scene.battle.party[2], "Scene timer advances to next hero")
 	for enemy in scene.battle.enemies:
-		enemy.accuracy = 1.0
-	scene.battle.party[0].evasion = 0.0
+		enemy.hit_bonus = 20
+		enemy.crit_threshold = 13
 	scene.view.pass_requested.emit()
 	await create_timer(0.65).timeout
 	check(scene.battle.phase == BattleManager.Phase.PLAYER_INPUT and scene.battle.actor == scene.battle.party[0], "AI timer chain resolves all three enemies then returns player control")
-	check(scene.battle.party[0].current_hp < 140, "Automated enemies apply actual damage")
+	check(scene.battle.party[0].current_hp < 10, "Automated enemies apply actual damage")
 	scene.view.skill_row.get_child(1).pressed.emit()
 	scene.view.cards[scene.battle.party[0]].pressed.emit()
-	check(scene.battle.party[0].current_shield == 25 and scene.battle.party[0].current_energy == 3, "Guard UI applies self shield and cost")
+	check(scene.battle.party[0].current_shield == 3 and scene.battle.party[0].current_energy == 3, "Guard UI applies self shield and cost")
 	for _index in 1000:
 		if scene.battle.phase == BattleManager.Phase.FINISHED:
 			break
@@ -259,7 +275,7 @@ func test_ui() -> void:
 	scene.view.restart_requested.emit()
 	await process_frame
 	await process_frame
-	check(current_scene != scene and current_scene.battle.party[0].current_hp == 140, "Restart creates a fresh encounter")
+	check(current_scene != scene and current_scene.battle.party[0].current_hp == 10, "Restart creates a fresh encounter")
 	current_scene.view.lab_requested.emit()
 	await process_frame
 	await process_frame

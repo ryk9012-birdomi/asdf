@@ -103,7 +103,7 @@ class Ornament extends Control:
 func setup(combatant: CharacterUnit, mirrored: bool = false) -> void:
 	unit = combatant
 	accent = unit.character_data.display_color
-	custom_minimum_size = Vector2(0, 124)
+	custom_minimum_size = Vector2(0, 134)
 	size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	focus_mode = Control.FOCUS_NONE
@@ -119,7 +119,7 @@ func setup(combatant: CharacterUnit, mirrored: bool = false) -> void:
 	content = MarginContainer.new()
 	content.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	for side in ["left", "top", "right", "bottom"]:
-		content.add_theme_constant_override("margin_" + side, 14)
+		content.add_theme_constant_override("margin_" + side, 12)
 	content.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(content)
 	var layout := HBoxContainer.new()
@@ -127,7 +127,7 @@ func setup(combatant: CharacterUnit, mirrored: bool = false) -> void:
 	layout.add_theme_constant_override("separation", 14)
 	content.add_child(layout)
 	emblem = Emblem.new()
-	emblem.custom_minimum_size = Vector2(96, 96)
+	emblem.custom_minimum_size = Vector2(88, 88)
 	emblem.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	emblem.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	emblem.color = accent
@@ -136,7 +136,7 @@ func setup(combatant: CharacterUnit, mirrored: bool = false) -> void:
 	var body := VBoxContainer.new()
 	body.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	body.add_theme_constant_override("separation", 5)
+	body.add_theme_constant_override("separation", 3)
 	layout.add_child(body)
 	layout.add_child(emblem)
 	if not mirrored:
@@ -156,7 +156,7 @@ func setup(combatant: CharacterUnit, mirrored: bool = false) -> void:
 	slot.text = SLOT_NAMES[unit.formation_slot]
 	slot.add_theme_color_override("font_color", accent)
 	var bars := Control.new()
-	bars.custom_minimum_size.y = 12
+	bars.custom_minimum_size.y = 10
 	bars.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	body.add_child(bars)
 	health_trail = make_bar(bars, Color("f3dcb0"), Color("140d09"))
@@ -179,7 +179,7 @@ func setup(combatant: CharacterUnit, mirrored: bool = false) -> void:
 		pip.custom_minimum_size = Vector2(10, 10)
 		pip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		energy_pips.add_child(pip)
-	details = make_label(body, 13)
+	details = make_label(body, 12)
 	details.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	details.add_theme_color_override("font_color", Color("b8a88a"))
 	down_stamp = Label.new()

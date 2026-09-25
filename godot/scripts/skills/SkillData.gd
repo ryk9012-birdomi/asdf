@@ -14,10 +14,12 @@ enum EffectType { DAMAGE, SHIELD }
 @export var damage_type: DamageType = DamageType.PHYSICAL
 @export var effect_type: EffectType = EffectType.DAMAGE
 @export_range(0.0, 10.0, 0.05) var attack_multiplier: float = 1.0
-@export_range(0, 10000) var flat_value: int = 0
+@export_range(0, 999) var flat_value: int = 0
 @export_range(1, 10) var hit_count: int = 1
 @export_range(0, 100) var energy_cost: int = 0
 @export_range(0, 20) var cooldown: int = 0
+## Skips the 2d6 attack roll entirely, like Magic Missile.
+@export var auto_hit: bool = false
 @export var animation_name: StringName = &""
 @export var sound: AudioStream
 

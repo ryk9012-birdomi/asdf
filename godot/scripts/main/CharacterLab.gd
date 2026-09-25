@@ -28,12 +28,12 @@ func on_action_requested(unit: CharacterUnit, action: StringName) -> void:
 	match action:
 		&"damage":
 			var previous_shield := unit.current_shield
-			var hp_damage := unit.receive_damage(30)
-			result = "피해 30 → 보호막 흡수 %d / HP 감소 %d" % [previous_shield - unit.current_shield, hp_damage]
+			var hp_damage := unit.receive_damage(3)
+			result = "피해 3 → 보호막 흡수 %d / HP 감소 %d" % [previous_shield - unit.current_shield, hp_damage]
 		&"heal":
-			result = "HP %d 회복" % unit.heal(25)
+			result = "HP %d 회복" % unit.heal(2)
 		&"shield":
-			result = "보호막 %d 획득" % unit.add_shield(20)
+			result = "보호막 %d 획득" % unit.add_shield(2)
 		&"spend":
 			result = "기력 2 사용" if unit.spend_energy(2) else "기력 부족: 상태 변화 없음"
 		&"restore":

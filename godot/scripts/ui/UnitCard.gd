@@ -52,7 +52,7 @@ func _ready() -> void:
 	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	description.custom_minimum_size.y = 40
 	add_label("ATK %d   /   DEF %d   /   SPD %d" % [character_data.attack, character_data.defense, character_data.speed], 14)
-	add_label("명중 %d%%   회피 %d%%   치명 %d%%" % [roundi(character_data.accuracy * 100), roundi(character_data.evasion * 100), roundi(character_data.critical_chance * 100)], 12, Color("b8a88a"))
+	add_label("Lv %d   ·   명중 %+d   ·   치명 %d+ (2d6)" % [character_data.level, character_data.hit_bonus, character_data.crit_threshold], 12, Color("b8a88a"))
 	health_label = add_label("", 14)
 	health_bar = add_bar(accent, 10)
 	resource_label = add_label("", 13, Color("d6c7a8"))
@@ -68,7 +68,7 @@ func _ready() -> void:
 	var actions := GridContainer.new()
 	actions.columns = 2
 	content.add_child(actions)
-	var labels := ["피해 30", "치유 25", "보호막 +20", "기력 −2", "기력 +2", "치명상"]
+	var labels := ["피해 3", "치유 2", "보호막 +2", "기력 −2", "기력 +2", "치명상"]
 	var ids: Array[StringName] = [&"damage", &"heal", &"shield", &"spend", &"restore", &"lethal"]
 	for index in ids.size():
 		var button := Button.new()

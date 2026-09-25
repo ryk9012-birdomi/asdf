@@ -6,12 +6,13 @@
 script = ExtResource("1_skill")
 id = &"magic_missile"
 skill_name = "마법 화살"
-description = "후열의 적 하나에게 빛나는 비전 화살을 날려 공격력 160%의 비전 피해."
+description = "후열의 적 하나에게 빗나가지 않는 비전 화살을 날려 공격력 100%의 피해. 명중 굴림 없음."
 target_type = 6
 damage_type = 1
 effect_type = 0
-attack_multiplier = 1.60
+attack_multiplier = 1.00
 flat_value = 0
 hit_count = 1
 energy_cost = 2
 cooldown = 1
+auto_hit = true

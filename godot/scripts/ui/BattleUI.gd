@@ -33,6 +33,40 @@ var log_lines: PackedStringArray = []
 var scroll: ScrollContainer
 var fx_layer: Control
 var popup_stacks: Dictionary = {}
+var dice_stacks: Dictionary = {}
+
+
+class DicePair extends Control:
+	## Two drawn six-sided dice; faces are set by the caller while tumbling and on landing.
+	const PIPS := {
+		1: [Vector2(0, 0)],
+		2: [Vector2(-1, -1), Vector2(1, 1)],
+		3: [Vector2(-1, -1), Vector2(0, 0), Vector2(1, 1)],
+		4: [Vector2(-1, -1), Vector2(1, -1), Vector2(-1, 1), Vector2(1, 1)],
+		5: [Vector2(-1, -1), Vector2(1, -1), Vector2(0, 0), Vector2(-1, 1), Vector2(1, 1)],
+		6: [Vector2(-1, -1), Vector2(1, -1), Vector2(-1, 0), Vector2(1, 0), Vector2(-1, 1), Vector2(1, 1)],
+	}
+	const SIDE := 34.0
+	var faces: Array[int] = [1, 1]
+	var rim: Color = Color("c9a24a")
+
+	func set_faces(first: int, second: int) -> void:
+		faces = [first, second]
+		queue_redraw()
+
+	func _draw() -> void:
+		for index in 2:
+			var rect := Rect2(Vector2(index * (SIDE + 8.0), 0), Vector2(SIDE, SIDE))
+			var box := StyleBoxFlat.new()
+			box.bg_color = Color("f1e3c2")
+			box.border_color = rim
+			box.set_border_width_all(2)
+			box.set_corner_radius_all(7)
+			box.shadow_color = Color(0, 0, 0, 0.55)
+			box.shadow_size = 5
+			draw_style_box(box, rect)
+			for pip in PIPS[faces[index]]:
+				draw_circle(rect.get_center() + pip * SIDE * 0.26, 3.4, Color("5a1d14"))
 var screen_tween: Tween
 
 
@@ -109,7 +143,7 @@ func _ready() -> void:
 	log_box.add_theme_color_override("default_color", Color("d6c7a8"))
 	log_box.scroll_following = true
 	log_body.add_child(log_box)
-	label(content, "스킬 선택 → 초록빛 대상 클릭  |  보호막은 피해를 먼저 흡수  |  자기 차례 기력 +1  |  재사용 대기는 자신의 턴 기준  |  d20은 명중 굴림", 12, MUTED)
+	label(content, "판정: 2d6 + 명중 − 방어  →  7~9 스침(피해 절반) · 10+ 명중 · 주사위 눈이 치명 기준 이상이면 치명타(2배)  |  보호막이 피해를 먼저 흡수  |  자기 차례 기력 +1", 12, MUTED)
 
 
 func build_battlefield() -> Control:
@@ -126,7 +160,7 @@ func build_battlefield() -> Control:
 	versus.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	glow_text(versus, Color("ff8a2a"), 14)
 	divider.add_child(beam_rule())
-	enemy_column = side_column(field, "적대  ·  행동 예고는 방어 적용 전 수치", RED, HORIZONTAL_ALIGNMENT_RIGHT)
+	enemy_column = side_column(field, "적대  ·  예고 적중률은 2d6 판정 기준", RED, HORIZONTAL_ALIGNMENT_RIGHT)
 	return field
 
 
@@ -258,16 +292,43 @@ func refresh_cards() -> void:
 	if selected_skill != null and battle.phase == BattleManager.Phase.PLAYER_INPUT:
 		legal = battle.available_targets(selected_skill)
 	for unit in cards:
-		var detail := "ATK %d  /  DEF %d  /  SPD %d" % [unit.attack, unit.defense, unit.speed]
-		if unit is EnemyUnit and unit.is_alive():
-			var before_turn: bool = unit != battle.actor or battle.phase != BattleManager.Phase.ENEMY_TURN
-			var intent: SkillData = unit.intended_skill(before_turn)
-			if intent != null:
-				var amount := roundi(unit.attack * intent.attack_multiplier) + intent.flat_value
-				detail = "예고 ▸ %s · %s %d" % [intent.skill_name, "보호막" if intent.effect_type == SkillData.EffectType.SHIELD else "공격", amount]
-			else:
-				detail = "예고 ▸ 대기"
+		var detail := "ATK %d  ·  방어 %d  ·  명중 %+d  ·  SPD %d" % [unit.attack, unit.defense, unit.hit_bonus, unit.speed]
+		if unit in legal:
+			detail = forecast(battle.actor, unit, selected_skill)
+		elif unit is EnemyUnit and unit.is_alive():
+			detail = intent_text(unit)
 		cards[unit].refresh(unit == battle.actor and battle.phase != BattleManager.Phase.FINISHED, unit in legal, detail)
+
+
+## Exact outcome chances of `skill` from `attacker` against `defender`, as card text.
+func forecast(attacker: CharacterUnit, defender: CharacterUnit, skill: SkillData) -> String:
+	var base := DamageCalculator.base_damage(attacker, skill)
+	if skill.effect_type == SkillData.EffectType.SHIELD:
+		return "보호막 +%d" % base
+	var odds := DamageCalculator.odds(attacker, defender, skill)
+	var hits := " × %d회" % skill.hit_count if skill.hit_count > 1 else ""
+	if skill.auto_hit:
+		return "적중 100%%  ·  자동 명중\n피해 %d%s" % [base, hits]
+	return "적중 %d%%  —  명중 %d%% · 스침 %d%% · 치명 %d%%\n피해 %d (스침 %d · 치명 %d)%s  ·  2d6 %+d" % [
+		percent(odds.land), percent(odds.hit), percent(odds.glance), percent(odds.critical),
+		base, DamageCalculator.damage_for(DamageCalculator.Outcome.GLANCE, base), base * 2, hits,
+		DamageCalculator.modifier(attacker, defender, skill)]
+
+
+func intent_text(enemy: EnemyUnit) -> String:
+	var before_turn: bool = enemy != battle.actor or battle.phase != BattleManager.Phase.ENEMY_TURN
+	var intent: SkillData = enemy.intended_skill(before_turn)
+	if intent == null:
+		return "예고 ▸ 대기"
+	var targets := TargetRules.legal_targets(enemy, intent, battle.enemies, battle.party)
+	if intent.effect_type == SkillData.EffectType.SHIELD or targets.is_empty():
+		return "예고 ▸ %s · 보호막 %d" % [intent.skill_name, DamageCalculator.base_damage(enemy, intent)]
+	var odds := DamageCalculator.odds(enemy, targets[0], intent)
+	return "예고 ▸ %s → %s\n적중 %d%% · 피해 %d" % [intent.skill_name, targets[0].display_name, percent(odds.land), DamageCalculator.base_damage(enemy, intent)]
+
+
+func percent(chance: float) -> int:
+	return roundi(chance * 100.0)
 
 
 func animate_action(actor: CharacterUnit, targets: Array[CharacterUnit], skill: SkillData) -> void:
@@ -313,6 +374,56 @@ func show_hit(target: CharacterUnit, health_damage: int, shield_damage: int, cri
 		shake_screen(7.0)
 	elif health_damage > 0 or shield_damage == 0:
 		spawn_popup(target, "−%d" % health_damage, Color("ff7a66"), 24)
+
+
+func show_dice(target: CharacterUnit, roll: Dictionary) -> void:
+	if not cards.has(target) or roll.auto:
+		return
+	var frame := Engine.get_process_frames()
+	var stack: Array = dice_stacks.get(target, [frame, 0])
+	if stack[0] != frame:
+		stack = [frame, 0]
+	var order: int = mini(stack[1], 2)
+	dice_stacks[target] = [frame, stack[1] + 1]
+	var colors := [Color("b3a78f"), Color("f0b44c"), Color("ff7a4d"), GOLD]
+	var holder := Control.new()
+	holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	fx_layer.add_child(holder)
+	var dice := DicePair.new()
+	dice.size = Vector2(DicePair.SIDE * 2 + 8, DicePair.SIDE)
+	dice.pivot_offset = dice.size / 2.0
+	dice.rim = colors[roll.outcome].darkened(0.1)
+	holder.add_child(dice)
+	var verdict := Label.new()
+	verdict.text = "%+d = %d  %s" % [roll.modifier, roll.total, DamageCalculator.OUTCOME_NAMES[roll.outcome]]
+	verdict.theme_type_variation = "HeadingLabel"
+	verdict.add_theme_font_size_override("font_size", 17)
+	verdict.add_theme_color_override("font_color", colors[roll.outcome])
+	verdict.add_theme_color_override("font_outline_color", Color(0.06, 0.03, 0.02, 0.95))
+	verdict.add_theme_constant_override("outline_size", 6)
+	verdict.position = Vector2(dice.size.x + 10, 4)
+	verdict.modulate.a = 0.0
+	holder.add_child(verdict)
+	var card: Control = cards[target]
+	var rect := card.get_global_rect()
+	holder.position = Vector2(rect.position.x + 16 + order * 190, rect.position.y - 24) - fx_layer.get_global_rect().position
+	var final_faces: Array = roll.dice
+	var spin := func(progress: float) -> void:
+		dice.rotation = sin(progress * 18.0) * 0.35 * (1.0 - progress)
+		dice.set_faces(randi_range(1, 6), randi_range(1, 6))
+	var land := func() -> void:
+		dice.set_faces(final_faces[0], final_faces[1])
+		dice.rotation = 0.0
+		dice.scale = Vector2.ONE * 1.25
+	var tumble := holder.create_tween()
+	tumble.tween_interval(order * 0.16)
+	tumble.tween_method(spin, 0.0, 1.0, 0.38)
+	tumble.tween_callback(land)
+	tumble.tween_property(dice, "scale", Vector2.ONE, 0.18).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tumble.parallel().tween_property(verdict, "modulate:a", 1.0, 0.15)
+	tumble.tween_interval(1.0)
+	tumble.tween_property(holder, "modulate:a", 0.0, 0.35)
+	tumble.tween_callback(holder.queue_free)
 
 
 func show_miss(target: CharacterUnit) -> void:
@@ -374,7 +485,7 @@ func spawn_popup(unit: CharacterUnit, text_value: String, color: Color, font_siz
 	popup.add_theme_constant_override("shadow_offset_y", 0)
 	fx_layer.add_child(popup)
 	popup.reset_size()
-	var origin := card_center(unit) - popup.size / 2.0 + Vector2(randf_range(-20, 20), 6 - order * 30)
+	var origin := card_center(unit) - popup.size / 2.0 + Vector2(randf_range(-20, 20), 24 - order * 28)
 	popup.position = origin
 	popup.pivot_offset = popup.size / 2.0
 	popup.scale = Vector2.ONE * 0.3
@@ -383,7 +494,7 @@ func spawn_popup(unit: CharacterUnit, text_value: String, color: Color, font_siz
 	motion.tween_interval(order * 0.12)
 	motion.tween_property(popup, "modulate:a", 1.0, 0.08)
 	motion.parallel().tween_property(popup, "scale", Vector2.ONE, 0.22).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	motion.parallel().tween_property(popup, "position:y", origin.y - 60, 0.95).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	motion.parallel().tween_property(popup, "position:y", origin.y - 44, 0.95).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	motion.tween_property(popup, "modulate:a", 0.0, 0.3)
 	motion.tween_callback(popup.queue_free)
 

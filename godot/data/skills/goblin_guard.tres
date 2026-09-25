@@ -6,12 +6,12 @@
 script = ExtResource("1_skill")
 id = &"goblin_guard"
 skill_name = "방패 뒤로 숨기"
-description = "자신에게 보호막 12를 두릅니다."
+description = "자신에게 보호막 2를 두릅니다."
 target_type = 0
 damage_type = 0
 effect_type = 1
 attack_multiplier = 0.00
-flat_value = 12
+flat_value = 2
 hit_count = 1
 energy_cost = 0
 cooldown = 0

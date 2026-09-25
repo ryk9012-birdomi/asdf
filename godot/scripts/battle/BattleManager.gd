@@ -8,6 +8,7 @@ signal action_resolved(actor: CharacterUnit, targets: Array[CharacterUnit], skil
 signal battle_finished(victory: bool)
 signal hit_resolved(target: CharacterUnit, health_damage: int, shield_damage: int, critical: bool)
 signal hit_missed(target: CharacterUnit)
+signal dice_rolled(target: CharacterUnit, roll: Dictionary)
 signal shield_granted(target: CharacterUnit, amount: int)
 
 enum Phase { IDLE, PLAYER_INPUT, ENEMY_TURN, RESOLVING, FINISHED }
@@ -144,14 +145,15 @@ func perform_action(skill: SkillData, target: CharacterUnit) -> bool:
 
 func apply_hit(recipient: CharacterUnit, skill: SkillData) -> void:
 	var roll := DamageCalculator.roll(actor, recipient, skill, rng)
+	dice_rolled.emit(recipient, roll)
 	if roll.miss:
 		hit_missed.emit(recipient)
-		message_logged.emit("  %s · 빗나감 (d20 %d)" % [recipient.display_name, roll.d20])
+		message_logged.emit("  %s · %s" % [recipient.display_name, DamageCalculator.describe(roll)])
 		return
 	var old_shield := recipient.current_shield
 	var hp_damage := recipient.receive_damage(roll.damage)
 	hit_resolved.emit(recipient, hp_damage, old_shield - recipient.current_shield, roll.critical)
-	message_logged.emit("  %s · HP −%d / 보호막 −%d%s  (d20 %d)" % [recipient.display_name, hp_damage, old_shield - recipient.current_shield, " / 치명타" if roll.critical else "", roll.d20])
+	message_logged.emit("  %s · %s · HP −%d / 보호막 −%d" % [recipient.display_name, DamageCalculator.describe(roll), hp_damage, old_shield - recipient.current_shield])
 	if not recipient.is_alive():
 		message_logged.emit("  %s · 쓰러짐" % recipient.display_name)
 
