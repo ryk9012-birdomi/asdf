@@ -5,6 +5,7 @@ signal skill_requested(skill: SkillData, target: CharacterUnit)
 signal pass_requested
 signal restart_requested
 signal lab_requested
+signal menu_requested
 
 const CARD_SCRIPT = preload("res://scripts/ui/CombatantView.gd")
 const STAGGER := 40
@@ -100,6 +101,7 @@ func _ready() -> void:
 	title.theme_type_variation = "HeadingLabel"
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	glow_text(title, Color("ff9a3c"), 10)
+	button(header, "메인 메뉴", func(): menu_requested.emit())
 	button(header, "야영지", func(): lab_requested.emit())
 	button(header, "전투 재시작", func(): restart_requested.emit())
 	var turn_strip := HBoxContainer.new()
@@ -239,7 +241,7 @@ func refresh() -> void:
 		pass_button = button(skill_row, "대기\n턴 넘기기", func(): pass_requested.emit())
 		pass_button.custom_minimum_size = Vector2(110, 56)
 	elif finished:
-		prompt.text = "전투 재시작으로 다시 도전할 수 있습니다."
+		prompt.text = "전투 재시작으로 다시 도전하거나 메인 메뉴로 돌아갈 수 있습니다."
 	elif battle.phase == BattleManager.Phase.ENEMY_TURN:
 		prompt.text = "%s · 행동 준비 중…" % battle.actor.display_name
 	else:

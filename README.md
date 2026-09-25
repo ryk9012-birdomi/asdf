@@ -4,7 +4,7 @@
 
 - 엔진: **Godot 4.7.2 stable** / GDScript / Compatibility(OpenGL) 렌더러
 - 프로젝트 루트: [`godot/project.godot`](godot/project.godot) (이 폴더가 `res://`)
-- 현재 단계: **MVP 1 · 2단계**, 3 대 3 턴제 전투
+- 현재 단계: **로드맵 1단계 완료**. 실행하면 메인 메뉴가 뜨고, 새 여정으로 3 대 3 턴제 전투를 합니다. 다음은 슬레이 더 스파이어식 맵입니다([로드맵](godot/docs/ROADMAP.md)).
 
 ## 실행
 
@@ -12,18 +12,27 @@
 
 | 목적 | 명령 |
 |---|---|
-| 전투 바로 실행 | `Play-Godot.cmd` 더블클릭 또는 `./Open-Godot.ps1 -Run` |
+| 게임 실행 (메인 메뉴) | `Play-Godot.cmd` 더블클릭 또는 `./Open-Godot.ps1 -Run` |
 | Godot 에디터 열기 | `./Open-Godot.ps1` |
 | 자동 검증 | `./Open-Godot.ps1 -Test` |
 
 Windows 외 환경에서는 직접 실행합니다.
 
 ```sh
-godot --path godot                                                   # 전투 실행
+godot --path godot                                                   # 게임 실행 (메인 메뉴)
 godot --headless --path godot --editor --import                      # 최초 1회 리소스 임포트
 godot --headless --path godot --script res://tests/test_character_system.gd
 godot --headless --path godot --script res://tests/test_battle.gd
+godot --headless --path godot --script res://tests/test_flow.gd
 ```
+
+## 메인 메뉴
+
+- **새 여정**: 전투를 시작합니다. 3단계 이후에는 맵으로 이동합니다.
+- **이어하기**: 저장 기능(5단계) 전까지 비활성입니다.
+- **야영지**: 일행의 능력치와 상태를 확인합니다.
+- **종료**
+- 전투와 야영지 화면에도 `메인 메뉴` 버튼이 있습니다. 화면이 바뀔 때마다 어둠이 걷히는 전환 효과가 공통으로 적용됩니다.
 
 ## 전투 화면
 
@@ -46,8 +55,8 @@ godot --headless --path godot --script res://tests/test_battle.gd
 ```text
 godot/
 ├─ project.godot
-├─ scenes/     battle(전투), main(야영지), ui(카드/전투 UI)
-├─ scripts/    battle(규칙), characters(유닛/데이터), skills, ui(표시·연출)
+├─ scenes/     battle(전투), main(메인 메뉴·야영지), ui(카드/전투 UI)
+├─ scripts/    core(화면 전환), battle(규칙), characters(유닛/데이터), skills, ui(표시·연출)
 ├─ data/       classes · enemies · skills  (.tres 데이터)
 ├─ tests/      헤드리스 자동 검증
 └─ docs/       단계별 개발 문서
@@ -55,5 +64,6 @@ godot/
 
 ## 문서
 
+- [로드맵: 메인 메뉴부터 한 막 완주까지](godot/docs/ROADMAP.md)
 - [프로젝트 구조와 1단계 기록](godot/README.md)
 - [MVP 1 · 2단계: 턴제 전투 구현·조작·테스트](godot/docs/MVP1_STEP2.md)

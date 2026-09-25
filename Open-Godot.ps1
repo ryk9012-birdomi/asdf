@@ -33,6 +33,7 @@ if ($Test) {
     Invoke-GodotCheck @('--headless', '--path', $projectPath, '--editor', '--import')
     Invoke-GodotCheck @('--headless', '--path', $projectPath, '--script', 'res://tests/test_character_system.gd')
     Invoke-GodotCheck @('--headless', '--path', $projectPath, '--script', 'res://tests/test_battle.gd')
+    Invoke-GodotCheck @('--headless', '--path', $projectPath, '--script', 'res://tests/test_flow.gd')
     exit 0
 }
 

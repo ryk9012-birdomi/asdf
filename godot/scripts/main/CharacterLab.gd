@@ -19,7 +19,13 @@ func _ready() -> void:
 		card.action_requested.connect(on_action_requested)
 		card.unit.unit_died.connect(on_unit_died)
 	%ResetButton.pressed.connect(reset_party)
-	%BattleButton.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/battle/BattleScene.tscn"))
+	%BattleButton.pressed.connect(func(): SceneRouter.go(get_tree(), SceneRouter.BATTLE))
+	var menu_button := Button.new()
+	menu_button.name = "MenuButton"
+	menu_button.text = "메인 메뉴"
+	menu_button.pressed.connect(func(): SceneRouter.go(get_tree(), SceneRouter.MAIN_MENU))
+	%BattleButton.get_parent().add_child(menu_button)
+	%BattleButton.get_parent().move_child(menu_button, %ResetButton.get_index())
 	log_message("모닥불 곁에 일행이 모였습니다. 각 모험가의 상태 시험 버튼을 눌러 보세요.")
 
 
