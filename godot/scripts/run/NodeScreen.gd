@@ -117,10 +117,30 @@ func take_rest() -> void:
 
 
 func open_chest() -> void:
+	# Swap the buttons after this press has finished being handled.
+	show_chest.call_deferred()
+
+
+func show_chest() -> void:
 	var gold := Encounters.gold_for(run, map_node)
 	AudioDirector.sfx("coin", 0.02)
 	run.gold += gold
-	finish("상자 안에는 교단이 빼돌린 금화가 들어 있었다. 골드 +%d (보유 %d)" % [gold, run.gold])
+	for child in actions.get_children():
+		actions.remove_child(child)
+		child.queue_free()
+	outcome.text = "상자 안에는 교단이 빼돌린 금화 %d닢과 장비 세 점이 들어 있다. 하나만 챙길 수 있다." % gold
+	for item_id in Encounters.reward_options(run, map_node):
+		var info: Dictionary = Items.item(item_id)
+		var pick := option("[%s]  %s  —  %s" % [Items.SLOT_NAMES[info.slot], info.name, Items.describe(item_id)], func(): take_item(item_id, gold))
+		pick.name = "Reward_%s" % item_id
+		pick.tooltip_text = info.flavor
+	option("아무것도 챙기지 않는다", func(): finish("금화만 챙겨 상자를 닫았다. 골드 +%d (보유 %d)" % [gold, run.gold]))
+
+
+func take_item(item_id: String, gold: int) -> void:
+	run.stash.append(item_id)
+	AudioDirector.sfx("shield", 0.05, -4.0)
+	finish("골드 +%d (보유 %d)  ·  %s 획득 — 지도의 야영지에서 착용할 수 있다." % [gold, run.gold, Items.item(item_id).name])
 
 
 func finish(message: String) -> void:
@@ -130,7 +150,7 @@ func finish(message: String) -> void:
 		child.queue_free()
 	var onward := FantasyTheme.button(actions, "지도로 돌아간다", func(): SceneRouter.go(get_tree(), SceneRouter.MAP))
 	onward.name = "ContinueButton"
-	onward.grab_focus.call_deferred()
+	FantasyTheme.focus_later(onward)
 
 
 func back_to_map() -> void:

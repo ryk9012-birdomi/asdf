@@ -67,6 +67,13 @@ func available_targets(skill: SkillData) -> Array[CharacterUnit]:
 	return TargetRules.legal_targets(actor, skill, allies, opponents)
 
 
+## Melee accuracy penalty for striking `target` past the foremost living line.
+func reach_penalty(skill: SkillData, target: CharacterUnit) -> int:
+	if actor == null:
+		return 0
+	return TargetRules.reach_penalty(skill, target, enemies if actor in party else party)
+
+
 func skill_block_reason(skill: SkillData) -> String:
 	if actor == null or not actor.is_alive():
 		return "행동할 수 없음"
@@ -145,7 +152,7 @@ func perform_action(skill: SkillData, target: CharacterUnit) -> bool:
 
 
 func apply_hit(recipient: CharacterUnit, skill: SkillData) -> void:
-	var roll := DamageCalculator.roll(actor, recipient, skill, rng)
+	var roll := DamageCalculator.roll(actor, recipient, skill, rng, reach_penalty(skill, recipient))
 	dice_rolled.emit(recipient, roll)
 	if roll.miss:
 		hit_missed.emit(recipient)

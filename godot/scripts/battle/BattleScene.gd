@@ -54,7 +54,7 @@ func _ready() -> void:
 	view.skill_requested.connect(battle.player_action)
 	view.pass_requested.connect(battle.player_pass)
 	view.restart_requested.connect(func(): get_tree().reload_current_scene())
-	view.lab_requested.connect(func(): SceneRouter.go(get_tree(), SceneRouter.CAMP))
+	view.lab_requested.connect(func(): SceneRouter.go(get_tree(), SceneRouter.TRAINING))
 	view.menu_requested.connect(func(): SceneRouter.go(get_tree(), SceneRouter.MAIN_MENU))
 	view.continue_requested.connect(on_continue)
 	battle.battle_finished.connect(on_battle_finished)
@@ -119,7 +119,14 @@ func on_battle_finished(victory: bool) -> void:
 	var note := "골드 +%d" % gold
 	if not revived.is_empty():
 		note += "   ·   %s 간신히 일어남 (HP 1)" % ", ".join(revived)
-	view.show_run_result(note, "여정 결과 보기" if run.finished else "지도로 돌아가기")
+	var onward := "여정 결과 보기" if run.finished else "지도로 돌아가기"
+	if run.finished:
+		view.show_run_result(note, onward)
+		return
+	view.show_rewards(note, Encounters.reward_options(run, map_node), func(item_id: String):
+		if not item_id.is_empty():
+			run.stash.append(item_id)
+		view.show_run_result(note + ("   ·   %s 획득 — 야영지에서 착용" % Items.item(item_id).name if not item_id.is_empty() else "   ·   보상 건너뜀"), onward))
 
 
 func on_continue() -> void:

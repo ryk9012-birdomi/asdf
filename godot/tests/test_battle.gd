@@ -113,8 +113,12 @@ func test_targets_and_costs() -> void:
 	var basic := actor.character_data.skills[0]
 	var double := actor.character_data.skills[1]
 	check(actor == battle.party[1], "Fastest hero acts first")
-	check(battle.available_targets(basic) == [battle.enemies[0]], "Melee targets only living front")
-	check(not battle.player_action(double, battle.enemies[2]), "Illegal rear target is rejected")
+	check(battle.available_targets(basic) == battle.enemies, "Melee can reach every living foe, front first")
+	check(battle.reach_penalty(basic, battle.enemies[0]) == 0 and battle.reach_penalty(basic, battle.enemies[1]) == 2 and battle.reach_penalty(basic, battle.enemies[2]) == 4, "Reaching the middle costs 2 accuracy, the back 4")
+	var near := DamageCalculator.odds(actor, battle.enemies[0], basic, battle.reach_penalty(basic, battle.enemies[0]))
+	var far := DamageCalculator.odds(actor, battle.enemies[2], basic, battle.reach_penalty(basic, battle.enemies[2]))
+	check(far.land < near.land, "The back line is harder to hit in melee")
+	check(not battle.player_action(double, battle.party[0]), "Melee cannot strike an ally")
 	check(actor.current_energy == 5 and actor.cooldowns.is_empty(), "Invalid target spends no energy or cooldown")
 	check(not battle.player_action(battle.party[2].character_data.skills[0], battle.enemies[0]), "Unowned skill is rejected")
 	actor.hit_bonus = 20
@@ -137,7 +141,7 @@ func test_targets_and_costs() -> void:
 			break
 	check(actor.remaining_cooldown(double) == 0, "Skill is available after one skipped personal turn")
 	battle.enemies[0].receive_damage(9999)
-	check(battle.available_targets(basic) == [battle.enemies[1]], "Dead front exposes middle")
+	check(battle.reach_penalty(basic, battle.enemies[1]) == 0, "Dead front makes the middle the new front line")
 	var rear_skill: SkillData = battle.party[2].character_data.skills[1]
 	check(battle.available_targets(rear_skill) == [battle.enemies[2]], "Rear skill targets living back")
 	battle.enemies[2].receive_damage(9999)
@@ -260,8 +264,9 @@ func test_ui() -> void:
 	check(hero_view.kind == &"paladin" and foe_view.kind == &"goblin_raider", "Each unit gets its own drawing")
 	scene.view.skill_row.get_child(0).pressed.emit()
 	var front: CharacterUnit = scene.battle.enemies[0]
-	check(not scene.view.fighters[front].disabled and scene.view.fighters[scene.battle.enemies[1]].disabled, "Skill button highlights only legal target")
+	check(not scene.view.fighters[front].disabled and not scene.view.fighters[scene.battle.enemies[2]].disabled and scene.view.fighters[scene.battle.party[0]].disabled, "Melee skill lights every foe and no ally")
 	check(scene.view.fighters[front].info.text.begins_with("적중"), "Target shows its hit odds overhead")
+	check("거리 −4" in scene.view.fighters[scene.battle.enemies[2]].info.text, "Back-line target shows the reach penalty")
 	if "--capture" in OS.get_cmdline_user_args():
 		await process_frame
 		await RenderingServer.frame_post_draw

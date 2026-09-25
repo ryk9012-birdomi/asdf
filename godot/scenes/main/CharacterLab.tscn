@@ -85,14 +85,14 @@ theme_override_constants/separation = 12
 [node name="Eyebrow" type="Label" parent="Scroll/Margin/Content"]
 theme_override_colors/font_color = Color(0.85, 0.70, 0.35, 1)
 theme_override_font_sizes/font_size = 13
-text = "OATH OF EMBERS     ·     CAMP     ·     001"
+text = "OATH OF EMBERS     ·     TRAINING GROUNDS"
 
 [node name="Header" type="HBoxContainer" parent="Scroll/Margin/Content"]
 
 [node name="Title" type="Label" parent="Scroll/Margin/Content/Header"]
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 34
-text = "잿불 서약  ·  야영지"
+text = "잿불 서약  ·  훈련장"
 
 [node name="ResetButton" type="Button" parent="Scroll/Margin/Content/Header"]
 unique_name_in_owner = true
@@ -127,7 +127,7 @@ formation_slot = 2
 [node name="LogTitle" type="Label" parent="Scroll/Margin/Content"]
 theme_override_colors/font_color = Color(0.85, 0.70, 0.35, 1)
 theme_override_font_sizes/font_size = 12
-text = "야영 일지  ·  상태 변경 기록"
+text = "훈련 일지  ·  상태 변경 기록"
 
 [node name="EventLog" type="RichTextLabel" parent="Scroll/Margin/Content"]
 unique_name_in_owner = true

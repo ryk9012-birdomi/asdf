@@ -7,7 +7,7 @@ const MUTED := FantasyTheme.MUTED
 
 var new_run_button: Button
 var continue_button: Button
-var camp_button: Button
+var training_button: Button
 var quit_button: Button
 var music_slider: HSlider
 var sfx_slider: HSlider
@@ -75,7 +75,7 @@ func _ready() -> void:
 	continue_button.disabled = run == null or run.finished
 	if continue_button.disabled:
 		continue_button.tooltip_text = "진행 중인 여정이 없습니다."
-	camp_button = menu_button(column, "야영지", "일행의 능력치와 상태를 살펴봅니다.", func(): SceneRouter.go(get_tree(), SceneRouter.CAMP))
+	training_button = menu_button(column, "훈련장", "일행의 능력치와 상태를 시험해 봅니다.", func(): SceneRouter.go(get_tree(), SceneRouter.TRAINING))
 	quit_button = menu_button(column, "종료", "게임을 끝냅니다.", quit_game)
 	var sound_gap := Control.new()
 	sound_gap.custom_minimum_size.y = 18
@@ -95,7 +95,7 @@ func _ready() -> void:
 	footer.position.y -= 34
 	footer.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(footer)
-	new_run_button.grab_focus.call_deferred()
+	FantasyTheme.focus_later(new_run_button)
 	column.modulate.a = 0.0
 	create_tween().tween_property(column, "modulate:a", 1.0, 0.8).set_trans(Tween.TRANS_SINE)
 

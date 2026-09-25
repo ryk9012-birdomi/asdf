@@ -72,6 +72,7 @@ var lab_button: Button
 var restart_button: Button
 var continue_button: Button
 var result_note: Label
+var reward_row: HBoxContainer
 var run_mode: bool = false
 var arena: BattleArena
 ## Effects of the action being resolved; played when the 3D blow lands.
@@ -110,7 +111,7 @@ func _ready() -> void:
 	title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	glow_text(title_label, Color("ff9a3c"), 10)
 	button(header, "메인 메뉴", func(): menu_requested.emit())
-	lab_button = button(header, "야영지", func(): lab_requested.emit())
+	lab_button = button(header, "훈련장", func(): lab_requested.emit())
 	restart_button = button(header, "전투 재시작", func(): restart_requested.emit())
 	var turn_strip := HBoxContainer.new()
 	turn_strip.add_theme_constant_override("separation", 12)
@@ -149,6 +150,11 @@ func _ready() -> void:
 	result_note = label(result_body, "", 15, TEXT)
 	result_note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	result_note.visible = false
+	reward_row = HBoxContainer.new()
+	reward_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	reward_row.add_theme_constant_override("separation", 10)
+	reward_row.visible = false
+	result_body.add_child(reward_row)
 	continue_button = button(result_body, "", func(): continue_requested.emit())
 	continue_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	continue_button.custom_minimum_size = Vector2(260, 44)
@@ -288,12 +294,14 @@ func forecast(attacker: CharacterUnit, defender: CharacterUnit, skill: SkillData
 	var base := DamageCalculator.base_damage(attacker, skill)
 	if skill.effect_type == SkillData.EffectType.SHIELD:
 		return "보호막 +%d" % base
-	var odds := DamageCalculator.odds(attacker, defender, skill)
+	var reach := battle.reach_penalty(skill, defender)
+	var odds := DamageCalculator.odds(attacker, defender, skill, reach)
 	var hits := "×%d" % skill.hit_count if skill.hit_count > 1 else ""
 	if skill.auto_hit:
 		return "적중 100%% · 피해 %d%s\n자동 명중" % [base, hits]
-	return "적중 %d%% · 피해 %d%s\n명중 %d · 스침 %d · 치명 %d" % [
-		percent(odds.land), base, hits, percent(odds.hit), percent(odds.glance), percent(odds.critical)]
+	var reach_note := "  (거리 −%d)" % reach if reach > 0 else ""
+	return "적중 %d%% · 피해 %d%s%s\n명중 %d · 스침 %d · 치명 %d" % [
+		percent(odds.land), base, hits, reach_note, percent(odds.hit), percent(odds.glance), percent(odds.critical)]
 
 
 ## Full breakdown for the target card's tooltip.
@@ -301,9 +309,10 @@ func forecast_detail(attacker: CharacterUnit, defender: CharacterUnit, skill: Sk
 	if skill.effect_type == SkillData.EffectType.SHIELD or skill.auto_hit:
 		return "클릭하여 대상 확정"
 	var base := DamageCalculator.base_damage(attacker, skill)
-	return "2d6 %+d (명중 %+d, 방어 −%d)\n7~9 스침: 피해 %d  ·  10+ 명중: 피해 %d\n주사위 %d 이상 치명타: 피해 %d\n클릭하여 대상 확정" % [
-		DamageCalculator.modifier(attacker, defender, skill), attacker.hit_bonus,
-		0 if skill.damage_type == SkillData.DamageType.TRUE_DAMAGE else defender.defense,
+	var reach := battle.reach_penalty(skill, defender)
+	return "2d6 %+d (명중 %+d, 방어 −%d, 거리 −%d)\n7~9 스침: 피해 %d  ·  10+ 명중: 피해 %d\n주사위 %d 이상 치명타: 피해 %d\n클릭하여 대상 확정" % [
+		DamageCalculator.modifier(attacker, defender, skill, reach), attacker.hit_bonus,
+		0 if skill.damage_type == SkillData.DamageType.TRUE_DAMAGE else defender.defense, reach,
 		DamageCalculator.damage_for(DamageCalculator.Outcome.GLANCE, base), base, attacker.crit_threshold, base * 2]
 
 
@@ -315,7 +324,7 @@ func intent_text(enemy: EnemyUnit) -> String:
 	var targets := TargetRules.legal_targets(enemy, intent, battle.enemies, battle.party)
 	if intent.effect_type == SkillData.EffectType.SHIELD or targets.is_empty():
 		return "▸ %s\n보호막 +%d" % [intent.skill_name, DamageCalculator.base_damage(enemy, intent)]
-	var odds := DamageCalculator.odds(enemy, targets[0], intent)
+	var odds := DamageCalculator.odds(enemy, targets[0], intent, TargetRules.reach_penalty(intent, targets[0], battle.party))
 	var aimed_at: String = "일행 전체" if intent.target_type == SkillData.TargetType.ALL_ENEMIES else targets[0].display_name
 	return "▸ %s → %s\n적중 %d%% · 피해 %d" % [intent.skill_name, aimed_at, percent(odds.land), DamageCalculator.base_damage(enemy, intent)]
 
@@ -500,15 +509,49 @@ func set_run_mode(heading: String) -> void:
 	restart_button.visible = false
 
 
+## Victory spoils: pick one of three pieces of gear (or skip); `picked` gets the item id or "".
+func show_rewards(note: String, options: Array[String], picked: Callable) -> void:
+	result_note.text = note + "\n전리품 하나를 고르세요."
+	result_note.visible = true
+	continue_button.visible = false
+	for child in reward_row.get_children():
+		reward_row.remove_child(child)
+		child.queue_free()
+	for item_id in options:
+		var info: Dictionary = Items.item(item_id)
+		var card := button(reward_row, "[%s]\n%s\n%s" % [Items.SLOT_NAMES[info.slot], info.name, Items.describe(item_id)], func():
+			reward_row.visible = false
+			AudioDirector.sfx("coin", 0.02)
+			picked.call(item_id), GOLD)
+		card.name = "Reward_%s" % item_id
+		card.custom_minimum_size = Vector2(190, 100)
+		card.tooltip_text = info.flavor
+	var skip := button(reward_row, "건너뛰기", func():
+		reward_row.visible = false
+		picked.call(""))
+	skip.name = "RewardSkip"
+	skip.custom_minimum_size = Vector2(110, 100)
+	reward_row.visible = true
+
+
 func show_run_result(note: String, onward: String) -> void:
 	result_note.text = note
 	result_note.visible = not note.is_empty()
 	continue_button.text = onward
 	continue_button.visible = true
-	continue_button.grab_focus.call_deferred()
+	FantasyTheme.focus_later(continue_button)
 
 
 func reveal_result() -> void:
+	# Fighters are added after the banner; bring it (over a dimmed field) to the front.
+	var dim := ColorRect.new()
+	dim.name = "ResultDim"
+	dim.color = Color(0.02, 0.01, 0.0, 0.0)
+	dim.mouse_filter = Control.MOUSE_FILTER_STOP
+	arena.add_child(dim)
+	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	create_tween().tween_property(dim, "color:a", 0.55, 0.4)
+	arena.move_child(result_banner, arena.get_child_count() - 1)
 	result_label.text = "승리  ·  고갯길을 되찾았습니다" if battle.victory else "패배  ·  일행이 모두 쓰러졌습니다"
 	var color := GOLD if battle.victory else RED
 	result_label.add_theme_color_override("font_color", color)

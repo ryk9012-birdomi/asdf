@@ -86,6 +86,8 @@ func build() -> void:
 	FantasyTheme.label(titles, "OATH OF EMBERS   ·   CHAPTER I", 14, FantasyTheme.TRIM)
 	var title := FantasyTheme.label(titles, "잿빛 고갯길  ·  여정 지도", 32, Color("f4e2b8"), true)
 	FantasyTheme.glow(title, Color("ff8a2a"), 10)
+	var camp := FantasyTheme.button(header, "야영지  (장비 · 기술 강화)", func(): SceneRouter.go(get_tree(), SceneRouter.CAMP))
+	camp.name = "CampButton"
 	FantasyTheme.button(header, "메인 메뉴", func(): SceneRouter.go(get_tree(), SceneRouter.MAIN_MENU))
 	var body := HBoxContainer.new()
 	body.size_flags_vertical = Control.SIZE_EXPAND_FILL

@@ -137,3 +137,11 @@ static func hero_row(parent: Node, hero: RunState.HeroState) -> void:
 	bar.add_theme_stylebox_override("background", back)
 	row.add_child(bar)
 	label(row, hero.definition.class_name_label, 13, color)
+
+
+## Focus a control on the next frame, unless the screen changed in between.
+static func focus_later(control: Control) -> void:
+	var grab := func() -> void:
+		if is_instance_valid(control) and control.is_inside_tree() and control.is_visible_in_tree():
+			control.grab_focus()
+	grab.call_deferred()

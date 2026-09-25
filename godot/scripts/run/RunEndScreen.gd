@@ -33,7 +33,7 @@ func _ready() -> void:
 	column.add_child(gap)
 	new_run_button = FantasyTheme.button(column, "새 여정", start_new_run, true)
 	menu_button = FantasyTheme.button(column, "메인 메뉴", func(): leave(SceneRouter.MAIN_MENU), true)
-	new_run_button.grab_focus.call_deferred()
+	FantasyTheme.focus_later(new_run_button)
 
 
 func centered(parent: Node, text_value: String, font_size: int, color: Color, heading: bool = false) -> Label:

@@ -32,8 +32,19 @@ static func enemies_for(run: RunState, map_node: RunMap.MapNode) -> Array[EnemyD
 			paths = front + back
 	var result: Array[EnemyData] = []
 	for path in paths:
-		result.append(load(path))
+		result.append(scaled(load(path), map_node.floor))
 	return result
+
+
+## Deeper floors field tougher foes, so gear and upgrades keep mattering.
+## Floors count from 0: +1 HP every two floors and +1 accuracy from floor 6 (7층).
+## Tuned by full-run simulation: a careful bot that wears gear and upgrades skills
+## wins about half its runs; one that ignores the camp rarely does.
+static func scaled(data: EnemyData, floor_index: int) -> EnemyData:
+	var foe := data.duplicate() as EnemyData
+	foe.max_hp += floor_index / 2
+	foe.hit_bonus += 1 if floor_index >= 6 else 0
+	return foe
 
 
 static func gold_for(run: RunState, map_node: RunMap.MapNode) -> int:
@@ -47,6 +58,19 @@ static func gold_for(run: RunState, map_node: RunMap.MapNode) -> int:
 		RunMap.NodeType.TREASURE:
 			return rng.randi_range(30, 50)
 	return rng.randi_range(8, 14)
+
+
+## Three different pieces of gear to choose one from after a fight or at a chest.
+static func reward_options(run: RunState, map_node: RunMap.MapNode) -> Array[String]:
+	var options: Array[String] = []
+	if map_node.type not in [RunMap.NodeType.BATTLE, RunMap.NodeType.ELITE, RunMap.NodeType.TREASURE]:
+		return options
+	var rng := RandomNumberGenerator.new()
+	rng.seed = run.encounter_seed(map_node.id) + 2
+	var pool: Array = Items.ALL.keys()
+	while options.size() < 3 and not pool.is_empty():
+		options.append(pool.pop_at(rng.randi_range(0, pool.size() - 1)))
+	return options
 
 
 static func is_combat(map_node: RunMap.MapNode) -> bool:

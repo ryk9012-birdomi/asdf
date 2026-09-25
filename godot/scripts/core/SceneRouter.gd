@@ -4,7 +4,8 @@ extends RefCounted
 
 const MAIN_MENU := "res://scenes/main/MainMenu.tscn"
 const BATTLE := "res://scenes/battle/BattleScene.tscn"
-const CAMP := "res://scenes/main/CharacterLab.tscn"
+const TRAINING := "res://scenes/main/CharacterLab.tscn"
+const CAMP := "res://scenes/run/CampScreen.tscn"
 const MAP := "res://scenes/run/MapScreen.tscn"
 const NODE := "res://scenes/run/NodeScreen.tscn"
 const RUN_END := "res://scenes/run/RunEndScreen.tscn"

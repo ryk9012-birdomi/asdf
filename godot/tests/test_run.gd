@@ -24,6 +24,7 @@ func run_tests() -> void:
 	test_travel()
 	test_party_persistence()
 	test_events()
+	test_gear_and_upgrades()
 	print("Run system: %d checks, %d failures" % [checks, failures])
 	AudioDirector.shutdown()
 	# Let the audio thread drop its playbacks before the leak check at exit.
@@ -243,3 +244,38 @@ func test_events() -> void:
 	var first := Events.resolve(RunState.begin(31, heroes()), start, cart.choices[0])
 	var second := Events.resolve(RunState.begin(31, heroes()), start, cart.choices[0])
 	check(first.roll.dice == second.roll.dice and first.roll.total == first.roll.dice[0] + first.roll.dice[1] + 1, "Event rolls are seeded and add the hero's bonus")
+
+
+func test_gear_and_upgrades() -> void:
+	var run := RunState.begin(55, heroes())
+	check(run.stash == Items.STARTING_STASH, "A journey starts with the starter gear stashed")
+	check(not run.equip(0, "honed_sword"), "Only stashed gear can be worn")
+	run.stash.append("chain_shirt")
+	check(run.equip(0, "chain_shirt") and run.party[0].max_hp() == 12 and run.party[0].current_hp == 12, "Armor raises max and current HP")
+	check(run.equip(0, "leather_vest") and "chain_shirt" in run.stash and run.party[0].max_hp() == 10, "Swapping armor returns the old piece to the stash")
+	var fighter := run.party[0].battle_definition()
+	check(fighter.defense == 3 and fighter.get_validation_errors().is_empty(), "Battle definition includes gear bonuses")
+	check(run.unequip(0, "armor") and run.party[0].equipment.is_empty(), "Gear can be taken off")
+	for item_id in Items.ALL:
+		check(Items.item(item_id).slot in Items.SLOTS and not Items.describe(item_id).is_empty(), "Item %s has a slot and a bonus" % item_id)
+	var strike: SkillData = run.party[0].definition.skills[0]
+	var guard: SkillData = run.party[0].definition.skills[1]
+	check(not run.can_upgrade(0, strike), "Upgrades cost gold")
+	run.gold = 100
+	check(run.upgrade_skill(0, guard) and run.upgrade_skill(0, guard), "A skill can be raised to level 3")
+	check(run.gold == 55 and not run.can_upgrade(0, guard), "Costs 15 then 30 gold; level 3 is the cap")
+	var improved := run.party[0].upgraded(guard)
+	check(improved.flat_value == guard.flat_value + 2 and improved.energy_cost == guard.energy_cost - 1, "Level 3: +2 effect and 1 MP cheaper")
+	check(guard.flat_value == 3, "The shared skill resource is untouched")
+	var options := Encounters.reward_options(run, run.map.start_nodes()[0])
+	check(options.is_empty(), "Events give no gear picks")
+	var fight: RunMap.MapNode = run.map.nodes.filter(func(candidate): return candidate.type == RunMap.NodeType.BATTLE)[0]
+	options = Encounters.reward_options(run, fight)
+	check(options.size() == 3 and options[0] != options[1] and options[1] != options[2] and options[0] != options[2], "Battle spoils are three different items")
+	check(options == Encounters.reward_options(run, fight), "Spoils are seeded per node")
+	var shallow := RunMap.MapNode.new(900, 1, 0)
+	var deep := RunMap.MapNode.new(901, 8, 0)
+	var raider_low: EnemyData = Encounters.enemies_for(run, shallow)[0]
+	var raider_high: EnemyData = Encounters.enemies_for(run, deep)[0]
+	check(raider_high.max_hp == raider_low.max_hp + 4 and raider_high.hit_bonus == raider_low.hit_bonus + 1, "Deeper floors field tougher goblins")
+	check(load(Encounters.RAIDER).max_hp == 6, "Scaling never edits the shared enemy data")
