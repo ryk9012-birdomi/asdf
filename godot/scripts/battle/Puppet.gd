@@ -45,8 +45,8 @@ static func create(kind: StringName) -> Puppet:
 		return null
 	var rig: Dictionary = HeroPuppet.RIGS[kind]
 	var puppet := hero(rig.art, rig.style, rig.get("size", 1.0), rig.get("head", []))
-	if rig.get("shape", "") == "chibi":
-		(puppet as HeroPuppet).proportion(HeroPuppet.CHIBI)
+	if rig.get("shape", "") == "realistic":
+		(puppet as HeroPuppet).proportion(HeroPuppet.REALISTIC)
 	return puppet
 
 

@@ -5,8 +5,8 @@
 <stop offset="0" stop-color="#55412a"/><stop offset="0.45" stop-color="#ac8455"/><stop offset="1" stop-color="#4b3a25"/></linearGradient>
 <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
 <stop offset="0" stop-color="#fbe39a"/><stop offset="0.55" stop-color="#e0a93e"/><stop offset="1" stop-color="#8e5c17"/></linearGradient></defs>
-<path d="M5 2.4 L13 2.4 L12.4 10 L5.6 10 Z" fill="url(#fabric)" stroke="#1a0f08" stroke-width="1.5" stroke-linejoin="round"/>
-<path d="M4.2 8.6 Q9 7.4 13.8 8.6 L13.2 22.4 Q9 23.4 4.8 22.4 Z" fill="url(#leather)" stroke="#1a0f08" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M5 2.4 L13 2.4 L12.4 10 L5.6 10 Z" fill="url(#fabric)" stroke="#2e2620" stroke-width="0.9" stroke-linejoin="round"/>
+<path d="M4.2 8.6 Q9 7.4 13.8 8.6 L13.2 22.4 Q9 23.4 4.8 22.4 Z" fill="url(#leather)" stroke="#2e2620" stroke-width="0.9" stroke-linejoin="round"/>
 <path d="M4.6 12.6 L13.4 12.6 M4.8 17.2 L13.2 17.2" stroke="#3e2f1e" stroke-width="0.9"/>
-<circle cx="11.4" cy="12.6" r="0.7" fill="url(#gold)" stroke="#1a0f08" stroke-width="0.5"/><circle cx="11.4" cy="17.2" r="0.7" fill="url(#gold)" stroke="#1a0f08" stroke-width="0.5"/>
+<circle cx="11.4" cy="12.6" r="0.7" fill="url(#gold)" stroke="#2e2620" stroke-width="0.5"/><circle cx="11.4" cy="17.2" r="0.7" fill="url(#gold)" stroke="#2e2620" stroke-width="0.5"/>
 </svg>

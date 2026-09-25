@@ -17,7 +17,7 @@ func _ready() -> void:
 	map_node = run.current_node()
 	theme = FantasyTheme.build()
 	AudioDirector.music("map")
-	add_child(StoryBackdrop.new())
+	add_child(Backdrop.new())
 	var center := CenterContainer.new()
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(center)
@@ -29,7 +29,7 @@ func _ready() -> void:
 	column.add_theme_constant_override("separation", 16)
 	panel.add_child(column)
 	FantasyTheme.label(column, "%d층   ·   %s" % [map_node.floor + 1, RunMap.TYPE_NAMES[map_node.type]], 15, FantasyTheme.TRIM)
-	var title := FantasyTheme.label(column, "", 34, Color("6a3a1a"), true)
+	var title := FantasyTheme.label(column, "", 34, Color("e6dcc6"), true)
 	FantasyTheme.glow(title, Color("ff8a2a"), 10)
 	story = FantasyTheme.label(column, "", 19, FantasyTheme.TEXT)
 	story.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -104,7 +104,7 @@ func show_party() -> void:
 			row.add_child(slot)
 			FantasyTheme.hero_row(slot, hero)
 		if run.ward > 0:
-			FantasyTheme.label(party_box, "축복: 다음 전투 시작 시 모두 보호막 +%d" % run.ward, 15, Color("3a6ab0"))
+			FantasyTheme.label(party_box, "축복: 다음 전투 시작 시 모두 보호막 +%d" % run.ward, 15, Color("8aa2c0"))
 		FantasyTheme.label(party_box, "골드 %d" % run.gold, 15, FantasyTheme.GOLD)
 
 

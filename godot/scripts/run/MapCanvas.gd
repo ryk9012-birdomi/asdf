@@ -10,10 +10,10 @@ const COLUMN := 128.0
 const MARGIN := Vector2(104, 96)
 const RADIUS := 22.0
 const BOSS_RADIUS := 42.0
-const INK := Color("3a2414")
-const FADED_INK := Color(0.23, 0.14, 0.08, 0.45)
-const PARCHMENT := Color("f6ebd2")
-const ROUTE := Color("8e2a1c")
+const INK := Color("201a14")
+const FADED_INK := Color(0.13, 0.1, 0.07, 0.5)
+const PARCHMENT := Color("b2a88e")
+const ROUTE := Color("6e3026")
 
 var run: RunState
 var positions: Dictionary = {}
@@ -115,9 +115,9 @@ func draw_node(map_node: RunMap.MapNode, center: Vector2, open: bool) -> void:
 		var grow := 1.18 if map_node.id == hovered else 1.0
 		radius *= grow
 		draw_circle(center, radius + 9.0 + pulse * 4.0, Color(1.0, 0.72, 0.25, 0.18 + 0.12 * pulse))
-		draw_arc(center, radius + 6.0 + pulse * 2.0, 0, TAU, 48, Color("c58a1e"), 2.5, true)
+		draw_arc(center, radius + 6.0 + pulse * 2.0, 0, TAU, 48, Color("a8825a"), 2.5, true)
 	var ink := INK if open or visited or boss else FADED_INK
-	draw_circle(center, radius, PARCHMENT if open else Color(0.94, 0.88, 0.76, 0.85))
+	draw_circle(center, radius, PARCHMENT if open else Color(0.6, 0.57, 0.49, 0.85))
 	draw_arc(center, radius, 0, TAU, 48, ink, 2.5 if boss else 2.0, true)
 	if boss:
 		draw_arc(center, radius - 6.0, 0, TAU, 48, Color(ROUTE, 0.8), 1.5, true)
@@ -161,7 +161,7 @@ func draw_icon(type: RunMap.NodeType, center: Vector2, size: float, ink: Color) 
 			var body := Rect2(center + Vector2(-size, -size * 0.2), Vector2(size * 2.0, size * 1.1))
 			draw_rect(body, ink, false, 2.5)
 			draw_arc(center + Vector2(0, -size * 0.2), size, PI, TAU, 16, ink, 2.5, true)
-			draw_rect(Rect2(center + Vector2(-size * 0.2, -size * 0.35), Vector2(size * 0.4, size * 0.45)), Color("b8860b") if ink.a > 0.9 else ink)
+			draw_rect(Rect2(center + Vector2(-size * 0.2, -size * 0.35), Vector2(size * 0.4, size * 0.45)), Color("9a7a3c") if ink.a > 0.9 else ink)
 		RunMap.NodeType.BOSS:
 			skull(center + Vector2(0, size * 0.1), size * 0.8, ink)
 			for index in 5:

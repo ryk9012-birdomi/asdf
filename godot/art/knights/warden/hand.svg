@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
 <defs><linearGradient id="steelv" x1="0" y1="0" x2="0" y2="1">
 <stop offset="0" stop-color="#c9ead8"/><stop offset="0.5" stop-color="#7fb39a"/><stop offset="1" stop-color="#34564a"/></linearGradient></defs>
-<path d="M2.4 3 Q8 0.8 13.6 3 L14 12.6 Q8 15.6 2.2 12.6 Z" fill="url(#steelv)" stroke="#1a0f08" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M2.4 3 Q8 0.8 13.6 3 L14 12.6 Q8 15.6 2.2 12.6 Z" fill="url(#steelv)" stroke="#2e2620" stroke-width="0.9" stroke-linejoin="round"/>
 <path d="M3 6.4 L13.4 6.4 M3 9.4 L13.6 9.4" stroke="#000000" stroke-opacity="0.4" stroke-width="0.8"/>
-<path d="M12.6 3.4 Q15.6 6.6 13.4 10.2" fill="none" stroke="#1a0f08" stroke-width="1"/>
+<path d="M12.6 3.4 Q15.6 6.6 13.4 10.2" fill="none" stroke="#2e2620" stroke-width="1"/>
 </svg>

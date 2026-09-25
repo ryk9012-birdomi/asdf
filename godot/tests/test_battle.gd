@@ -324,7 +324,7 @@ func test_knight_gallery() -> void:
 	root.add_child(gallery)
 	await process_frame
 	await process_frame
-	check(gallery.figures.size() == 12, "Knight gallery shows all twelve examples")
+	check(gallery.figures.size() == 13, "Knight gallery shows all thirteen examples")
 	var complete := true
 	for figure in gallery.figures:
 		for id in [&"torso", &"head", &"sword", &"shield", &"cape"]:

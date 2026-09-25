@@ -9,7 +9,7 @@ pointed hat and carry an orb staff.
     python tools/generate_hero_art.py
 
 writes godot/art/knights|rogues|wizards/<id>/ for every example, the battle sets in
-godot/art/heroes/<class>/ (DEFAULTS picks which example each class wears), and
+godot/art/heroes/<class>/ (HEROES picks which example each class wears), and
 godot/art/gallery.json for scenes/dev/HeroGallery.tscn.
 
 Part pivots (drawing units; the rig scales them up). A canvas may be larger than listed as
@@ -37,6 +37,7 @@ STEELS = {
     "crimson": ("#ff9d8c", "#c2463a", "#7c231d", "#541410"),
     "verdigris": ("#c9ead8", "#7fb39a", "#4b7564", "#34564a"),
     "rusted": ("#c7a58a", "#8a6a55", "#5b4436", "#3e2e24"),
+    "tarnished": ("#aeb2ae", "#80867f", "#565c57", "#3c413d"),
 }
 TRIMS = {
     "gold": ("#fbe39a", "#e0a93e", "#8e5c17"),
@@ -44,6 +45,7 @@ TRIMS = {
     "brass": ("#f6d38a", "#b8893c", "#6e4e1a"),
     "red": ("#ff9c8a", "#c63c2c", "#6d1a12"),
     "bone": ("#f4ecd6", "#cbbd98", "#7d7056"),
+    "iron": ("#a8a69a", "#72706a", "#3e3c38"),
 }
 SKINS = {
     "fair": ("#f3caa8", "#e9b893", "#b37752"),
@@ -52,6 +54,7 @@ SKINS = {
     "dark": ("#8a5a3c", "#6b432b", "#40271a"),
     "pale": ("#fbe6d6", "#efcdb6", "#c0927a"),
     "grave": ("#b9c7b4", "#98a893", "#5d6b5a"),
+    "weathered": ("#cfae94", "#ad8a72", "#735646"),
 }
 
 # ---------------------------------------------------------------- the examples
@@ -114,6 +117,12 @@ VARIANTS = [
          cape=("#26302e", "#101615", "#3d6b5e"), helm="horned", plume=None, eye_glow="#9fffcf",
          skin="grave", beard="none", eyes="#9fffcf",
          weapon="greatsword", blade="dark", shield="none"),
+    dict(id="grey_warden", name="잿빛 파수 기사 (기본)", note="빛바랜 철갑, 청회색 겉옷, 해진 적갈색 망토",
+         steel="tarnished", trim="iron", tabard=("#4e5864", "#2e3640"), emblem="tower", emblem_color="#8f8b7c",
+         cape=("#5e4a40", "#352a24", "#6a3a30"), helm="bascinet", plume=None,
+         skin="weathered", beard="full", beard_color="#3e3228", eyes="#4a4e44",
+         weapon="longsword", shield="heater", field=("#4e5864", "#8f8b7c"), charge="plain", shield_emblem="tower",
+         shield_emblem_color="#8f8b7c"),
     dict(id="sun_priest", name="태양의 기사단장", note="금빛 판금과 흰 망토, 긴 흰 깃털, 철퇴",
          steel="gilded", trim="gold", tabard=("#b8321f", "#7a1c10"), emblem="sun", emblem_color="gold",
          cape=("#fbf5e6", "#cfc6ad", "#b8321f"), helm="crowned", plume="#fffaf0",
@@ -607,6 +616,9 @@ ROGUES = [
     dict(id="desert", name="사막 자객", note="모래빛 천 두건과 복면, 굽은 단검",
          leather="#8a6a44", trim="gold", steel="silver", cloth="#c9ad7c", hood="#d8c08e", mask="#b8935e",
          skin="brown", beard="none", eyes="#2a1a0a", helm="hood", blade="bright"),
+    dict(id="ashen_scout", name="잿빛 정찰자 (기본)", note="바랜 올리브 두건, 젖은 호두색 가죽, 숯갈색 바지",
+         leather="#4a3828", trim="iron", steel="tarnished", cloth="#3e3630", hood="#5c6146",
+         skin="weathered", beard="none", eyes="#4e5a48", helm="hood", blade="steel"),
     dict(id="tracker", name="숲 추적자", note="초록 두건, 수염, 사냥용 단검",
          leather="#5e452c", trim="brass", steel="silver", cloth="#3a3a26", hood="#3f6a34",
          skin="tan", beard="moustache", beard_color="#6a4a2a", eyes="#4a3a1a", helm="hood", blade="steel"),
@@ -705,6 +717,10 @@ WIZARDS = [
          robe="#1e2226", trim="bone", steel="silver", sash="#3d6b5e", hood="#15181b", hair="#3a3d44",
          skin="grave", beard="none", eyes="#9fffcf", eye_glow="#9fffcf", helm="wizard_hat", band="#3d6b5e",
          orb=("#eafff4", "#8fffc6", "#1a8a5a")),
+    dict(id="hedge_mage", name="들판의 마법사 (기본)", note="회녹색 로브, 바랜 펠트 모자, 호박빛 구슬 나무 지팡이",
+         robe="#4a5046", trim="iron", steel="tarnished", sash="#6a3a30", hood="#3e3a32", hair="#4a3a2e",
+         skin="weathered", beard="full", beard_color="#6a5e52", eyes="#5a5448", helm="wizard_hat", band="#5e4a3a",
+         orb=("#f0e2c0", "#c8a060", "#7a5a2a")),
     dict(id="archmage", name="대마법사", note="흰 로브와 금실, 긴 흰 수염, 수정 지팡이",
          robe="#ece6d6", trim="gold", steel="silver", sash="#2b3f8a", hood="#d8d0bc", hair="#f4f2ec",
          skin="fair", beard="long", beard_color="#f1eee6", eyes="#4a5a8a", helm="wizard_hat", band="#2b3f8a",
@@ -1070,9 +1086,9 @@ def orc_body(folder, hide):
 <stop offset="0" stop-color="#fbe39a"/><stop offset="1" stop-color="#8e5c17"/></linearGradient>'''])
 
 
-GOBLIN_SKIN = ("#a8c46a", "#7a9a44", "#4a6426")
-HOB_SKIN = ("#f0a060", "#c8743a", "#7a4020")
-ORC_SKIN = ("#9aae72", "#6f8a4a", "#3e5226")
+GOBLIN_SKIN = ("#a3ab82", "#737c56", "#454d33")
+HOB_SKIN = ("#c9a07c", "#9a7454", "#5e4230")
+ORC_SKIN = ("#949c7c", "#687152", "#3e4532")
 
 # style: how the rig poses it (HeroPuppet.STYLES) · size: scale of the whole puppet
 # head: [left, top] margins of the head canvas, so the rig pivot is (20+left, 46+top)
@@ -1313,23 +1329,21 @@ def use_lines(ink, width, thin):
     THIN = f'stroke="{INK}" stroke-width="{thin}" stroke-linejoin="round"'
 
 
-## Semi-realistic look test: the same parts with thin, warm-brown outlines instead of
-## heavy black ink, written to art/prototypes/<id>/.
-PROTOTYPES = [("moon_knight", VARIANTS, build), ("shade", ROGUES, rogue_parts),
-              ("starlight", WIZARDS, wizard_parts), ("goblin_raider", ENEMIES, enemy_parts)]
+## The battle heroes: the Art Bible's weathered knight, scout and hedge mage.
+HEROES = {"paladin": ("grey_warden", VARIANTS, build), "rogue": ("ashen_scout", ROGUES, rogue_parts),
+          "wizard": ("hedge_mage", WIZARDS, wizard_parts)}
 
 
-def build_prototypes():
-    saved = (INK, SW, THIN)
-    use_lines("#3a2618", 0.8, 0.5)
-    for pick, variants, make in PROTOTYPES:
+def build_heroes():
+    for role, (pick, variants, make) in HEROES.items():
         for k in variants:
             if k["id"] == pick:
-                make(k, os.path.join(ROOT, "art", "prototypes", pick))
-    use_lines(saved[0], 1.5, 0.9)
+                make(k, os.path.join(ROOT, "art", "heroes", role))
 
 
 def main():
+    # Art Bible: few, thin, dark grey-brown lines; form comes from shading, not outlines.
+    use_lines("#2e2620", 0.9, 0.55)
     gallery = []
     for folder, title, style, variants, make in GROUPS:
         entries = []
@@ -1341,11 +1355,8 @@ def main():
                     entry[key] = k[key]
             entries.append(entry)
         gallery.append({"id": folder, "title": title, "style": style, "entries": entries})
-    # The battle heroes are the storybook knight, rogue and mage (tools/storybook_art.py).
-    import storybook_art
-    storybook_art.build(ROOT)
+    build_heroes()
     build_gear()
-    build_prototypes()
     with open(os.path.join(ROOT, "art", "gallery.json"), "w", encoding="utf-8") as f:
         json.dump(gallery, f, ensure_ascii=False, indent=1)
     print(", ".join("%d %s" % (len(v), t) for _f, t, _s, v, _m in GROUPS))

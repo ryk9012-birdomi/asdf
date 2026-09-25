@@ -15,7 +15,7 @@ var sfx_slider: HSlider
 func _ready() -> void:
 	theme = FantasyTheme.build()
 	AudioDirector.music("menu")
-	add_child(StoryBackdrop.new())
+	add_child(Backdrop.new())
 	# A paper card behind the title and choices, like a storybook's title page.
 	var card := Panel.new()
 	card.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -32,9 +32,9 @@ func _ready() -> void:
 	column.add_theme_constant_override("separation", 10)
 	add_child(column)
 	centered(column, "잿빛 왕국 연대기   ·   제 1 막", 14, TRIM)
-	var title := centered(column, "잿불 서약", 84, Color("6a3a1a"))
+	var title := centered(column, "잿불 서약", 84, Color("e6dcc6"))
 	title.theme_type_variation = "HeadingLabel"
-	glow(title, Color("ff8a2a"), 18)
+	FantasyTheme.glow(title, TRIM, 12)
 	var subtitle := centered(column, "O A T H    O F    E M B E R S", 18, TRIM)
 	subtitle.theme_type_variation = "HeadingLabel"
 	centered(column, "용의 교단이 왕국을 잠식하는 시대, 맹세로 묶인 세 모험가가 잿빛 고갯길로 향한다.", 15, MUTED)
@@ -60,7 +60,7 @@ func _ready() -> void:
 	var footer := Label.new()
 	footer.text = "MVP 1 프로토타입   ·   Godot 4.7   ·   Enter / 방향키로도 선택할 수 있습니다"
 	footer.add_theme_font_size_override("font_size", 12)
-	footer.add_theme_color_override("font_color", Color("8c7458"))
+	footer.add_theme_color_override("font_color", Color("978f80"))
 	footer.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
 	footer.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	footer.position.y -= 34
@@ -109,13 +109,6 @@ func centered(parent: Node, text_value: String, font_size: int, color: Color) ->
 	item.add_theme_color_override("font_color", color)
 	parent.add_child(item)
 	return item
-
-
-func glow(item: Label, color: Color, strength: int) -> void:
-	item.add_theme_color_override("font_shadow_color", Color(color, 0.45))
-	item.add_theme_constant_override("shadow_outline_size", strength)
-	item.add_theme_constant_override("shadow_offset_x", 0)
-	item.add_theme_constant_override("shadow_offset_y", 0)
 
 
 func menu_button(parent: Node, caption: String, hint: String, callback: Callable) -> Button:

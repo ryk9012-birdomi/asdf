@@ -1,20 +1,40 @@
 class_name FantasyTheme
 extends RefCounted
-## Shared storybook look: cream paper panels with soft brown borders, dark-brown ink text,
-## round Jua headings and Gowun Dodum body text (both OFL, in assets/fonts).
+## Shared look from the Art Bible (docs/ART_BIBLE.md): old records and field gear. Dark
+## weathered parchment panels framed in dull iron, faded ink-and-parchment text, muted rust
+## accents, Gowun Batang serif throughout (OFL, in assets/fonts).
 
-const BODY_FONT := "res://assets/fonts/GowunDodum-Regular.ttf"
-const TITLE_FONT := "res://assets/fonts/Jua-Regular.ttf"
-const PAPER := Color("f7eedb")
-const EDGE := Color("a07a50")
-const TRIM := Color("9a5a2a")
-const GOLD := Color("c8862a")
-const TEXT := Color("4a3222")
-const MUTED := Color("8c7458")
-const INK := Color("3a2414")
-const BLOOD := Color("c0443a")
-## Cream halo around titles and names drawn straight onto a painted background.
-const HALO := Color("fff6e0")
+const BODY_FONT := "res://assets/fonts/GowunBatang-Regular.ttf"
+const TITLE_FONT := "res://assets/fonts/GowunBatang-Bold.ttf"
+## Panel ground: dark, smoke-stained parchment.
+const PAPER := Color("2a2722")
+## Dull iron frame.
+const EDGE := Color("5e5a50")
+## Muted rust: headings and accents.
+const TRIM := Color("b98260")
+## Tarnished brass.
+const GOLD := Color("b0915c")
+## Cold parchment text.
+const TEXT := Color("d8d1c1")
+const MUTED := Color("978f80")
+## Brightest text, for hover and emphasis.
+const INK := Color("f0e9d8")
+## Dried blood, lifted enough to read on the dark panels.
+const BLOOD := Color("c0645a")
+## Dark rim around text drawn straight onto a painting.
+const HALO := Color("15130f")
+## Good news (healing, gains) in a faded moss green.
+const MOSS := Color("8fae7c")
+const MUTED_SHADER := """
+shader_type canvas_item;
+void fragment() {
+	vec4 c = texture(TEXTURE, UV) * COLOR;
+	float luma = dot(c.rgb, vec3(0.299, 0.587, 0.114));
+	c.rgb = mix(c.rgb, vec3(luma), 0.45) * vec3(0.94, 0.95, 0.96);
+	COLOR = c;
+}
+"""
+static var _muted: ShaderMaterial
 
 
 static func build() -> Theme:
@@ -30,13 +50,13 @@ static func build() -> Theme:
 	for variation in ["Button", "MenuButtonLarge"]:
 		if variation != "Button":
 			ui_theme.set_type_variation(variation, "Button")
-			ui_theme.set_font_size("font_size", variation, 24)
+			ui_theme.set_font_size("font_size", variation, 23)
 		ui_theme.set_font("font", variation, title)
 		ui_theme.set_color("font_color", variation, TEXT)
 		ui_theme.set_color("font_hover_color", variation, INK)
 		ui_theme.set_color("font_focus_color", variation, INK)
 		ui_theme.set_color("font_pressed_color", variation, INK)
-		ui_theme.set_color("font_disabled_color", variation, Color("b3a38a"))
+		ui_theme.set_color("font_disabled_color", variation, Color("6c665b"))
 		for state in ["normal", "hover", "pressed", "disabled", "focus"]:
 			ui_theme.set_stylebox(state, variation, button_style(state, variation == "Button"))
 	ui_theme.set_color("font_color", "TooltipLabel", TEXT)
@@ -45,13 +65,14 @@ static func build() -> Theme:
 	return ui_theme
 
 
+## Worn leather buttons with an iron rim; hover warms the rim like lantern light.
 static func button_style(state: String, compact: bool) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color("efdfbd")
-	style.border_color = Color("8a6440")
+	style.bg_color = Color("39322a")
+	style.border_color = Color("6a6152")
 	style.set_border_width_all(2)
-	style.set_corner_radius_all(10)
-	style.shadow_color = Color(0.3, 0.18, 0.08, 0.22)
+	style.set_corner_radius_all(3)
+	style.shadow_color = Color(0, 0, 0, 0.4)
 	style.shadow_size = 3
 	style.shadow_offset = Vector2(0, 2)
 	var pad := 14 if compact else 0
@@ -61,32 +82,41 @@ static func button_style(state: String, compact: bool) -> StyleBoxFlat:
 	style.content_margin_bottom = 6 if compact else 0
 	match state:
 		"hover", "focus":
-			style.bg_color = Color("fff4dc")
-			style.border_color = Color("c07a3a")
-			style.shadow_color = Color(1.0, 0.7, 0.3, 0.45)
-			style.shadow_size = 8
+			style.bg_color = Color("463d32")
+			style.border_color = Color("a8825a")
+			style.shadow_color = Color(0.85, 0.55, 0.25, 0.22)
+			style.shadow_size = 6
 			style.shadow_offset = Vector2.ZERO
 		"pressed":
-			style.bg_color = Color("e0c898")
-			style.border_color = Color("7a5430")
+			style.bg_color = Color("2a251f")
+			style.border_color = Color("8a6a4a")
 		"disabled":
-			style.bg_color = Color(0.9, 0.86, 0.78, 0.75)
-			style.border_color = Color("c2b294")
+			style.bg_color = Color(0.2, 0.19, 0.17, 0.75)
+			style.border_color = Color("48443c")
 	return style
 
 
-static func panel(border: Color = EDGE, alpha: float = 0.95, padding: int = 14) -> StyleBoxFlat:
+static func panel(border: Color = EDGE, alpha: float = 0.93, padding: int = 14) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
 	style.bg_color = Color(PAPER, alpha)
-	style.border_color = border.lerp(EDGE, 0.5)
+	style.border_color = border.lerp(EDGE, 0.6)
 	style.set_border_width_all(2)
-	style.set_corner_radius_all(12)
-	style.shadow_color = Color(0.25, 0.15, 0.05, 0.25)
-	style.shadow_size = 8
-	style.shadow_offset = Vector2(0, 3)
+	style.set_corner_radius_all(4)
+	style.shadow_color = Color(0, 0, 0, 0.45)
+	style.shadow_size = 10
+	style.shadow_offset = Vector2(0, 4)
 	for side in [SIDE_LEFT, SIDE_TOP, SIDE_RIGHT, SIDE_BOTTOM]:
 		style.set_content_margin(side, padding)
 	return style
+
+
+## Takes bright item art down to the world's muted colours (shared material).
+static func muted() -> ShaderMaterial:
+	if _muted == null:
+		_muted = ShaderMaterial.new()
+		_muted.shader = Shader.new()
+		_muted.shader.code = MUTED_SHADER
+	return _muted
 
 
 static func label(parent: Node, text_value: String, font_size: int = 14, color: Color = TEXT, heading: bool = false) -> Label:
@@ -100,12 +130,12 @@ static func label(parent: Node, text_value: String, font_size: int = 14, color: 
 	return item
 
 
-## Storybook title: warm brown letters with a cream halo, readable on any painting.
+## Title drawn on a painting: faded parchment letters with a dark rim.
 static func glow(item: Label, _color: Color = TRIM, strength: int = 8) -> void:
-	item.add_theme_color_override("font_color", Color("6a3a1a"))
+	item.add_theme_color_override("font_color", Color("e6dcc6"))
 	item.add_theme_color_override("font_outline_color", HALO)
 	item.add_theme_constant_override("outline_size", maxi(6, strength))
-	item.add_theme_color_override("font_shadow_color", Color(0.3, 0.15, 0.05, 0.3))
+	item.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.5))
 	item.add_theme_constant_override("shadow_offset_x", 0)
 	item.add_theme_constant_override("shadow_offset_y", 3)
 
@@ -131,7 +161,7 @@ static func hero_row(parent: Node, hero: RunState.HeroState) -> void:
 	var color := hero.definition.display_color
 	var title := HBoxContainer.new()
 	row.add_child(title)
-	var name_label := label(title, hero.definition.character_name, 18, Color("4a3222"), true)
+	var name_label := label(title, hero.definition.character_name, 18, TEXT, true)
 	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	label(title, "HP %d/%d" % [hero.current_hp, hero.max_hp()], 15, TEXT if hero.is_alive() else BLOOD)
 	var bar := ProgressBar.new()

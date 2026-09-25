@@ -19,8 +19,8 @@ var tabs: Dictionary = {}
 
 func _ready() -> void:
 	theme = FantasyTheme.build()
-	add_child(StoryBackdrop.new())
-	var title := FantasyTheme.label(self, "영웅 견본", 32, Color("6a3a1a"), true)
+	add_child(Backdrop.new())
+	var title := FantasyTheme.label(self, "영웅 견본", 32, Color("e6dcc6"), true)
 	title.position = Vector2(28, 16)
 	groups = JSON.parse_string(FileAccess.get_file_as_string(INDEX))
 	var tab_bar := HBoxContainer.new()
@@ -75,17 +75,19 @@ func add_hero(entry: Dictionary, index: int, count: int, group: Dictionary) -> v
 		# Foes face the party, as in battle.
 		figure.pivot_offset = Vector2(CELL.x / 2.0, 300 - FighterView.FEET)
 		figure.scale = Vector2(-1, 1)
+	(figure.puppet as HeroPuppet).proportion(HeroPuppet.REALISTIC)
 	figure.puppet.phase = figure.phase
 	figure.add_child(figure.puppet)
 	figure.set_meta("home", cell)
 	shelf.add_child(figure)
+	figure.light()
 	figures.append(figure)
 	var caption := VBoxContainer.new()
 	caption.position = cell + Vector2(4, 300)
 	caption.size = Vector2(CELL.x - 8, 90)
 	caption.add_theme_constant_override("separation", 2)
 	shelf.add_child(caption)
-	var name_label := FantasyTheme.label(caption, entry.name, 18, Color("4a3222"), true)
+	var name_label := FantasyTheme.label(caption, entry.name, 18, FantasyTheme.TEXT, true)
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	var note := FantasyTheme.label(caption, entry.note, 13, FantasyTheme.MUTED)
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

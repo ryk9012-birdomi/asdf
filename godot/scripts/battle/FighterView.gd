@@ -9,7 +9,7 @@ const HUD_HEIGHT := 150.0
 const ART_SCALE := 1.4
 const FEET := 34.0
 ## Cream halo behind overhead names and numbers, so dark ink reads on the painted field.
-const OUTLINE := Color("fff6e0")
+const OUTLINE := Color("15130f")
 
 var unit: CharacterUnit
 var kind: StringName
@@ -50,7 +50,7 @@ class ShieldRow extends Control:
 		shield(Vector2(left + 10.0, size.y / 2.0))
 		var baseline := Vector2(left + 25.0, size.y / 2.0 + 6.0)
 		draw_string_outline(font, baseline, text, HORIZONTAL_ALIGNMENT_LEFT, -1, 17, 5, FighterView.OUTLINE)
-		draw_string(font, baseline, text, HORIZONTAL_ALIGNMENT_LEFT, -1, 17, Color("2a5ab0"))
+		draw_string(font, baseline, text, HORIZONTAL_ALIGNMENT_LEFT, -1, 17, Color("9fb4cf"))
 
 	func shield(center: Vector2) -> void:
 		var outline := PackedVector2Array([Vector2(-8, -9), Vector2(8, -9), Vector2(8, 1), Vector2(0, 10), Vector2(-8, 1)])
@@ -67,6 +67,9 @@ class ShieldRow extends Control:
 
 ## Watercolor finish for a figure rendered on its own: pigment pools darker where colours
 ## meet and at the silhouette, colour mottles softly inside, and the paper's grain shows.
+## Art Bible look for the figures: short brush strokes smear the flat vector shading, colour
+## drops to the muted grey-green world, an overcast light falls from above (the legs sit in
+## shade), and the silhouette breaks up a little at its edges and fades at the feet.
 const LIT_SHADER := """
 shader_type canvas_item;
 uniform vec2 texel = vec2(0.002, 0.002);
@@ -84,28 +87,36 @@ float noise(vec2 p) {
 }
 
 void fragment() {
+	vec2 px = UV / texel;
+	// Stroke direction wanders slowly over the figure; smear along it.
+	float angle = noise(px / 46.0) * 6.2832 * 1.5;
+	vec2 dir = vec2(cos(angle), sin(angle)) * texel * 1.6;
+	vec4 sum = vec4(0.0);
+	for (int i = -3; i <= 3; i++) {
+		vec4 s = texture(TEXTURE, UV + dir * float(i));
+		sum += vec4(s.rgb * s.a, s.a);
+	}
 	vec4 base = texture(TEXTURE, UV);
-	if (base.a < 0.01) {
+	float alpha = max(base.a, sum.a / 7.0 * 0.9);
+	if (alpha < 0.01) {
 		COLOR = vec4(0.0);
 	} else {
-		vec3 col = base.rgb;
-		vec3 around = vec3(0.0);
-		float solid = 0.0;
-		for (int i = 0; i < 8; i++) {
-			float a = float(i) * 0.785398;
-			vec4 s = texture(TEXTURE, UV + vec2(cos(a), sin(a)) * texel * 3.0);
-			around += s.rgb * s.a;
-			solid += s.a;
-		}
-		around /= max(solid, 0.001);
-		float edge = clamp(length(col - around) * 1.6, 0.0, 1.0) + (1.0 - solid / 8.0) * 0.8;
-		vec2 px = UV / texel;
-		float mottle = noise(px / 22.0) * 0.6 + noise(px / 7.0) * 0.4;
-		col *= 1.0 - clamp(edge, 0.0, 1.0) * 0.14;
-		col *= 0.95 + mottle * 0.09;
-		col = mix(col, vec3(1.0, 0.98, 0.94), 0.05);
-		col *= 0.97 + hash(floor(px)) * 0.05;
-		COLOR = vec4(col, base.a);
+		vec3 col = sum.rgb / max(sum.a, 0.001);
+		col = mix(col, base.rgb, base.a * 0.35);
+		float luma = dot(col, vec3(0.299, 0.587, 0.114));
+		col = mix(col, vec3(luma), 0.42);
+		col = mix(vec3(0.40, 0.41, 0.40), col, 0.86);
+		col *= vec3(0.95, 0.97, 1.0);
+		// Overcast light from above; the lower body sits in the damp shade.
+		col *= mix(1.06, 0.78, smoothstep(0.35, 0.95, UV.y));
+		// Loose paint: blotchy value shifts and a canvas tooth.
+		float blot = noise(px / 18.0) * 0.6 + noise(px / 5.0) * 0.4;
+		col *= 0.9 + blot * 0.16;
+		col *= 0.97 + hash(floor(px / 2.0)) * 0.05;
+		// Ragged, lost edges: thin coverage breaks up, and the figure fades at the feet.
+		float ragged = smoothstep(0.25, 0.75, alpha + (noise(px / 3.0) - 0.5) * 0.5);
+		float feet = 1.0 - smoothstep(0.93, 1.0, UV.y) * 0.5;
+		COLOR = vec4(col, ragged * feet);
 	}
 }
 """
@@ -150,7 +161,7 @@ class Figure extends Control:
 	func light() -> void:
 		if puppet == null or lit_view != null:
 			return
-		# Parts cut from a painted sheet are watercolour already.
+		# Parts cut from a painted sheet carry their own brushwork.
 		if puppet is HeroPuppet and not (puppet as HeroPuppet).sheet.is_empty():
 			return
 		var box := size + FighterView.LIT_MARGIN * Vector2(2, 1)
@@ -236,24 +247,24 @@ func setup(combatant: CharacterUnit, facing_right: bool) -> void:
 	hud.size = Vector2(WIDTH - 12, HUD_HEIGHT)
 	hud.add_theme_constant_override("separation", 3)
 	add_child(hud)
-	name_label = small_label(19, Color("4a3222"))
+	name_label = small_label(19, Color("d8d1c1"))
 	name_label.theme_type_variation = "HeadingLabel"
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	name_label.add_theme_color_override("font_outline_color", OUTLINE)
 	name_label.add_theme_constant_override("outline_size", 6)
 	var hp_row := bar_row(20)
-	hp_trail = make_bar(hp_row, Color("f7e3b8"), Color(0.35, 0.25, 0.18, 0.85))
-	hp_bar = make_bar(hp_row, Color("d0574a") if facing < 0 else Color("6fb34a"), Color(0, 0, 0, 0))
+	hp_trail = make_bar(hp_row, Color("a89a78"), Color(0.35, 0.25, 0.18, 0.85))
+	hp_bar = make_bar(hp_row, Color("a4483c") if facing < 0 else Color("6e8c52"), Color(0, 0, 0, 0))
 	hp_text = bar_text(hp_row, 14)
 	var mp_row := bar_row(15)
-	mp_bar = make_bar(mp_row, Color("5a8ae0"), Color(0.2, 0.22, 0.32, 0.85))
+	mp_bar = make_bar(mp_row, Color("52709a"), Color(0.14, 0.15, 0.18, 0.85))
 	mp_bar.max_value = maxi(1, unit.max_energy)
 	mp_text = bar_text(mp_row, 12)
 	shields = ShieldRow.new()
 	shields.custom_minimum_size.y = 22
 	shields.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	hud.add_child(shields)
-	info = small_label(15, Color("2a180c"))
+	info = small_label(15, Color("e6dcc6"))
 	info.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	info.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	info.add_theme_color_override("font_outline_color", OUTLINE)
@@ -319,7 +330,7 @@ func refresh(active: bool, targetable: bool, line: String) -> void:
 	var alive := unit.is_alive()
 	disabled = not targetable
 	name_label.text = ("▶ " if active and alive else "") + unit.display_name
-	name_label.add_theme_color_override("font_color", Color("2e8a3e") if targetable else (Color("c0702a") if active else Color("4a3222")))
+	name_label.add_theme_color_override("font_color", Color("8fae7c") if targetable else (Color("d09a5a") if active else Color("d8d1c1")))
 	mp_bar.value = unit.current_energy
 	mp_text.text = "MP %d / %d" % [unit.current_energy, unit.max_energy]
 	info.text = line if alive else "쓰러짐"

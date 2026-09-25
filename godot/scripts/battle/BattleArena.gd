@@ -1,6 +1,6 @@
 class_name BattleArena
 extends Control
-## 2D side-view battlefield: a storybook meadow road with the party on the left and foes
+## 2D side-view battlefield: a muddy road through a ruined village, party on the left, foes
 ## on the right. Plays resolved actions as motion; it never changes game state.
 
 signal unit_clicked(unit: CharacterUnit)
@@ -42,21 +42,25 @@ func _ready() -> void:
 	clip_contents = true
 	mouse_filter = Control.MOUSE_FILTER_PASS
 	resized.connect(layout)
+	# Brush strokes over the painted ground only; the fighters are added above it.
+	var strokes := Painting.brush(0.45)
+	strokes.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(strokes)
 	var embers := CPUParticles2D.new()
 	embers.name = "Embers"
 	embers.amount = 50
 	embers.lifetime = 5.0
 	embers.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
 	embers.emission_rect_extents = Vector2(700, 10)
-	# Dandelion seeds and petals drifting across the field.
+	# Dust and ash lifted off the road by a cold wind.
 	embers.direction = Vector2.UP
-	embers.spread = 40.0
-	embers.gravity = Vector2(10, -4)
-	embers.initial_velocity_min = 12.0
-	embers.initial_velocity_max = 36.0
-	embers.scale_amount_min = 1.5
-	embers.scale_amount_max = 3.0
-	embers.color = Color(1.0, 0.97, 0.88, 0.75)
+	embers.spread = 50.0
+	embers.gravity = Vector2(14, -2)
+	embers.initial_velocity_min = 8.0
+	embers.initial_velocity_max = 26.0
+	embers.scale_amount_min = 1.0
+	embers.scale_amount_max = 2.2
+	embers.color = Color(0.8, 0.8, 0.76, 0.5)
 	add_child(embers)
 
 
@@ -72,25 +76,21 @@ func ground_y() -> float:
 func _draw() -> void:
 	var w := size.x
 	var h := size.y
-	Storybook.paint(self, Rect2(Vector2.ZERO, size), 0.58, true, time)
-	# Lantern posts at both edges with a warm, gently breathing glow.
-	var road_top := h * 0.58 + h * 0.42 * Storybook.ROAD.x
+	Painting.paint(self, Rect2(Vector2.ZERO, size), 0.58, true, time)
+	# Rusted lanterns on leaning posts at both edges: the only warm light on the field.
+	var road_top := h * 0.58 + h * 0.42 * Painting.ROAD.x
 	for side in [0.035, 0.965]:
 		var tx: float = w * side
 		var ty := road_top - 150.0
-		var flicker := 0.9 + 0.1 * sin(time * 3.0 + side * 10.0)
+		var flicker := 0.85 + 0.15 * sin(time * 3.0 + side * 10.0) * sin(time * 7.3)
 		for ring in 5:
-			draw_circle(Vector2(tx, ty), (26.0 + ring * 22.0) * flicker, Color(1.0, 0.8, 0.45, 0.1 - ring * 0.018))
-		draw_line(Vector2(tx, ty - 14), Vector2(tx, road_top + 20), Color("6a4a2e"), 6.0)
-		draw_line(Vector2(tx, ty - 14), Vector2(tx + 18.0 * (1.0 if side < 0.5 else -1.0), ty - 14), Color("6a4a2e"), 4.0)
-		draw_rect(Rect2(Vector2(tx - 9, ty - 8), Vector2(18, 22)), Color("fff0b8"))
-		draw_rect(Rect2(Vector2(tx - 9, ty - 8), Vector2(18, 22)), Color("4a3222"), false, 2.0)
-		draw_colored_polygon(PackedVector2Array([Vector2(tx - 12, ty - 8), Vector2(tx + 12, ty - 8), Vector2(tx, ty - 20)]), Color("4a3222"))
-	# A soft warm edge so the page feels framed, not a dark vignette.
-	for step in 10:
-		var alpha := 0.035 * (10 - step) / 10.0
-		draw_rect(Rect2(Vector2(step * 8.0, 0), Vector2(8, h)), Color(0.55, 0.38, 0.2, alpha))
-		draw_rect(Rect2(Vector2(w - (step + 1) * 8.0, 0), Vector2(8, h)), Color(0.55, 0.38, 0.2, alpha))
+			draw_circle(Vector2(tx, ty), (20.0 + ring * 18.0) * flicker, Color(0.95, 0.62, 0.3, 0.07 - ring * 0.012))
+		var lean := 6.0 * (1.0 if side < 0.5 else -1.0)
+		draw_line(Vector2(tx + lean, ty - 14), Vector2(tx, road_top + 20), Painting.WOOD, 6.0)
+		draw_line(Vector2(tx + lean, ty - 14), Vector2(tx + lean + 18.0 * (1.0 if side < 0.5 else -1.0), ty - 14), Painting.WOOD, 4.0)
+		draw_rect(Rect2(Vector2(tx - 8, ty - 8), Vector2(16, 20)), Color(0.86, 0.66, 0.4, 0.85 * flicker))
+		draw_rect(Rect2(Vector2(tx - 8, ty - 8), Vector2(16, 20)), Painting.RUST.darkened(0.4), false, 2.0)
+		draw_colored_polygon(PackedVector2Array([Vector2(tx - 11, ty - 8), Vector2(tx + 11, ty - 8), Vector2(tx, ty - 19)]), Painting.RUST.darkened(0.45))
 
 
 func setup(party: Array[CharacterUnit], enemies: Array[CharacterUnit]) -> void:

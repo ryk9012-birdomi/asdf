@@ -31,11 +31,11 @@ class MapBubble extends Control:
 		column.position = PAD
 		column.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(column)
-		title = line(17, Color("6a3a1a"))
-		note = line(14, Color("4a3222"))
+		title = line(17, Color("e6dcc6"))
+		note = line(14, Color("d8d1c1"))
 		note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		note.custom_minimum_size.x = 210
-		state = line(13, Color("3a8a3a"))
+		state = line(13, Color("8fae7c"))
 
 	func line(font_size: int, color: Color) -> Label:
 		var label := Label.new()
@@ -49,7 +49,7 @@ class MapBubble extends Control:
 		title.text = heading
 		note.text = text
 		state.text = status
-		state.add_theme_color_override("font_color", Color("3a8a3a") if open else Color("8c7458"))
+		state.add_theme_color_override("font_color", Color("8fae7c") if open else Color("978f80"))
 		column.reset_size()
 		size = column.get_combined_minimum_size() + PAD * 2.0
 		below = anchor.y - GAP - TAIL - size.y < 4.0
@@ -110,14 +110,14 @@ void fragment() {
 	vec2 px = UV * resolution;
 	float grain = fbm(px / 60.0);
 	float stain = fbm(px / 260.0 + 7.0);
-	vec3 base = mix(vec3(0.90, 0.82, 0.66), vec3(0.98, 0.93, 0.80), grain);
+	vec3 base = mix(vec3(0.52, 0.49, 0.41), vec3(0.66, 0.62, 0.52), grain);
 	base *= 1.0 - smoothstep(0.55, 0.85, stain) * 0.12;
 	// A little warmth towards the edges, like an old storybook page.
 	base *= 1.0 - smoothstep(0.35, 0.8, distance(UV, vec2(0.5, 0.5))) * 0.14;
 	vec2 edge_distance = min(px, resolution - px);
 	float ragged = min(edge_distance.x, edge_distance.y) + (fbm(px / 18.0) - 0.5) * 22.0;
 	float burn = smoothstep(4.0, 34.0, ragged);
-	base = mix(vec3(0.62, 0.44, 0.28), base, burn);
+	base = mix(vec3(0.22, 0.19, 0.15), base, burn);
 	COLOR = vec4(base, smoothstep(0.0, 5.0, ragged));
 }
 """
@@ -147,7 +147,7 @@ func _ready() -> void:
 func build() -> void:
 	theme = FantasyTheme.build()
 	AudioDirector.music("map")
-	add_child(StoryBackdrop.new())
+	add_child(Backdrop.new())
 	var margin := MarginContainer.new()
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	for side in ["left", "right"]:
@@ -164,7 +164,7 @@ func build() -> void:
 	titles.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(titles)
 	FantasyTheme.label(titles, "OATH OF EMBERS   ·   CHAPTER I", 14, FantasyTheme.TRIM)
-	var title := FantasyTheme.label(titles, "잿빛 고갯길  ·  여정 지도", 32, Color("6a3a1a"), true)
+	var title := FantasyTheme.label(titles, "잿빛 고갯길  ·  여정 지도", 32, Color("e6dcc6"), true)
 	FantasyTheme.glow(title, Color("ff8a2a"), 10)
 	header.add_theme_constant_override("separation", 10)
 	var camp := FantasyTheme.button(header, "야영지", func(): SceneRouter.go(get_tree(), SceneRouter.CAMP))
@@ -223,7 +223,7 @@ func party_panel() -> PanelContainer:
 	FantasyTheme.label(column, "위치   %s" % floor_text, 16, FantasyTheme.TEXT)
 	FantasyTheme.label(column, "승리한 전투   %d" % run.battles_won, 16, FantasyTheme.TEXT)
 	if run.ward > 0:
-		FantasyTheme.label(column, "축복   다음 전투 보호막 +%d" % run.ward, 15, Color("3a6ab0"))
+		FantasyTheme.label(column, "축복   다음 전투 보호막 +%d" % run.ward, 15, Color("8aa2c0"))
 	return panel
 
 

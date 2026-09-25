@@ -3,7 +3,7 @@
 <stop offset="0" stop-color="#221f26"/><stop offset="0.45" stop-color="#453e4c"/><stop offset="1" stop-color="#232027"/></linearGradient>
 <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
 <stop offset="0" stop-color="#f4ecd6"/><stop offset="0.55" stop-color="#cbbd98"/><stop offset="1" stop-color="#7d7056"/></linearGradient></defs>
-<path d="M18 2 Q29 -0.4 31 6 L29 40 Q28.6 70 32 100 Q18 103 4 98 Q6 60 10 20 Q12 6 18 2 Z" fill="url(#robe)" stroke="#5a3a28" stroke-width="1.1" stroke-linejoin="round"/>
+<path d="M18 2 Q29 -0.4 31 6 L29 40 Q28.6 70 32 100 Q18 103 4 98 Q6 60 10 20 Q12 6 18 2 Z" fill="url(#robe)" stroke="#2e2620" stroke-width="0.9" stroke-linejoin="round"/>
 <path d="M20 12 Q18.6 54 16 98 M25.6 12 Q25 56 26 100 M13.4 28 Q10.6 62 9 97" fill="none" stroke="#1d1a20" stroke-width="1.1"/>
 <path d="M4 98 Q18 103 32 100" fill="none" stroke="url(#gold)" stroke-width="1.4"/>
 </svg>

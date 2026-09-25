@@ -71,6 +71,12 @@
     "path": "res://art/knights/death_knight/"
    },
    {
+    "id": "grey_warden",
+    "name": "잿빛 파수 기사 (기본)",
+    "note": "빛바랜 철갑, 청회색 겉옷, 해진 적갈색 망토",
+    "path": "res://art/knights/grey_warden/"
+   },
+   {
     "id": "sun_priest",
     "name": "태양의 기사단장",
     "note": "금빛 판금과 흰 망토, 긴 흰 깃털, 철퇴",
@@ -102,6 +108,12 @@
     "path": "res://art/rogues/desert/"
    },
    {
+    "id": "ashen_scout",
+    "name": "잿빛 정찰자 (기본)",
+    "note": "바랜 올리브 두건, 젖은 호두색 가죽, 숯갈색 바지",
+    "path": "res://art/rogues/ashen_scout/"
+   },
+   {
     "id": "tracker",
     "name": "숲 추적자",
     "note": "초록 두건, 수염, 사냥용 단검",
@@ -131,6 +143,12 @@
     "name": "강령술사",
     "note": "검은 로브, 창백한 얼굴, 초록 해골빛",
     "path": "res://art/wizards/necromancer/"
+   },
+   {
+    "id": "hedge_mage",
+    "name": "들판의 마법사 (기본)",
+    "note": "회녹색 로브, 바랜 펠트 모자, 호박빛 구슬 나무 지팡이",
+    "path": "res://art/wizards/hedge_mage/"
    },
    {
     "id": "archmage",

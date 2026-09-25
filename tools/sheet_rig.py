@@ -74,9 +74,11 @@ def fit(image, pivot, end, units):
     return {"pivot": [round(px[0], 1), round(px[1], 1)], "density": round(length / units, 3)}
 
 
-def rogue():
+def rogue(out=os.path.join(ROOT, "art", "sheets", "rogue")):
+    """The example sheet (tools/sheets/rogue.webp). It predates the Art Bible, so its output
+    is not used by the game; point RIGS at the folder once a Bible-style sheet replaces it."""
     sheet = Sheet(os.path.join(HERE, "sheets", "rogue.webp"))
-    out = os.path.join(ROOT, "art", "heroes", "rogue")
+    os.makedirs(out, exist_ok=True)
     parts = {}
     rig = {"hip": 55, "parts": parts, "overlays": False, "far_arm_behind": True, "rest": [0.2, -0.3], "raise": [-1.2, -0.6], "joints": {
         "thigh_b": [-7, 0], "thigh_f": [6, 0], "shin": [0, 26], "head": [0, -45], "cape": [0, -40],
@@ -134,5 +136,6 @@ def rogue():
 
 
 if __name__ == "__main__":
-    rogue()
+    import sys
+    rogue(*sys.argv[1:2])
     print("rogue sheet rig written")

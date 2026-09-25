@@ -9,19 +9,19 @@
 <stop offset="0" stop-color="#6f7885"/><stop offset="0.38" stop-color="#eef2f6"/>
 <stop offset="0.62" stop-color="#b9c2cd"/><stop offset="1" stop-color="#5a626e"/></linearGradient>
 </defs>
-<path d="M13 46 L24 46 L22 70 Q14 70.6 9.6 68.6 Z" fill="url(#fabric)" stroke="#1a0f08" stroke-width="1.5" stroke-linejoin="round"/>
-<path d="M26 46 L39.4 46 L42.6 68.4 Q34 70.8 27.4 70 Z" fill="url(#fabric)" stroke="#1a0f08" stroke-width="1.5" stroke-linejoin="round"/>
-<path d="M12.5 21 Q14.5 13.5 24.5 12.5 Q37 12.5 41 20 Q44.5 31 41 45 L39.6 50 L12 50 Q8.5 36 12.5 21 Z" fill="url(#leather)" stroke="#1a0f08" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M13 46 L24 46 L22 70 Q14 70.6 9.6 68.6 Z" fill="url(#fabric)" stroke="#2e2620" stroke-width="0.9" stroke-linejoin="round"/>
+<path d="M26 46 L39.4 46 L42.6 68.4 Q34 70.8 27.4 70 Z" fill="url(#fabric)" stroke="#2e2620" stroke-width="0.9" stroke-linejoin="round"/>
+<path d="M12.5 21 Q14.5 13.5 24.5 12.5 Q37 12.5 41 20 Q44.5 31 41 45 L39.6 50 L12 50 Q8.5 36 12.5 21 Z" fill="url(#leather)" stroke="#2e2620" stroke-width="0.9" stroke-linejoin="round"/>
 <path d="M31 20 Q34 32 32.6 49" fill="none" stroke="#211711" stroke-width="1"/>
 <path d="M30.6 23 L33.8 24.8 M33.8 23 L30.6 24.8" stroke="#d8c8a0" stroke-width="0.6"/><path d="M30.6 28 L33.8 29.8 M33.8 28 L30.6 29.8" stroke="#d8c8a0" stroke-width="0.6"/><path d="M30.6 33 L33.8 34.8 M33.8 33 L30.6 34.8" stroke="#d8c8a0" stroke-width="0.6"/><path d="M30.6 38 L33.8 39.8 M33.8 38 L30.6 39.8" stroke="#d8c8a0" stroke-width="0.6"/><path d="M30.6 43 L33.8 44.8 M33.8 43 L30.6 44.8" stroke="#d8c8a0" stroke-width="0.6"/>
 <path d="M15.5 20 Q16.8 30 15.5 44" fill="none" stroke="#ffffff" stroke-width="1.1" opacity="0.3"/>
-<path d="M14 16 L40 42 L38.6 45 L12.6 19.4 Z" fill="#211711" stroke="#1a0f08" stroke-width="0.9" stroke-linejoin="round"/>
-<rect x="21" y="24" width="4.6" height="5.4" rx="1" transform="rotate(45 23.3 26.7)" fill="url(#leather)" stroke="#1a0f08" stroke-width="0.6"/>
-<rect x="28" y="31" width="4.6" height="5.4" rx="1" transform="rotate(45 30.3 33.7)" fill="url(#leather)" stroke="#1a0f08" stroke-width="0.6"/>
-<path d="M10.5 45.5 L41.5 45.5 L41.8 50.5 L10.2 50.5 Z" fill="#211711" stroke="#1a0f08" stroke-width="0.9" stroke-linejoin="round"/>
-<rect x="29" y="44.8" width="5.6" height="6.4" rx="1" fill="url(#gold)" stroke="#1a0f08" stroke-width="0.8"/>
-<path d="M8.4 48 L6 62 L9.6 62.6 L11.6 48.6 Z" fill="#3b2a1e" stroke="#1a0f08" stroke-width="0.9" stroke-linejoin="round"/>
-<rect x="14.6" y="49.6" width="7" height="7.6" rx="1.6" fill="url(#leather)" stroke="#1a0f08" stroke-width="0.8"/>
+<path d="M14 16 L40 42 L38.6 45 L12.6 19.4 Z" fill="#211711" stroke="#2e2620" stroke-width="0.55" stroke-linejoin="round"/>
+<rect x="21" y="24" width="4.6" height="5.4" rx="1" transform="rotate(45 23.3 26.7)" fill="url(#leather)" stroke="#2e2620" stroke-width="0.6"/>
+<rect x="28" y="31" width="4.6" height="5.4" rx="1" transform="rotate(45 30.3 33.7)" fill="url(#leather)" stroke="#2e2620" stroke-width="0.6"/>
+<path d="M10.5 45.5 L41.5 45.5 L41.8 50.5 L10.2 50.5 Z" fill="#211711" stroke="#2e2620" stroke-width="0.55" stroke-linejoin="round"/>
+<rect x="29" y="44.8" width="5.6" height="6.4" rx="1" fill="url(#gold)" stroke="#2e2620" stroke-width="0.8"/>
+<path d="M8.4 48 L6 62 L9.6 62.6 L11.6 48.6 Z" fill="#3b2a1e" stroke="#2e2620" stroke-width="0.55" stroke-linejoin="round"/>
+<rect x="14.6" y="49.6" width="7" height="7.6" rx="1.6" fill="url(#leather)" stroke="#2e2620" stroke-width="0.8"/>
 <path d="M14.6 52 L21.6 52" stroke="#211711" stroke-width="0.8"/>
-<path d="M17 11.6 Q25 9 34.4 11.8 L35.6 18 Q25 15.6 16 18 Z" fill="url(#fabric)" stroke="#1a0f08" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M17 11.6 Q25 9 34.4 11.8 L35.6 18 Q25 15.6 16 18 Z" fill="url(#fabric)" stroke="#2e2620" stroke-width="0.9" stroke-linejoin="round"/>
 </svg>

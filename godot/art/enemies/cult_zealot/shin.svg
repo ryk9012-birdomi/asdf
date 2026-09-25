@@ -5,10 +5,10 @@
 <stop offset="0" stop-color="#231613"/><stop offset="0.45" stop-color="#482d28"/><stop offset="1" stop-color="#1f1311"/></linearGradient>
 <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
 <stop offset="0" stop-color="#fbe39a"/><stop offset="0.55" stop-color="#e0a93e"/><stop offset="1" stop-color="#8e5c17"/></linearGradient></defs>
-<path d="M6.4 4 Q11 2.6 15.8 4 L15.4 16 L6.8 16 Z" fill="url(#fabric)" stroke="#5a3a28" stroke-width="1.1" stroke-linejoin="round"/>
-<path d="M5.8 13 Q11 11 16.6 13 L16 27 Q22.6 27.6 28.8 32.2 Q30.4 34.6 28.8 35.8 L5.8 36 Q4.4 31 5.8 26 Z" fill="url(#leather)" stroke="#5a3a28" stroke-width="1.1" stroke-linejoin="round"/>
-<path d="M5 12 Q11 9.4 17.2 12 L16.8 16.4 Q11 14.2 5.4 16.4 Z" fill="#4b2e29" stroke="#5a3a28" stroke-width="0.7" stroke-linejoin="round"/>
+<path d="M6.4 4 Q11 2.6 15.8 4 L15.4 16 L6.8 16 Z" fill="url(#fabric)" stroke="#2e2620" stroke-width="0.9" stroke-linejoin="round"/>
+<path d="M5.8 13 Q11 11 16.6 13 L16 27 Q22.6 27.6 28.8 32.2 Q30.4 34.6 28.8 35.8 L5.8 36 Q4.4 31 5.8 26 Z" fill="url(#leather)" stroke="#2e2620" stroke-width="0.9" stroke-linejoin="round"/>
+<path d="M5 12 Q11 9.4 17.2 12 L16.8 16.4 Q11 14.2 5.4 16.4 Z" fill="#4b2e29" stroke="#2e2620" stroke-width="0.55" stroke-linejoin="round"/>
 <path d="M6.4 21 L15.8 20 M6.6 25 L15.6 24.2" stroke="#1a100e" stroke-width="1"/>
-<path d="M5.6 34.6 L29 34.6" stroke="#5a3a28" stroke-width="1.2"/>
+<path d="M5.6 34.6 L29 34.6" stroke="#2e2620" stroke-width="1.2"/>
 <path d="M18 30 Q22 30.6 26 33" fill="none" stroke="#ffffff" stroke-width="0.8" opacity="0.35"/>
 </svg>

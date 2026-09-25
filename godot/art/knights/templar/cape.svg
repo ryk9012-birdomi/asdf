@@ -3,7 +3,7 @@
 <stop offset="0" stop-color="#ffffff"/><stop offset="0.55" stop-color="#c9d1dc"/><stop offset="1" stop-color="#6f7885"/></linearGradient>
 <linearGradient id="cape" x1="1" y1="0" x2="0" y2="0.2">
 <stop offset="0" stop-color="#b9b19a"/><stop offset="0.55" stop-color="#f2eee2"/><stop offset="1" stop-color="#b9b19a"/></linearGradient></defs>
-<path d="M18 2 Q29 -0.4 31 6 L29 40 Q28 64 31.5 89 Q20 91.6 9.6 87.6 Q2 85.4 0.8 81 Q5.8 50 10 20 Q12 6 18 2 Z" fill="url(#cape)" stroke="#1a0f08" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M18 2 Q29 -0.4 31 6 L29 40 Q28 64 31.5 89 Q20 91.6 9.6 87.6 Q2 85.4 0.8 81 Q5.8 50 10 20 Q12 6 18 2 Z" fill="url(#cape)" stroke="#2e2620" stroke-width="0.9" stroke-linejoin="round"/>
 <path d="M0.8 81 Q5.8 50 10 20 Q9.8 50 5.4 83.8 Z" fill="#c3281e"/>
 <path d="M20 12 Q18 48 16 86 M25.5 12 Q25 50 25.2 88 M14 26 Q11 55 9.6 85" fill="none" stroke="#948d7b" stroke-width="1.2"/>
 <path d="M22.5 14 Q21.5 48 20.5 86" fill="none" stroke="#ffffff" stroke-width="0.9" opacity="0.25"/>

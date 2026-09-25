@@ -15,7 +15,7 @@ const SLOT_BOXES := {
 	"armor": Rect2(298, 60, 84, 110),
 	"trinket": Rect2(308, 190, 64, 64),
 }
-const INK := Color("0b0806")
+const INK := Color("15130f")
 const BRONZE := Color("8a6a3a")
 const VALID := Color("6fe08a")
 const INVALID := Color("d04a3a")
@@ -45,6 +45,7 @@ class ItemCell extends Panel:
 		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		icon.material = FantasyTheme.muted()
 		icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		icon.offset_left = 4
 		icon.offset_top = 4
@@ -56,7 +57,7 @@ class ItemCell extends Panel:
 			caption.text = Items.SLOT_NAMES[slot]
 			caption.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			caption.add_theme_font_size_override("font_size", 12)
-			caption.add_theme_color_override("font_color", Color("6b5a44"))
+			caption.add_theme_color_override("font_color", Color("978f80"))
 			caption.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 			caption.grow_horizontal = Control.GROW_DIRECTION_BOTH
 			caption.grow_vertical = Control.GROW_DIRECTION_BOTH
@@ -74,8 +75,8 @@ class ItemCell extends Panel:
 
 	func restyle() -> void:
 		var box := StyleBoxFlat.new()
-		box.bg_color = Color("e8dabb") if item_id.is_empty() else Color("fbf3e0")
-		box.border_color = mark if mark.a > 0.0 else (BRONZE if not slot.is_empty() else Color("3a2c1c"))
+		box.bg_color = Color("2c2823") if item_id.is_empty() else Color("3a342b")
+		box.border_color = mark if mark.a > 0.0 else (BRONZE if not slot.is_empty() else Color("4a443a"))
 		box.set_border_width_all(2 if mark.a > 0.0 or not slot.is_empty() else 1)
 		box.set_corner_radius_all(3)
 		box.shadow_color = Color(0, 0, 0, 0.6)
@@ -90,6 +91,7 @@ class ItemCell extends Panel:
 		var preview := Control.new()
 		var picture := TextureRect.new()
 		picture.texture = icon.texture
+		picture.material = FantasyTheme.muted()
 		picture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		picture.size = Vector2(56, 56)
 		picture.position = Vector2(-28, -28)
@@ -132,7 +134,7 @@ func _ready() -> void:
 		return
 	theme = FantasyTheme.build()
 	AudioDirector.music("menu")
-	add_child(StoryBackdrop.new())
+	add_child(Backdrop.new())
 	var margin := MarginContainer.new()
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	for side in ["left", "right"]:
@@ -146,7 +148,7 @@ func _ready() -> void:
 	var header := HBoxContainer.new()
 	header.add_theme_constant_override("separation", 14)
 	page.add_child(header)
-	var title := FantasyTheme.label(header, "야영지  ·  정비", 30, Color("6a3a1a"), true)
+	var title := FantasyTheme.label(header, "야영지  ·  정비", 30, Color("e6dcc6"), true)
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	FantasyTheme.glow(title, Color("ff8a2a"), 10)
 	gold_label = FantasyTheme.label(header, "", 22, FantasyTheme.GOLD, true)
@@ -197,7 +199,7 @@ func build_hero(row: HBoxContainer, index: int) -> Dictionary:
 	doll.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	column.add_child(doll)
 	var floor_glow := ColorRect.new()
-	floor_glow.color = Color(0, 0, 0, 0.35)
+	floor_glow.color = Color(0.5, 0.5, 0.46, 0.22)
 	floor_glow.position = Vector2(88, 6)
 	floor_glow.size = Vector2(204, 346)
 	floor_glow.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -212,6 +214,7 @@ func build_hero(row: HBoxContainer, index: int) -> Dictionary:
 	figure.puppet.size = 1.2
 	figure.add_child(figure.puppet)
 	doll.add_child(figure)
+	figure.light()
 	var slots := {}
 	for slot in Items.SLOTS:
 		var cell := ItemCell.new(self, index, slot)
@@ -358,11 +361,11 @@ func item_tooltip(id: String) -> Control:
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation", 3)
 	panel.add_child(column)
-	FantasyTheme.label(column, info.name, 18, Color("f0c85a"), true).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	FantasyTheme.label(column, Items.SLOT_NAMES[info.slot], 13, Color("9a8a70")).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	FantasyTheme.label(column, info.name, 18, FantasyTheme.GOLD, true).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	FantasyTheme.label(column, Items.SLOT_NAMES[info.slot], 13, Color("978f80")).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	for part in Items.describe(id).split(" · "):
 		FantasyTheme.label(column, part, 15, Color("8ab0ff")).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	var flavor := FantasyTheme.label(column, info.flavor, 13, Color("c8a878"))
+	var flavor := FantasyTheme.label(column, info.flavor, 13, Color("b0a078"))
 	flavor.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	flavor.custom_minimum_size.x = 220
 	flavor.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

@@ -6,12 +6,12 @@
 <stop offset="0" stop-color="#c7a58a"/><stop offset="0.5" stop-color="#8a6a55"/><stop offset="1" stop-color="#3e2e24"/></linearGradient>
 <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
 <stop offset="0" stop-color="#f6d38a"/><stop offset="0.55" stop-color="#b8893c"/><stop offset="1" stop-color="#6e4e1a"/></linearGradient></defs>
-<path d="M6.5 7 Q11 5 15.8 7 L15 27 L7.2 27 Z" fill="url(#steel)" stroke="#1a0f08" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M6.5 7 Q11 5 15.8 7 L15 27 L7.2 27 Z" fill="url(#steel)" stroke="#2e2620" stroke-width="0.9" stroke-linejoin="round"/>
 <path d="M8.4 9 L8.8 25" stroke="#ffffff" stroke-width="1" opacity="0.45"/>
-<path d="M5 26.5 Q10 24.5 16.5 25.5 Q24 27 29 31 Q30.5 33.5 29.5 35.5 L5.5 36 Q3.8 31 5 26.5 Z" fill="url(#steelv)" stroke="#1a0f08" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M5 26.5 Q10 24.5 16.5 25.5 Q24 27 29 31 Q30.5 33.5 29.5 35.5 L5.5 36 Q3.8 31 5 26.5 Z" fill="url(#steelv)" stroke="#2e2620" stroke-width="0.9" stroke-linejoin="round"/>
 <path d="M15.5 26.2 Q17 30 16.5 35.8 M20.5 27.8 Q21.8 31 21.2 35.8 M25 29.6 Q26 32 25.6 35.7" fill="none" stroke="#000000" stroke-opacity="0.35" stroke-width="0.8"/>
-<path d="M4.8 34.6 L29.8 34.6" stroke="#1a0f08" stroke-width="1.2"/>
-<path d="M3.4 3.5 Q11 -2 18.6 3.5 Q16 8.5 11 9.2 Q6 8.5 3.4 3.5 Z" fill="url(#steelv)" stroke="#1a0f08" stroke-width="1.5" stroke-linejoin="round"/>
-<circle cx="11" cy="4.6" r="2.6" fill="url(#gold)" stroke="#1a0f08" stroke-width="0.8"/>
-<path d="M2.6 4 Q0.4 7.5 3 10.5 Q4.6 7.6 5.5 6.3 Z" fill="url(#steelv)" stroke="#1a0f08" stroke-width="0.9" stroke-linejoin="round"/>
+<path d="M4.8 34.6 L29.8 34.6" stroke="#2e2620" stroke-width="1.2"/>
+<path d="M3.4 3.5 Q11 -2 18.6 3.5 Q16 8.5 11 9.2 Q6 8.5 3.4 3.5 Z" fill="url(#steelv)" stroke="#2e2620" stroke-width="0.9" stroke-linejoin="round"/>
+<circle cx="11" cy="4.6" r="2.6" fill="url(#gold)" stroke="#2e2620" stroke-width="0.8"/>
+<path d="M2.6 4 Q0.4 7.5 3 10.5 Q4.6 7.6 5.5 6.3 Z" fill="url(#steelv)" stroke="#2e2620" stroke-width="0.55" stroke-linejoin="round"/>
 </svg>
