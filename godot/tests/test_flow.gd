@@ -70,8 +70,29 @@ func run_tests() -> void:
 
 	current_scene.new_run_button.pressed.emit()
 	await settle()
+	var setup := current_scene
+	check(setup.name == "PartySetup" and RunState.active == null, "New journey first asks for the party")
+	check(setup.classes == ["paladin", "rogue", "wizard"], "The party starts as knight, rogue, wizard")
+	check(setup.names.all(func(name): return not name.is_empty()) and setup.names[0] != setup.names[1] and setup.names[1] != setup.names[2] and setup.names[0] != setup.names[2], "Every hero gets a different random name")
+	check(setup.slots.all(func(slot): return slot.figure.puppet is HeroPuppet), "Each place previews its hero on the battle rig")
+	var first_name: String = setup.names[2]
+	setup.find_child("Class_2_paladin", true, false).pressed.emit()
+	await process_frame
+	check(setup.classes[2] == "paladin" and setup.slots[2].stats.text.begins_with("HP 10"), "A class button changes that place and its stats")
+	check(setup.names[2] != first_name and setup.names[2] != setup.names[0], "A new class draws a new name")
+	var drawn: String = setup.names[2]
+	setup.find_child("Reroll_2", true, false).pressed.emit()
+	check(setup.names[2] != drawn and setup.slots[2].name.text == setup.names[2], "The name can be redrawn")
+	setup.find_child("Class_2_wizard", true, false).pressed.emit()
+	await process_frame
+	var picked: Array = setup.names.duplicate()
+	setup.find_child("StartButton", true, false).pressed.emit()
+	await settle()
 	var run := RunState.active
-	check(run != null and current_scene.name == "MapScreen", "New journey opens the map")
+	check(run != null and current_scene.name == "MapScreen", "Setting out opens the map")
+	check(run.party.map(func(hero): return hero.definition.character_name) == picked, "The party carries the chosen names")
+	check(run.party.map(func(hero): return String(hero.definition.class_id)) == ["paladin", "rogue", "wizard"], "The party carries the chosen classes")
+	check(load("res://data/classes/paladin.tres").character_name == "알데릭", "Naming a hero never touches the class data")
 	check(AudioDirector.instance.current_track == "map", "Map plays the travel theme")
 	check(current_scene.canvas.positions.size() == run.map.nodes.size(), "Map draws every node")
 	var opening: RunMap.MapNode = run.available_nodes()[0]

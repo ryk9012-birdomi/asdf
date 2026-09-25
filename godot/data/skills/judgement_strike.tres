@@ -6,7 +6,7 @@
 script = ExtResource("1_skill")
 id = &"judgement_strike"
 skill_name = "심판의 일격"
-description = "전열의 적 하나를 신성한 철퇴로 내리쳐 공격력 100%의 광휘 피해."
+description = "적 하나를 신성한 검으로 내리쳐 공격력 100%의 광휘 피해. 뒷줄을 노리면 한 줄마다 명중 −2."
 target_type = 5
 damage_type = 3
 effect_type = 0

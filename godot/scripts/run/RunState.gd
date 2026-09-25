@@ -9,6 +9,12 @@ static var active: RunState
 const REST_HEAL_FRACTION := 0.4
 const MAX_SKILL_LEVEL := 3
 const DEFAULT_PARTY := ["res://data/classes/paladin.tres", "res://data/classes/rogue.tres", "res://data/classes/wizard.tres"]
+## Classes a player can pick for each of the three places in the party.
+const CLASSES := {
+	"paladin": "res://data/classes/paladin.tres",
+	"rogue": "res://data/classes/rogue.tres",
+	"wizard": "res://data/classes/wizard.tres",
+}
 
 var seed_value: int = 0
 var map: RunMap
@@ -91,6 +97,17 @@ static func begin(run_seed: int, heroes: Array[CharacterData]) -> RunState:
 		run.stash.append(id)
 	active = run
 	return run
+
+
+## A party picked on the setup screen: one class per place (repeats allowed) and a name
+## each. Every hero gets its own copy of the class data carrying that name.
+static func begin_party(run_seed: int, classes: Array, names: Array) -> RunState:
+	var heroes: Array[CharacterData] = []
+	for index in classes.size():
+		var hero := (load(CLASSES[classes[index]]) as CharacterData).duplicate() as CharacterData
+		hero.character_name = names[index]
+		heroes.append(hero)
+	return begin(run_seed, heroes)
 
 
 static func begin_default(run_seed: int) -> RunState:

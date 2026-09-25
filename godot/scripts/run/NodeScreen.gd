@@ -54,16 +54,15 @@ func _ready() -> void:
 		_:
 			var event := Events.for_node(run, map_node)
 			title.text = event.title
-			story.text = event.text
+			story.text = Events.text(run, event.text)
 			for choice in event.choices:
-				var caption: String = choice.label
+				var caption: String = Events.text(run, choice.label)
 				var odds := Events.describe_check(run, choice)
 				if not odds.is_empty():
 					caption += "\n      " + odds
 				var item := option(caption, func(): choose(choice))
-				item.disabled = not Events.affordable(run, choice)
-				if item.disabled:
-					item.tooltip_text = "골드가 부족합니다 (보유 %d)" % run.gold
+				item.disabled = not Events.available(run, choice)
+				item.tooltip_text = Events.blocked_reason(run, choice)
 	show_party()
 
 

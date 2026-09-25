@@ -6,7 +6,7 @@
 script = ExtResource("1_skill")
 id = &"goblin_firebomb"
 skill_name = "화염병 투척"
-description = "전열의 적에게 공격력 150%의 화염 피해."
+description = "적에게 공격력 150%의 화염 피해. 뒷줄을 노리면 한 줄마다 명중 −2."
 target_type = 5
 damage_type = 2
 effect_type = 0

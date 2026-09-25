@@ -264,7 +264,7 @@ func test_ui() -> void:
 	check(foe_view.info.text.begins_with("▸"), "Enemy intent shows above the enemy")
 	check(hero_view.kind == &"paladin" and foe_view.kind == &"goblin_raider", "Each unit gets its own drawing")
 	var puppet: Puppet = hero_view.figure.puppet
-	check(puppet is PaladinPuppet and foe_view.figure.puppet == null, "Aldric is a jointed cut-out puppet; others keep the drawn art")
+	check(puppet is HeroPuppet and foe_view.figure.puppet == null, "Heroes are jointed cut-out puppets; enemies keep the drawn art")
 	check(puppet.get_child_count() >= 17 and puppet.bones.head.sprite.texture != null, "Puppet assembles every SVG part")
 	var resting_sword: float = puppet.world_angle(&"sword")
 	hero_view.figure.arm = 1.5
@@ -320,7 +320,7 @@ func test_ui() -> void:
 
 
 func test_knight_gallery() -> void:
-	var gallery: Control = load("res://scenes/dev/KnightGallery.tscn").instantiate()
+	var gallery: Control = load("res://scenes/dev/HeroGallery.tscn").instantiate()
 	root.add_child(gallery)
 	await process_frame
 	await process_frame
@@ -330,8 +330,8 @@ func test_knight_gallery() -> void:
 		for id in [&"torso", &"head", &"sword", &"shield", &"cape"]:
 			complete = complete and figure.puppet.bones[id].sprite.texture != null
 	check(complete, "Every example knight has every part")
-	var black: Puppet = gallery.find_child("Knight_black_knight", true, false).puppet
-	var templar: Puppet = gallery.find_child("Knight_templar", true, false).puppet
+	var black: Puppet = gallery.find_child("Hero_black_knight", true, false).puppet
+	var templar: Puppet = gallery.find_child("Hero_templar", true, false).puppet
 	check(not black.shielded and templar.shielded, "Shieldless knights are detected from empty shield art")
 	gallery.play_all("쓰러짐")
 	check(not gallery.auto, "A motion button stops the automatic cycle")

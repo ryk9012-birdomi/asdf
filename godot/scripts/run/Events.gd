@@ -1,15 +1,21 @@
 class_name Events
 extends RefCounted
-## Story events on the map. Each choice may call for a 2d6 check by one hero
+## Story events on the map. Each choice may call for a 2d6 check by one hero of a class
 ## (2d6 + that hero's hit bonus ≥ target) and applies simple effects to the run:
-##   gold: ±n   heal: n to every living hero   hurt: [hero index or -1 for all, n]
+##   gold: ±n   heal: n to every living hero   hurt: [class or ALL, n]
 ##   ward: n shield for every hero at the start of the next battle   cost: gold to pay
 ## Events never kill: hurt stops at 1 HP.
+## The party is chosen by the player and names are random, so text names heroes by class:
+## {paladin} is the first knight's name, {paladin/이} adds the right particle (이/가,
+## 은/는, 을/를, 과/와). A check needs someone of that class in the party; plain choices
+## that name a missing class fall back to the first hero.
 
-const PALADIN := 0
-const ROGUE := 1
-const WIZARD := 2
-const ALL := -1
+const PALADIN := "paladin"
+const ROGUE := "rogue"
+const WIZARD := "wizard"
+const ALL := "all"
+## Particles written after a closed syllable, and their open-syllable partners.
+const PARTICLES := {"이": "가", "은": "는", "을": "를", "과": "와"}
 
 ## The opening floor: the party sets out from the last village below the pass.
 const OPENING := [
@@ -27,12 +33,12 @@ const OPENING := [
 		"title": "고갯길 입구의 상인",
 		"text": "비탈길 초입, 바퀴가 부러진 수레 아래에 상인이 깔려 신음한다. 수레를 들어 올리려면 누군가 힘을 써야 한다.",
 		"choices": [
-			{"label": "알데릭이 수레를 들어 올린다", "check": {"hero": PALADIN, "target": 8},
-				"success": {"effects": {"gold": 25}, "text": "알데릭이 이를 악물고 수레를 들어 올렸다. 상인이 사례금을 쥐여 준다. 골드 +25."},
-				"failure": {"effects": {"hurt": [PALADIN, 2]}, "text": "수레가 미끄러지며 알데릭의 어깨를 짓눌렀다. 상인은 겨우 빠져나왔지만 알데릭 HP −2."}},
-			{"label": "시엔이 지렛대를 찾아 머리를 쓴다", "check": {"hero": ROGUE, "target": 9},
+			{"label": "{paladin/이} 수레를 들어 올린다", "check": {"hero": PALADIN, "target": 8},
+				"success": {"effects": {"gold": 25}, "text": "{paladin/이} 이를 악물고 수레를 들어 올렸다. 상인이 사례금을 쥐여 준다. 골드 +25."},
+				"failure": {"effects": {"hurt": [PALADIN, 2]}, "text": "수레가 미끄러지며 {paladin}의 어깨를 짓눌렀다. 상인은 겨우 빠져나왔지만 {paladin} HP −2."}},
+			{"label": "{rogue/이} 지렛대를 찾아 머리를 쓴다", "check": {"hero": ROGUE, "target": 9},
 				"success": {"effects": {"gold": 20, "ward": 1}, "text": "부러진 창대 하나로 수레가 들렸다. 상인이 고갯길의 매복 지점을 귀띔해 준다. 골드 +20, 다음 전투 보호막 +1."},
-				"failure": {"effects": {"hurt": [ROGUE, 1]}, "text": "창대가 부러지며 시엔의 손을 긁었다. 결국 모두 힘으로 들어 올렸다. 시엔 HP −1."}},
+				"failure": {"effects": {"hurt": [ROGUE, 1]}, "text": "창대가 부러지며 {rogue}의 손을 긁었다. 결국 모두 힘으로 들어 올렸다. {rogue} HP −1."}},
 			{"label": "갈 길이 바쁘다. 지나친다", "effects": {}, "text": "뒤에서 상인의 욕설이 들려왔다."},
 		],
 	},
@@ -41,10 +47,10 @@ const OPENING := [
 		"title": "불길한 표식",
 		"text": "길가 바위에 붉은 잿불로 새긴 교단의 표식이 아직 따뜻하다. 무언가를 부르는 주문 같다.",
 		"choices": [
-			{"label": "엘로웬이 표식을 해독한다", "check": {"hero": WIZARD, "target": 9},
+			{"label": "{wizard/이} 표식을 해독한다", "check": {"hero": WIZARD, "target": 9},
 				"success": {"effects": {"ward": 3, "gold": 10}, "text": "표식을 거꾸로 읽어 보호의 문장으로 바꾸었다. 표식 아래 숨겨진 헌금함도 찾았다. 다음 전투 보호막 +3, 골드 +10."},
-				"failure": {"effects": {"hurt": [WIZARD, 2]}, "text": "표식이 불꽃을 토해 엘로웬의 소매를 태웠다. 엘로웬 HP −2."}},
-			{"label": "알데릭이 표식을 부순다", "effects": {"ward": 1}, "text": "철퇴가 바위를 가르자 잿불이 꺼졌다. 다음 전투 보호막 +1."},
+				"failure": {"effects": {"hurt": [WIZARD, 2]}, "text": "표식이 불꽃을 토해 {wizard}의 소매를 태웠다. {wizard} HP −2."}},
+			{"label": "{paladin/이} 표식을 부순다", "effects": {"ward": 1}, "text": "철퇴가 바위를 가르자 잿불이 꺼졌다. 다음 전투 보호막 +1."},
 		],
 	},
 ]
@@ -57,9 +63,9 @@ const JOURNEY := [
 		"text": "아직 식지 않은 모닥불 자리. 교단 척후병들이 급히 떠난 흔적이다. 풀숲에 약초가, 천막 아래에 짐 꾸러미가 보인다.",
 		"choices": [
 			{"label": "약초를 달여 상처를 돌본다", "effects": {"heal": 2}, "text": "쓴 약초 차가 몸을 데운다. 모두 HP +2."},
-			{"label": "시엔이 짐 꾸러미를 뒤진다", "check": {"hero": ROGUE, "target": 8},
+			{"label": "{rogue/이} 짐 꾸러미를 뒤진다", "check": {"hero": ROGUE, "target": 8},
 				"success": {"effects": {"gold": 30}, "text": "덫을 피해 꾸러미를 열었다. 교단의 군자금이다. 골드 +30."},
-				"failure": {"effects": {"hurt": [ROGUE, 2], "gold": 5}, "text": "숨겨진 바늘 덫에 찔렸다. 동전 몇 닢만 건졌다. 시엔 HP −2, 골드 +5."}},
+				"failure": {"effects": {"hurt": [ROGUE, 2], "gold": 5}, "text": "숨겨진 바늘 덫에 찔렸다. 동전 몇 닢만 건졌다. {rogue} HP −2, 골드 +5."}},
 		],
 	},
 	{
@@ -78,7 +84,7 @@ const JOURNEY := [
 		"title": "무너진 제단",
 		"text": "교단이 더럽히기 전의 옛 순례자 제단이다. 금 간 성상 아래에 붉은 보석이 박혀 있다.",
 		"choices": [
-			{"label": "알데릭이 무릎 꿇고 기도한다", "effects": {"heal": 3}, "text": "희미한 빛이 일행을 감싼다. 모두 HP +3."},
+			{"label": "{paladin/이} 무릎 꿇고 기도한다", "effects": {"heal": 3}, "text": "희미한 빛이 일행을 감싼다. 모두 HP +3."},
 			{"label": "보석을 뜯어낸다", "effects": {"gold": 35, "hurt": [ALL, 1]}, "text": "보석을 떼어 내자 제단이 신음하듯 무너진다. 골드 +35, 모두 HP −1."},
 		],
 	},
@@ -87,9 +93,9 @@ const JOURNEY := [
 		"title": "쓰러진 정찰병",
 		"text": "왕국군 정찰병이 화살을 맞고 쓰러져 있다. 숨은 붙어 있지만 오래 버티지 못할 것 같다.",
 		"choices": [
-			{"label": "엘로웬이 치유 주문을 시도한다", "check": {"hero": WIZARD, "target": 8},
+			{"label": "{wizard/이} 치유 주문을 시도한다", "check": {"hero": WIZARD, "target": 8},
 				"success": {"effects": {"gold": 15, "ward": 2}, "text": "정찰병이 눈을 떴다. 감사의 표시로 봉급과 교단 진지 위치를 알려 준다. 골드 +15, 다음 전투 보호막 +2."},
-				"failure": {"effects": {"hurt": [WIZARD, 1]}, "text": "주문이 흩어지며 엘로웬이 비틀거렸다. 정찰병은 끝내 숨을 거두었다. 엘로웬 HP −1."}},
+				"failure": {"effects": {"hurt": [WIZARD, 1]}, "text": "주문이 흩어지며 {wizard/이} 비틀거렸다. 정찰병은 끝내 숨을 거두었다. {wizard} HP −1."}},
 			{"label": "명복을 빌고 지나간다", "effects": {}, "text": "일행은 정찰병의 망토를 덮어 주고 발걸음을 옮겼다."},
 		],
 	},
@@ -101,9 +107,17 @@ static func for_node(run: RunState, map_node: RunMap.MapNode) -> Dictionary:
 	return pool[run.encounter_seed(map_node.id) % pool.size()]
 
 
+## Index of the first hero of that class, or -1.
+static func hero_for(run: RunState, role: String) -> int:
+	for index in run.party.size():
+		if String(run.party[index].definition.class_id) == role:
+			return index
+	return -1
+
+
 static func bonus(run: RunState, check: Dictionary) -> int:
-	var hero: int = check.hero
-	return 0 if hero == ALL else run.party[hero].definition.hit_bonus
+	var index := hero_for(run, check.hero)
+	return 0 if index < 0 else run.party[index].definition.hit_bonus
 
 
 static func chance(run: RunState, check: Dictionary) -> float:
@@ -118,6 +132,54 @@ static func chance(run: RunState, check: Dictionary) -> float:
 
 static func affordable(run: RunState, choice: Dictionary) -> bool:
 	return run.gold >= int(choice.get("cost", 0))
+
+
+## A check can only be tried by a hero of its class.
+static func attemptable(run: RunState, choice: Dictionary) -> bool:
+	if not choice.has("check"):
+		return true
+	var role: String = choice.check.hero
+	return role == ALL or hero_for(run, role) >= 0
+
+
+static func available(run: RunState, choice: Dictionary) -> bool:
+	return affordable(run, choice) and attemptable(run, choice)
+
+
+## Why a choice is greyed out, for its tooltip.
+static func blocked_reason(run: RunState, choice: Dictionary) -> String:
+	if not attemptable(run, choice):
+		var role: String = CLASS_NAMES.get(choice.check.hero, choice.check.hero)
+		return "일행에 %s%s 없습니다" % [role, "이" if has_final_consonant(role) else "가"]
+	if not affordable(run, choice):
+		return "골드가 부족합니다 (보유 %d)" % run.gold
+	return ""
+
+
+const CLASS_NAMES := {"paladin": "기사", "rogue": "도적", "wizard": "마법사"}
+
+
+## Fills {class} and {class/particle} with the party's names.
+static func text(run: RunState, template: String) -> String:
+	var pattern := RegEx.new()
+	pattern.compile("\\{(paladin|rogue|wizard)(?:/(이|은|을|과))?\\}")
+	var out := template
+	for found in pattern.search_all(template):
+		var index := hero_for(run, found.get_string(1))
+		var name: String = run.party[maxi(index, 0)].definition.character_name
+		var particle := found.get_string(2)
+		if not particle.is_empty():
+			name += particle if has_final_consonant(name) else PARTICLES[particle]
+		out = out.replace(found.get_string(0), name)
+	return out
+
+
+## True when the last Hangul syllable ends in a consonant (받침); other letters count as open.
+static func has_final_consonant(word: String) -> bool:
+	if word.is_empty():
+		return false
+	var code := word.unicode_at(word.length() - 1)
+	return code >= 0xAC00 and code <= 0xD7A3 and (code - 0xAC00) % 28 != 0
 
 
 ## Resolves one choice with the node's own dice, applies it and returns what happened.
@@ -135,7 +197,7 @@ static func resolve(run: RunState, map_node: RunMap.MapNode, choice: Dictionary)
 		roll = {"dice": dice, "bonus": bonus(run, check), "total": total, "target": check.target, "passed": passed}
 		outcome = choice.success if passed else choice.failure
 	apply(run, outcome.effects)
-	return {"text": outcome.text, "roll": roll, "effects": outcome.effects}
+	return {"text": text(run, outcome.text), "roll": roll, "effects": outcome.effects}
 
 
 static func apply(run: RunState, effects: Dictionary) -> void:
@@ -145,9 +207,10 @@ static func apply(run: RunState, effects: Dictionary) -> void:
 		if hero.is_alive() and heal > 0:
 			hero.current_hp = mini(hero.max_hp(), hero.current_hp + heal)
 	if effects.has("hurt"):
-		var who: int = effects.hurt[0]
+		var who: String = effects.hurt[0]
+		var target := -1 if who == ALL else maxi(0, hero_for(run, who))
 		for index in run.party.size():
-			if who == ALL or who == index:
+			if target < 0 or index == target:
 				var hero := run.party[index]
 				hero.current_hp = maxi(mini(1, hero.current_hp), hero.current_hp - int(effects.hurt[1]))
 	run.ward += int(effects.get("ward", 0))
@@ -157,6 +220,8 @@ static func describe_check(run: RunState, choice: Dictionary) -> String:
 	if not choice.has("check"):
 		return ""
 	var check: Dictionary = choice.check
-	var who := "주사위" if check.hero == ALL else run.party[check.hero].definition.character_name
+	if not attemptable(run, choice):
+		return "%s 판정 · 일행에 %s 없음" % [CLASS_NAMES.get(check.hero, check.hero), CLASS_NAMES.get(check.hero, check.hero)]
+	var who := "주사위" if check.hero == ALL else run.party[hero_for(run, check.hero)].definition.character_name
 	var mod := bonus(run, check)
 	return "%s 판정: 2d6%s ≥ %d  ·  성공 %d%%" % [who, (" %+d" % mod) if mod != 0 else "", check.target, roundi(chance(run, check) * 100.0)]

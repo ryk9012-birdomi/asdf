@@ -9,7 +9,9 @@
 <linearGradient id="mail" x1="0" y1="0" x2="1" y2="0">
 <stop offset="0" stop-color="#191a1e"/><stop offset="0.5" stop-color="#373941"/><stop offset="1" stop-color="#131417"/></linearGradient>
 <linearGradient id="skin" x1="0" y1="0" x2="1" y2="0">
-<stop offset="0" stop-color="#c0927a"/><stop offset="0.6" stop-color="#fbe6d6"/><stop offset="1" stop-color="#efcdb6"/></linearGradient></defs>
+<stop offset="0" stop-color="#c0927a"/><stop offset="0.6" stop-color="#fbe6d6"/><stop offset="1" stop-color="#efcdb6"/></linearGradient>
+<linearGradient id="hood" x1="0" y1="0" x2="1" y2="0.4">
+<stop offset="0" stop-color="#282828"/><stop offset="0.5" stop-color="#444444"/><stop offset="1" stop-color="#333333"/></linearGradient></defs>
 <g transform="translate(6,10)"><path d="M7.5 29 Q6 43 13 48.5 L31 48.5 Q29 41 27 36 Z" fill="url(#mail)" stroke="#1a0f08" stroke-width="1.5" stroke-linejoin="round"/><path d="M9.0 34.0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0" fill="none" stroke="#14161b" stroke-width="0.55" opacity="0.7"/>
 <path d="M9.0 36.6 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0" fill="none" stroke="#14161b" stroke-width="0.55" opacity="0.7"/>
 <path d="M9.0 39.2 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0" fill="none" stroke="#14161b" stroke-width="0.55" opacity="0.7"/>

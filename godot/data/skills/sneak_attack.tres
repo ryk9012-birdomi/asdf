@@ -6,7 +6,7 @@
 script = ExtResource("1_skill")
 id = &"sneak_attack"
 skill_name = "급소 찌르기"
-description = "전열의 적 하나의 빈틈을 노려 공격력 70%의 피해를 두 번 가합니다."
+description = "적 하나의 빈틈을 노려 공격력 70%의 피해를 두 번 가합니다. 뒷줄을 노리면 한 줄마다 명중 −2."
 target_type = 5
 damage_type = 0
 effect_type = 0

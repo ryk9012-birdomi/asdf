@@ -1,0 +1,140 @@
+[
+ {
+  "title": "기사",
+  "style": "knight",
+  "entries": [
+   {
+    "id": "aldric",
+    "name": "알데릭",
+    "note": "은빛 판금, 태양 문장, 열린 투구와 붉은 깃털",
+    "path": "res://art/knights/aldric/"
+   },
+   {
+    "id": "templar",
+    "name": "성전 기사",
+    "note": "흰 겉옷과 붉은 십자, 닫힌 대투구",
+    "path": "res://art/knights/templar/"
+   },
+   {
+    "id": "black_knight",
+    "name": "흑기사",
+    "note": "검게 그을린 강철, 핏빛 안감, 붉게 빛나는 눈구멍",
+    "path": "res://art/knights/black_knight/"
+   },
+   {
+    "id": "golden_paladin",
+    "name": "황금 성기사",
+    "note": "금도금 갑옷, 날개 투구, 전투 망치",
+    "path": "res://art/knights/golden_paladin/"
+   },
+   {
+    "id": "moon_knight",
+    "name": "달빛 기사 (기본)",
+    "note": "푸른 은빛 판금, 초승달 문장, 곡면 투구",
+    "path": "res://art/knights/moon_knight/"
+   },
+   {
+    "id": "crimson_knight",
+    "name": "진홍 기사",
+    "note": "붉게 칠한 판금, 뿔 투구, 전투 도끼",
+    "path": "res://art/knights/crimson_knight/"
+   },
+   {
+    "id": "warden",
+    "name": "숲의 파수꾼",
+    "note": "녹슨 청동빛 갑옷, 나무 문장, 창",
+    "path": "res://art/knights/warden/"
+   },
+   {
+    "id": "royal_guard",
+    "name": "왕실 근위대",
+    "note": "왕관 투구, 파란 망토, 탑 방패",
+    "path": "res://art/knights/royal_guard/"
+   },
+   {
+    "id": "veteran",
+    "name": "늙은 용병",
+    "note": "낡은 사슬과 판금, 회색 수염, 철퇴",
+    "path": "res://art/knights/veteran/"
+   },
+   {
+    "id": "squire",
+    "name": "견습 기사",
+    "note": "투구 없이 금발, 짧은 검과 작은 방패",
+    "path": "res://art/knights/squire/"
+   },
+   {
+    "id": "death_knight",
+    "name": "망자의 기사",
+    "note": "녹슨 판금 속 창백한 얼굴과 푸른 눈빛",
+    "path": "res://art/knights/death_knight/"
+   },
+   {
+    "id": "sun_priest",
+    "name": "태양의 기사단장",
+    "note": "금빛 판금과 흰 망토, 긴 흰 깃털, 철퇴",
+    "path": "res://art/knights/sun_priest/"
+   }
+  ]
+ },
+ {
+  "title": "도적",
+  "style": "rogue",
+  "entries": [
+   {
+    "id": "shade",
+    "name": "그림자 도적 (기본)",
+    "note": "보랏빛 두건과 복면, 검은 가죽, 쌍단검",
+    "path": "res://art/rogues/shade/"
+   },
+   {
+    "id": "scarlet",
+    "name": "붉은 두건",
+    "note": "진홍 두건, 밝은 가죽, 맨얼굴의 미소",
+    "path": "res://art/rogues/scarlet/"
+   },
+   {
+    "id": "desert",
+    "name": "사막 자객",
+    "note": "모래빛 천 두건과 복면, 굽은 단검",
+    "path": "res://art/rogues/desert/"
+   },
+   {
+    "id": "tracker",
+    "name": "숲 추적자",
+    "note": "초록 두건, 수염, 사냥용 단검",
+    "path": "res://art/rogues/tracker/"
+   }
+  ]
+ },
+ {
+  "title": "마법사",
+  "style": "wizard",
+  "entries": [
+   {
+    "id": "starlight",
+    "name": "별빛 마법사 (기본)",
+    "note": "남빛 로브와 별 무늬, 은발, 푸른 구슬 지팡이",
+    "path": "res://art/wizards/starlight/"
+   },
+   {
+    "id": "pyromancer",
+    "name": "화염술사",
+    "note": "진홍 로브, 불꽃 구슬, 검은 수염",
+    "path": "res://art/wizards/pyromancer/"
+   },
+   {
+    "id": "necromancer",
+    "name": "강령술사",
+    "note": "검은 로브, 창백한 얼굴, 초록 해골빛",
+    "path": "res://art/wizards/necromancer/"
+   },
+   {
+    "id": "archmage",
+    "name": "대마법사",
+    "note": "흰 로브와 금실, 긴 흰 수염, 수정 지팡이",
+    "path": "res://art/wizards/archmage/"
+   }
+  ]
+ }
+]

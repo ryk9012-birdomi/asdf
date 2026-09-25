@@ -35,15 +35,15 @@ class Spring:
 
 
 static func create(kind: StringName) -> Puppet:
-	match kind:
-		&"paladin":
-			return knight(PaladinPuppet.ART)
-	return null
+	if not HeroPuppet.CLASSES.has(kind):
+		return null
+	var entry: Array = HeroPuppet.CLASSES[kind]
+	return hero(entry[0], entry[1])
 
 
-## A knight wearing any part set from tools/generate_knight_art.py.
-static func knight(art: String) -> Puppet:
-	var puppet := PaladinPuppet.new(art)
+## A hero wearing any part set from tools/generate_hero_art.py, posed in that class's style.
+static func hero(art: String, style_id: StringName = &"knight") -> Puppet:
+	var puppet := HeroPuppet.new(art, style_id)
 	puppet.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	return puppet
 

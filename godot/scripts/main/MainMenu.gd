@@ -68,7 +68,7 @@ func _ready() -> void:
 	var gap := Control.new()
 	gap.custom_minimum_size.y = 36
 	column.add_child(gap)
-	new_run_button = menu_button(column, "새 여정", "고갯길에서 새 모험을 시작합니다.", start_new_run)
+	new_run_button = menu_button(column, "새 여정", "직업을 골라 일행을 꾸리고 새 모험을 시작합니다.", start_new_run)
 	continue_button = menu_button(column, "이어하기", "진행 중인 여정으로 돌아갑니다.", func(): SceneRouter.go(get_tree(), SceneRouter.MAP))
 	var run := RunState.active
 	continue_button.disabled = run == null or run.finished
@@ -125,8 +125,7 @@ func quit_game() -> void:
 
 
 func start_new_run() -> void:
-	RunState.begin_default(randi())
-	SceneRouter.go(get_tree(), SceneRouter.MAP)
+	SceneRouter.go(get_tree(), SceneRouter.PARTY)
 
 
 func centered(parent: Node, text_value: String, font_size: int, color: Color) -> Label:

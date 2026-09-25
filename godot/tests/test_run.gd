@@ -24,6 +24,7 @@ func run_tests() -> void:
 	test_travel()
 	test_party_persistence()
 	test_events()
+	test_any_party()
 	test_gear_and_upgrades()
 	print("Run system: %d checks, %d failures" % [checks, failures])
 	AudioDirector.shutdown()
@@ -244,6 +245,28 @@ func test_events() -> void:
 	var first := Events.resolve(RunState.begin(31, heroes()), start, cart.choices[0])
 	var second := Events.resolve(RunState.begin(31, heroes()), start, cart.choices[0])
 	check(first.roll.dice == second.roll.dice and first.roll.total == first.roll.dice[0] + first.roll.dice[1] + 1, "Event rolls are seeded and add the hero's bonus")
+
+
+func test_any_party() -> void:
+	var twins := RunState.begin_party(12, ["rogue", "rogue", "wizard"], ["미렌", "카시", "아리엘"])
+	check(twins.party[0].definition != twins.party[1].definition and twins.party[1].definition.character_name == "카시", "Repeated classes get their own named copies")
+	var cart: Dictionary = Events.OPENING.filter(func(event): return event.id == "broken_cart")[0]
+	check(not Events.available(twins, cart.choices[0]) and Events.blocked_reason(twins, cart.choices[0]) == "일행에 기사가 없습니다", "A knight's check needs a knight")
+	check(Events.available(twins, cart.choices[1]) and Events.describe_check(twins, cart.choices[1]).begins_with("미렌 판정"), "The first hero of a class takes its check")
+	check(Events.text(twins, "{rogue/이} 웃었다. {wizard/은} 보았다. {rogue/을} 불렀다.") == "미렌이 웃었다. 아리엘은 보았다. 미렌을 불렀다.", "Names take the right particle after a closed syllable")
+	var open := RunState.begin_party(12, ["paladin", "rogue", "wizard"], ["세라", "카시", "아리"])
+	check(Events.text(open, "{paladin/이} {rogue/은} {wizard/을} {paladin/과}") == "세라가 카시는 아리를 세라와", "Names take the right particle after an open syllable")
+	check(Events.text(twins, "{paladin/이} 표식을 부순다") == "미렌이 표식을 부순다", "A missing class falls back to the first hero")
+	for hero in twins.party:
+		hero.current_hp = 5
+	Events.apply(twins, {"hurt": ["wizard", 3]})
+	check(twins.party[2].current_hp == 2 and twins.party[0].current_hp == 5, "Hurting a class hurts that hero only")
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 7
+	var names := []
+	for _index in 40:
+		names.append(Names.random("wizard", rng, names))
+	check(names.size() == 40 and names.all(func(name): return name.length() >= 2 and not Names.stutters(name)), "Random names are unique and read well")
 
 
 func test_gear_and_upgrades() -> void:
