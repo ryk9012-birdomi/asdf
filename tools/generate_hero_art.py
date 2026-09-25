@@ -577,6 +577,8 @@ def shield(folder, k, g):
         "kite": [(9.6, 9), (30.4, 9), (20, 40)], "heater": [(8.6, 9), (31.4, 9), (20, 40)],
         "round": [(20, 9.4), (32.6, 22.5), (20, 35.6), (7.4, 22.5)], "tower": [(9.6, 8), (30.4, 8), (9.6, 40), (30.4, 40)],
     }[kind])
+    if k.get("cracked"):
+        rivets += f'<path d="M20 6 L17 15 L22 21 L18 31 L21 40" fill="none" stroke="{INK}" stroke-width="1.1"/>'
     write(folder, "shield", 40, 50, [g["gold"], g["steelv"], light, clip], f'''
 <path d="{outline}" fill="url(#gold)" {SW}/>
 <path d="{inner}" fill="url(#face)" {THIN}/>
@@ -674,7 +676,7 @@ def rogue_parts(k, folder):
     b = BLADES[k.get("blade", "steel")]
     blade = f'''<linearGradient id="blade" x1="0" y1="0" x2="1" y2="0">
 <stop offset="0" stop-color="{b[0]}"/><stop offset="0.48" stop-color="{b[1]}"/><stop offset="0.52" stop-color="{b[2]}"/><stop offset="1" stop-color="{b[3]}"/></linearGradient>'''
-    curve = k["id"] == "desert"
+    curve = k.get("curved", k["id"] == "desert")
     edge = "M14 52 Q20.6 62 17.4 81 L10.8 81 Q11.2 66 14 52 Z" if curve else "M14 55 L17.2 61 L16.8 81 L11.2 81 L10.8 61 Z"
     dagger = (f'<path d="{edge}" fill="url(#blade)" {SW}/>'
               '<path d="M14 60 L14 79" stroke="#000000" stroke-opacity="0.3" stroke-width="0.8"/>'
@@ -789,12 +791,362 @@ def build(k, folder):
     glow(folder)
 
 
+# ================================================================ enemies
+# Foes use the same skeleton. Each starts from a hero builder for its body and swaps in
+# its own head, hands, weapon or off-hand. `size` scales the whole puppet (goblins are
+# small); heads are drawn in a canvas with `left`/`top` margins so big ears, horns and
+# helmets fit, and the rig reads the matching pivot from HeroPuppet.RIGS.
+
+def skin_defs(colors):
+    light, mid, dark = colors
+    return f'''<linearGradient id="hide" x1="0" y1="0" x2="1" y2="0.3">
+<stop offset="0" stop-color="{dark}"/><stop offset="0.55" stop-color="{light}"/><stop offset="1" stop-color="{mid}"/></linearGradient>'''
+
+
+def creature_heads(folder, draw, defs, left=16, top=24, width=76):
+    """draw(mood) returns SVG in face coordinates (neck pivot at 20,46)."""
+    for mood in ["idle", "blink", "shout", "hurt", "down"]:
+        name = "head" if mood == "idle" else "head_" + mood
+        write(folder, name, width, 50 + top, defs, f'<g transform="translate({left},{top})">{draw(mood)}</g>')
+    write(folder, "plume", 30, 24, [], "")
+
+
+def eye(mood, x, y, iris, sclera="#ffd23a", r=2.6, slit=True):
+    if mood in ("blink", "down"):
+        return f'<path d="M{x - r} {y} Q{x} {y + 1.4} {x + r} {y}" fill="none" stroke="{INK}" stroke-width="1"/>'
+    if mood == "hurt":
+        return f'<path d="M{x - r} {y - 1.6} L{x + r * 0.8} {y} L{x - r} {y + 1.6}" fill="none" stroke="{INK}" stroke-width="1.1"/>'
+    pupil = (f'<ellipse cx="{x + 0.6}" cy="{y}" rx="0.6" ry="{r * 0.7}" fill="{INK}"/>' if slit
+             else f'<circle cx="{x + 0.6}" cy="{y}" r="{r * 0.45}" fill="{iris}"/>')
+    return f'<ellipse cx="{x}" cy="{y}" rx="{r}" ry="{r * 0.78}" fill="{sclera}" stroke="{INK}" stroke-width="0.7"/>{pupil}'
+
+
+def goblin_head(mood, cap=None):
+    brow = {"shout": "M27 17.6 Q32 19 37.4 21.4", "hurt": "M27.6 19.4 Q32 16.6 37 16.4"}.get(mood, "M27 18.6 Q32 16.8 37.6 18.4")
+    mouth = {
+        "shout": f'<path d="M25 33.6 Q33 32.4 40.6 33.6 Q38 42 31 42.4 Q26 40 25 33.6 Z" fill="#3a1010" stroke="{INK}" stroke-width="0.8"/>'
+                 '<path d="M27 34 L28.4 37 L29.8 34 M36 33.8 L37.2 36.6 L38.4 33.8" fill="#f4ecd6"/>',
+        "hurt": f'<path d="M26 36 Q30 34 33 36 Q36 38 40 35.6" fill="none" stroke="{INK}" stroke-width="1.1"/>',
+        "down": f'<path d="M27 37 Q33 38.6 39 36.8" fill="none" stroke="{INK}" stroke-width="1"/>',
+    }.get(mood, f'<path d="M25.4 34.6 Q33 38.4 40.6 34" fill="none" stroke="{INK}" stroke-width="1.1"/>'
+                '<path d="M28 35.6 L29 38 L30 36.2 M36 36 L37 38.4 L38 35.4" fill="#f4ecd6" stroke="#1a0f08" stroke-width="0.4"/>')
+    hat = ""
+    if cap:
+        hat = (f'<path d="M5.6 20 Q6 4 22 3 Q36 3 40 14 Q30 11 20 13 Q11 15 5.6 20 Z" fill="{cap}" {SW}/>'
+               f'<path d="M8 14 Q20 7 36 10" fill="none" stroke="{shade(cap, 0.6)}" stroke-width="1"/>'
+               '<path d="M22 3 Q24 -4 20 -8 Q28 -4 26 4 Z" fill="#c8b98a" stroke="#1a0f08" stroke-width="0.7"/>')
+    return (f'<path d="M13.6 21 Q2 13 -3 4 Q-1 16 10 29 Z" fill="url(#hide)" {SW}/>'
+            '<path d="M11 21 Q3 14 0 8 Q2 16 9 25 Z" fill="#000000" opacity="0.25"/>'
+            f'<path d="M8.4 27 Q6 7 23 5 Q38 4.6 41.4 18 Q43 23 42 27.4 Q41 36 35 42 Q25 47.6 16.4 42.6 Q9.6 37.6 8.4 27 Z" fill="url(#hide)" {SW}/>'
+            f'<path d="M37 21 Q46 24.6 48 31.4 Q44.4 33.6 38.4 31 Z" fill="url(#hide)" {SW}/>'
+            '<circle cx="14" cy="16" r="0.9" fill="#000000" opacity="0.3"/><circle cx="18" cy="11" r="0.7" fill="#000000" opacity="0.3"/>'
+            + mouth + eye(mood, 32, 22.4, "#000000") +
+            f'<path d="{brow}" fill="none" stroke="{INK}" stroke-width="1.6" stroke-linecap="round"/>' + hat)
+
+
+def hobgoblin_head(mood):
+    brow = {"shout": "M27 17 Q32 18.6 38 21.6", "hurt": "M27.6 19 Q32 16 37.4 16"}.get(mood, "M27 18.4 Q32 16.6 38 18.6")
+    jaw_open = mood == "shout"
+    mouth = (f'<path d="M26 34 Q34 32.6 41 34.6 Q39 42.6 32 43 Q27 41 26 34 Z" fill="#3a1010" stroke="{INK}" stroke-width="0.8"/>'
+             if jaw_open else f'<path d="M26 36 Q33 38 41 35.6" fill="none" stroke="{INK}" stroke-width="1.1"/>')
+    tusk_y = 30 if jaw_open else 32
+    return (f'<path d="M12 22 Q4 16 1 9 Q3 18 10 27 Z" fill="url(#hide)" {SW}/>'
+            f'<path d="M8 27 Q6 8 22 5 Q38 4.6 42 18 L43.4 24 L46.4 28 L42.6 31 Q42.4 38 36.4 43 Q26 48.6 16 43 Q9 38 8 27 Z" fill="url(#hide)" {SW}/>'
+            + mouth +
+            f'<path d="M29 {tusk_y + 4} L30.4 {tusk_y - 1} L32 {tusk_y + 4} Z M37 {tusk_y + 3.4} L38.2 {tusk_y - 1.4} L39.6 {tusk_y + 3.4} Z" fill="#f4ecd6" stroke="{INK}" stroke-width="0.6"/>'
+            + eye(mood, 33, 22.4, "#000000", sclera="#ffb03a", r=2.2) +
+            f'<path d="{brow}" fill="none" stroke="{INK}" stroke-width="1.8" stroke-linecap="round"/>'
+            # crested iron helm with cheek plates
+            f'<path d="M6 25 Q4 6 21 2.6 Q36 1.6 41.6 14 L40 17.4 Q30 13.6 24.4 15.6 Q22 22 23.6 30 L14 34 Q7 31 6 25 Z" fill="url(#steel)" {SW}/>'
+            '<path d="M9 10 Q14 5 22 4.4" fill="none" stroke="#ffffff" stroke-width="1.4" opacity="0.5"/>'
+            f'<path d="M14 3.4 Q20 -9 34 -8 Q30 -2 32 3.4 Q24 0.6 14 3.4 Z" fill="#b8321f" {SW}/>'
+            '<path d="M18 1 Q24 -5 31 -5" fill="none" stroke="#6a120c" stroke-width="0.9"/>'
+            '<path d="M6.6 18 Q20 12 40.6 13.4" fill="none" stroke="url(#gold)" stroke-width="2"/>'
+            + rivet(10, 22) + rivet(16, 28))
+
+
+def orc_head(mood):
+    brow = {"shout": "M27 18.6 Q33 20 39 23", "hurt": "M27.6 20.4 Q33 17.4 38.6 17.6"}.get(mood, "M27 19.6 Q33 18 39 20")
+    open_jaw = mood == "shout"
+    mouth = (f'<path d="M25 34.6 Q34 33 42 35 Q40 44.6 32 45 Q26 43 25 34.6 Z" fill="#3a1010" stroke="{INK}" stroke-width="0.8"/>'
+             if open_jaw else f'<path d="M25.4 37 Q33 39 41.6 36.6" fill="none" stroke="{INK}" stroke-width="1.2"/>')
+    ty = 31.6 if open_jaw else 33
+    return (f'<path d="M12.6 22 Q6 19 4 13 Q6 20 10 27 Z" fill="url(#hide)" {SW}/>'
+            f'<path d="M8 27 Q6 9 22 6.6 Q37 6 41.6 18 L42.4 25 L45 29 L42 31.4 Q43.4 40 37 45 Q26 50 16 44.6 Q8.6 39 8 27 Z" fill="url(#hide)" {SW}/>'
+            f'<path d="M37 27.4 Q42 26 44.6 29 Q41 31 37.6 30 Z" fill="#000000" opacity="0.2"/>'
+            + mouth +
+            f'<path d="M29 {ty + 5} L30.6 {ty - 2} L32.6 {ty + 5} Z M37.4 {ty + 4.6} L39 {ty - 2.4} L41 {ty + 4.6} Z" fill="#f4ecd6" stroke="{INK}" stroke-width="0.7"/>'
+            + eye(mood, 33.4, 23.4, "#000000", sclera="#ff4a2a", r=2.0, slit=False) +
+            f'<path d="{brow}" fill="none" stroke="{INK}" stroke-width="2.2" stroke-linecap="round"/>'
+            '<path d="M24 12 L28.6 26" stroke="#5a2a1a" stroke-width="0.9"/>'
+            # black mohawk
+            f'<path d="M10 12 Q14 -6 30 -4 Q26 0 32 2 Q24 2 26 6 Q18 4 16 10 Z" fill="#1c1a18" {SW}/>'
+            '<path d="M14 6 Q18 -2 26 -2 M16 9 Q20 3 25 3" fill="none" stroke="#4a4642" stroke-width="0.8"/>'
+            '<circle cx="5.6" cy="16" r="1.2" fill="url(#gold)" stroke="#1a0f08" stroke-width="0.5"/>')
+
+
+def skull_head(mood, glow="#9fe8ff"):
+    lit = mood not in ("down",)
+    dim = 0.45 if mood == "blink" else 1.0
+    jaw_drop = 4 if mood == "shout" else (1.6 if mood == "hurt" else 0)
+    tilt = ' transform="rotate(8 26 36)"' if mood == "hurt" else ""
+    sockets = (f'<ellipse cx="31.4" cy="22.4" rx="3.6" ry="3.2" fill="{INK}"/>'
+               + (f'<circle cx="32" cy="22.6" r="1.4" fill="{glow}" opacity="{dim}"/><circle cx="32" cy="22.6" r="3" fill="{glow}" opacity="{0.35 * dim}"/>' if lit else ""))
+    return (f'<g{tilt}>'
+            f'<path d="M12 34 Q9 14 21 8 Q35 5 40 16 Q42.6 22 41 28 L38 30 Q30 31 24 33.6 Z" fill="url(#bone)" {SW}/>'
+            + sockets +
+            f'<path d="M37.6 26 L39.6 30 L36.4 30 Z" fill="{INK}"/>'
+            f'<path d="M22 32 Q30 29.4 39.6 30.6 L39 34 Q30 33 22.6 35.6 Z" fill="url(#bone)" {THIN}/>'
+            + "".join(f'<path d="M{x} 30.6 L{x} 34" stroke="{INK}" stroke-width="0.6"/>' for x in (27, 30, 33, 36)) +
+            f'<path d="M20 {36 + jaw_drop} Q30 {33 + jaw_drop} 39 {34 + jaw_drop} L38 {39 + jaw_drop} Q30 {41 + jaw_drop} 21 {41 + jaw_drop} Z" fill="url(#bone)" {SW}/>'
+            + "".join(f'<path d="M{x} {34.4 + jaw_drop} L{x} {37 + jaw_drop}" stroke="{INK}" stroke-width="0.6"/>' for x in (27, 30, 33, 36)) +
+            '<path d="M18 20 Q20 26 17 30 M26 12 L28 16" fill="none" stroke="#6a5e44" stroke-width="0.8"/>'
+            '</g>'
+            # dented kettle helm
+            f'<path d="M-1 17.6 Q20 10.6 45 15 Q45 17.6 41 18 Q20 14.6 1 20 Q-2 19.4 -1 17.6 Z" fill="url(#rust)" {SW}/>'
+            f'<path d="M8 16 Q9 2 23 1.4 Q36 2 37.4 14.6 Q22 11.6 8 16 Z" fill="url(#rust)" {SW}/>'
+            '<path d="M14 7 Q20 3.6 28 4" fill="none" stroke="#f0c090" stroke-width="1.1" opacity="0.5"/>'
+            '<path d="M24 4 L26 9 L23.6 12" fill="none" stroke="#2a1a10" stroke-width="0.9"/>')
+
+
+def cowl_head(mood, cowl, mask, glow):
+    lit = mood not in ("blink", "down")
+    shout = mood == "shout"
+    eyes = ((f'<ellipse cx="32.6" cy="23.6" rx="2.6" ry="1.2" fill="{glow}"/>'
+             f'<ellipse cx="32.6" cy="23.6" rx="{5 if shout else 3.6}" ry="{2.4 if shout else 1.8}" fill="{glow}" opacity="0.35"/>')
+            if lit else f'<path d="M30 23.8 L35 23.8" stroke="{INK}" stroke-width="1"/>')
+    tilt = ' transform="rotate(-6 26 30)"' if mood == "hurt" else ""
+    return (f'<g{tilt}>'
+            f'<path d="M3 34 Q-0.5 8 19 2.4 Q35.5 0.2 41.6 12.5 Q43.4 18.4 40.6 20.6 Q36 13.6 27 14.6 Q21.6 17.4 21.4 27.6 Q21.6 36.6 24.8 42.4 L27 50 L5 50 Q1.6 43 3 34 Z" fill="url(#cowl)" {SW}/>'
+            f'<path d="M22 15.6 Q33 13.4 40 19 L41.4 27 L38 29 L39 36 Q33 43.4 23.6 41.4 Q21 30 22 15.6 Z" fill="url(#mask)" {SW}/>'
+            f'<path d="M24 20.6 L39.4 20.6 L39 26.6 L24.4 26.6 Z" fill="{INK}"/>'
+            + eyes +
+            f'<path d="M26 31 Q32 29 38 31 M27 35 Q32 34 37 35.6" fill="none" stroke="{shade(mask, 0.55)}" stroke-width="0.9"/>'
+            # curled horns on the mask
+            f'<path d="M26 15 Q20 2 28 -6 Q34 -10 38 -4 Q32 -6 30 0 Q28 6 31 14 Z" fill="url(#gold)" {SW}/>'
+            f'<path d="M40 18 Q46 8 44 0 Q48 4 48 12 Q46 18 41.4 22 Z" fill="url(#gold)" {THIN}/>'
+            '</g>')
+
+
+# ---- enemy bodies and gear
+
+def bare_hand(folder, colors):
+    write(folder, "hand", 16, 16, [skin_defs(colors)], f'''
+<path d="M2.6 2.6 Q8 0.8 13.4 2.6 L14 12.4 Q8 15.4 2.4 12.4 Z" fill="url(#hide)" {SW}/>
+<path d="M3 6.6 L13.6 6.6 M3 9.6 L13.8 9.6" stroke="#000000" stroke-opacity="0.35" stroke-width="0.7"/>
+<path d="M12.6 3.4 Q15.4 6.4 13.4 10" fill="none" stroke="{INK}" stroke-width="0.9"/>''')
+
+
+def scimitar(folder, blade_colors=("#8d97a4", "#ffffff", "#c6ced8", "#7b8592")):
+    b = blade_colors
+    write(folder, "weapon", 28, 110, [f'''<linearGradient id="blade" x1="0" y1="0" x2="1" y2="0">
+<stop offset="0" stop-color="{b[0]}"/><stop offset="0.5" stop-color="{b[1]}"/><stop offset="1" stop-color="{b[3]}"/></linearGradient>'''], f'''
+<path d="M13 81 Q10 60 14 46 Q20 34 26 32 Q22 44 20 58 Q18.4 70 17 81 Z" fill="url(#blade)" {SW}/>
+<path d="M15.4 78 Q14 62 17 50" fill="none" stroke="#000000" stroke-opacity="0.3" stroke-width="0.8"/>
+<path d="M10 80.4 L20 80.4 L20 83.6 L10 83.6 Z" fill="#6a4a2a" {THIN}/>
+<rect x="12.2" y="83.6" width="3.8" height="10" rx="1" fill="#3a2414" {THIN}/>
+<circle cx="14" cy="95.6" r="2" fill="#6a4a2a" stroke="{INK}" stroke-width="0.8"/>''')
+
+
+def buckler(folder, face="#7a5230", rim="#4a4d57"):
+    write(folder, "shield", 40, 50, [f'''<radialGradient id="wood" cx="0.4" cy="0.35" r="0.7">
+<stop offset="0" stop-color="{shade(face, 1.3)}"/><stop offset="1" stop-color="{shade(face, 0.6)}"/></radialGradient>'''], f'''
+<circle cx="20" cy="22" r="13" fill="url(#wood)" stroke="{rim}" stroke-width="2.6"/>
+<circle cx="20" cy="22" r="13" fill="none" stroke="{INK}" stroke-width="0.8"/>
+<path d="M9 18 L31 18 M8 25 L32 25" stroke="#000000" stroke-opacity="0.3" stroke-width="0.8"/>
+<circle cx="20" cy="22" r="3.6" fill="{rim}" stroke="{INK}" stroke-width="0.8"/>
+<path d="M13 12 L17 19 L15 23" fill="none" stroke="#2a1a10" stroke-width="0.8"/>''')
+
+
+def bow(folder):
+    # Held upright in the far hand (pivot at the grip, 20,22); the string runs behind.
+    write(folder, "shield", 40, 50, ['''<linearGradient id="wood" x1="0" y1="0" x2="1" y2="0">
+<stop offset="0" stop-color="#3a2412"/><stop offset="0.5" stop-color="#9a6a3a"/><stop offset="1" stop-color="#3a2412"/></linearGradient>'''], f'''
+<path d="M11 1 L11 43" stroke="#e8e0c8" stroke-width="0.7"/>
+<path d="M11 1 Q24 8 21 22 Q24 36 11 43 L13.4 43 Q27.4 36 23.6 22 Q27.4 8 13.4 1 Z" fill="url(#wood)" {SW}/>
+<rect x="19.6" y="18" width="5.6" height="8" rx="1.4" fill="#5a3a22" {THIN}/>''')
+
+
+def arrow(folder):
+    write(folder, "weapon", 28, 110, [], f'''
+<path d="M13.4 40 L14.6 40 L14.6 96 L13.4 96 Z" fill="#8a6a3a" {THIN}/>
+<path d="M14 30 L17 40 L11 40 Z" fill="#9aa3ad" {THIN}/>
+<path d="M14 90 L9.6 99 L14 96 L18.4 99 Z" fill="#b8321f" {THIN}/>''')
+
+
+def torch(folder):
+    # Flame above the fist (pivot 20,22), handle below.
+    write(folder, "shield", 40, 50, ['''<radialGradient id="fire" cx="0.5" cy="0.7" r="0.6">
+<stop offset="0" stop-color="#fff6c0"/><stop offset="0.5" stop-color="#ffa030"/><stop offset="1" stop-color="#d8301a"/></radialGradient>'''], f'''
+<path d="M18.6 17 L21.4 17 L22.4 46 L17.6 46 Z" fill="#5a3a22" {SW}/>
+<path d="M16.4 13 L23.6 13 L23 18 L17 18 Z" fill="#3a3a3a" {THIN}/>
+<path d="M20 0 Q27 8 25 13 Q23.6 16 20 16.4 Q16 16 15 13 Q14 8 18 4 Q18 9 20 9 Q19 4 20 0 Z" fill="url(#fire)" {THIN}/>''')
+
+
+def greataxe(folder):
+    write(folder, "weapon", 40, 110, ['''<linearGradient id="wood" x1="0" y1="0" x2="1" y2="0">
+<stop offset="0" stop-color="#3a2412"/><stop offset="0.5" stop-color="#8a5a32"/><stop offset="1" stop-color="#2e1c0e"/></linearGradient>''', '''<linearGradient id="blade" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="#c9ced6"/><stop offset="0.5" stop-color="#6b7480"/><stop offset="1" stop-color="#3a3f48"/></linearGradient>'''], f'''
+<rect x="12.2" y="14" width="3.6" height="92" rx="1.2" fill="url(#wood)" {THIN}/>
+<path d="M16 18 Q30 10 36 22 Q38 34 32 44 Q26 38 16 38 Z" fill="url(#blade)" {SW}/>
+<path d="M12 18 Q2 12 -0.6 24 Q-1 32 3 40 Q7 36 12 36 Z" transform="translate(1,0)" fill="url(#blade)" {SW}/>
+<path d="M33 22 Q35 32 31 42" fill="none" stroke="#ffffff" stroke-width="0.9" opacity="0.6"/>
+<path d="M14 8 L16 18 L12 18 Z" fill="#6b7480" {THIN}/>
+<rect x="11.4" y="80" width="5.2" height="12" rx="1" fill="#3a2414" {THIN}/>
+<circle cx="14" cy="26" r="2" fill="#b8321f" stroke="{INK}" stroke-width="0.6"/>''')
+
+
+def skeleton_body(folder):
+    bone = '''<linearGradient id="bone" x1="0" y1="0" x2="1" y2="0">
+<stop offset="0" stop-color="#a89c7c"/><stop offset="0.5" stop-color="#f1e9d2"/><stop offset="1" stop-color="#b8ab88"/></linearGradient>'''
+    rust = '''<linearGradient id="rust" x1="0" y1="0" x2="1" y2="0.3">
+<stop offset="0" stop-color="#5b3a26"/><stop offset="0.45" stop-color="#b0764a"/><stop offset="1" stop-color="#4a2e1c"/></linearGradient>'''
+    write(folder, "thigh", 22, 36, [bone], f'''
+<path d="M9.6 4 L12.4 4 L12.2 29 L9.8 29 Z" fill="url(#bone)" {SW}/>
+<circle cx="11" cy="4.4" r="3.4" fill="url(#bone)" {SW}/>
+<ellipse cx="11" cy="30.6" rx="3.6" ry="2.6" fill="url(#bone)" {SW}/>''')
+    write(folder, "shin", 32, 38, [bone, rust], f'''
+<path d="M9.4 4 L11.6 4 L11.2 27 L9.8 27 Z M12.4 5 L13.6 5 L13.2 26 L12.2 26 Z" fill="url(#bone)" {THIN}/>
+<path d="M6 11 Q11 9 16 11 L15.6 20 Q11 18.6 6.4 20 Z" fill="url(#rust)" {SW}/>
+<path d="M7 27.4 Q12 26 17 27.4 L24 30.6 Q28 32 28.6 34.6 L7 35.4 Q5.6 31 7 27.4 Z" fill="url(#bone)" {SW}/>
+<path d="M17 28.6 L17 35 M21 29.8 L21 35 M25 31.4 L25 34.8" stroke="{INK}" stroke-width="0.6"/>''')
+    write(folder, "torso", 52, 72, [bone, rust], f'''
+<path d="M11 50 Q24 44 39 50 L37 60 Q24 55 13 60 Z" fill="url(#bone)" {SW}/>
+<path d="M14 47 L36 47 L38 70 L33 64 L30 71 L26 64 L22 71 L18 64 L12 70 Z" fill="#3a3430" {SW}/>
+<path d="M13 45.6 L37.6 45.6 L37.8 49.6 L12.8 49.6 Z" fill="#4a3020" {THIN}/>
+{"".join(f'<rect x="22.6" y="{y}" width="4.6" height="4" rx="1.2" fill="url(#bone)" stroke="{INK}" stroke-width="0.7"/>' for y in (14, 19, 24, 29, 34, 39))}
+<path d="M14 20 Q24 13 38 19 Q42.6 30 36.6 42 Q26 46 16 42 Q10.4 32 14 20 Z" fill="url(#bone)" {SW}/>
+{"".join(f'<path d="M16.4 {y} Q26 {y - 3} 38.6 {y + 0.6}" fill="none" stroke="{INK}" stroke-width="1.6"/>' for y in (24.6, 29.6, 34.6, 39))}
+<path d="M24.4 16 L25.6 44" stroke="{INK}" stroke-width="1"/>
+<path d="M14 18 Q24 10 38 16 L39 23 Q30 20 26 21 L20 34 L15 30 Z" fill="url(#rust)" {SW}/>
+<path d="M17 20 Q24 15 33 17" fill="none" stroke="#f0c090" stroke-width="0.9" opacity="0.5"/>
+<path d="M15.5 11.4 Q25 8 35.5 11.4 L36.5 17 Q25 14.6 14.5 17 Z" fill="url(#rust)" {SW}/>''')
+    write(folder, "arm_upper", 30, 30, [bone, rust], f'''
+<path d="M12.8 6 L15.4 6 L15 26 L13 26 Z" fill="url(#bone)" {SW}/>
+<ellipse cx="14" cy="26.6" rx="3" ry="2.2" fill="url(#bone)" {SW}/>
+<path d="M5 11 Q6 2 15 1.6 Q24 2 24.6 11 Q20 8.4 14.6 8.6 Q9 8.8 5 11 Z" fill="url(#rust)" {SW}/>''')
+    write(folder, "arm_lower", 18, 30, [bone], f'''
+<path d="M6.8 3 L8.8 3 L8.6 20 L7 20 Z M9.8 3.4 L11.4 3.4 L11 20 L9.6 20 Z" fill="url(#bone)" {THIN}/>
+<circle cx="9" cy="3.4" r="2.8" fill="url(#bone)" {SW}/>''')
+    write(folder, "hand", 16, 16, [bone], f'''
+<path d="M4 2 L12 2 L12.6 7 L4 7 Z" fill="url(#bone)" {THIN}/>
+{"".join(f'<path d="M{x} 7 L{x} 12.6" stroke="{INK}" stroke-width="2.2" stroke-linecap="round"/><path d="M{x} 7 L{x} 12.4" stroke="#eee4ca" stroke-width="1.2" stroke-linecap="round"/>' for x in (5, 7.6, 10.2, 12.6))}''')
+    creature_heads(folder, lambda mood: skull_head(mood), [bone, rust])
+
+
+def orc_body(folder, hide):
+    fur = '''<linearGradient id="fur" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#8a6a44"/><stop offset="1" stop-color="#4a3420"/></linearGradient>'''
+    write(folder, "thigh", 22, 36, [fur], f'''
+<path d="M4.4 1.6 Q11 -0.4 17.6 1.6 L16.6 31.4 Q11 33.4 5.4 31.4 Z" fill="#4a3a2a" {SW}/>
+<path d="M4.6 12 L17.4 13 L17.2 16.6 L4.8 15.6 Z" fill="#2a1e14" {THIN}/>''')
+    write(folder, "shin", 32, 38, [fur], f'''
+<path d="M6.4 4 Q11 2.6 15.8 4 L15.4 14 L6.8 14 Z" fill="#4a3a2a" {SW}/>
+<path d="M4.4 12 L6 9 L8 12 L10 8.6 L12 12 L14 8.8 L16 12 L18 9.4 L17.4 27 Q23 27.6 29 32 Q30.4 34.6 28.8 35.8 L5.8 36 Q4 31 5 26 Z" fill="url(#fur)" {SW}/>
+<path d="M8 18 L9 22 M12 17 L13 21 M15 19 L15.6 23" stroke="#2a1e14" stroke-width="0.8"/>''')
+    write(folder, "torso", 52, 72, [skin_defs(hide), fur], f'''
+<path d="M10 46 L42 46 L44 62 L40 60 L38 68 L34 62 L30 70 L26 62 L22 70 L18 62 L14 68 L12 60 L8 62 Z" fill="url(#fur)" {SW}/>
+<path d="M11 21 Q13 12 25 11 Q38 11 42 20 Q46.6 32 41.6 46 L11.6 47 Q7 34 11 21 Z" fill="url(#hide)" {SW}/>
+<path d="M26 22 Q33 26 41 23 M27 31 Q34 33 40 31 M28 38 Q34 39.6 39.4 38" fill="none" stroke="{hide[2]}" stroke-width="1"/>
+<path d="M25.6 16 Q27 30 26.6 45" fill="none" stroke="{hide[2]}" stroke-width="0.9"/>
+<path d="M13 15 L40 44 L37.6 46.4 L11 18 Z" fill="#3a2414" {THIN}/>
+<circle cx="25" cy="29" r="2.4" fill="#9aa3ad" stroke="{INK}" stroke-width="0.7"/>
+<path d="M10.5 44.6 L42 44.6 L42.4 49.6 L10.2 49.6 Z" fill="#2a1a10" {THIN}/>
+<path d="M27.4 43.4 Q30.6 42 33.6 43.4 L33.4 50.8 Q30.6 52 27.6 50.8 Z" fill="#e8e0c8" stroke="{INK}" stroke-width="0.7"/>
+<circle cx="29.4" cy="46" r="0.8" fill="{INK}"/><circle cx="31.8" cy="46" r="0.8" fill="{INK}"/>''')
+    write(folder, "arm_upper", 30, 30, [skin_defs(hide)], f'''
+<path d="M8 7 Q14 5 20.4 7 L19.6 27 Q14 28.6 8.6 27 Z" fill="url(#hide)" {SW}/>
+<path d="M10.6 13 Q14 16 18 13" fill="none" stroke="{hide[2]}" stroke-width="0.9"/>
+<path d="M3 11 Q4 1 15 0.6 Q26 1 26.6 11 Q20 8.4 14.6 8.6 Q9 8.8 3 11 Z" fill="#4a4d57" {SW}/>
+<path d="M8 4 L6 -3 L11 2.6 M15 1.2 L15 -6 L18 1.4 M21.6 3 L25 -3 L24 5" fill="#9aa3ad" stroke="{INK}" stroke-width="0.8"/>''')
+    write(folder, "arm_lower", 18, 30, [skin_defs(hide)], f'''
+<path d="M4 3 L14 3 L12.6 21 L5.4 21 Z" fill="url(#hide)" {SW}/>
+<path d="M3.6 13 Q9 11.6 14.4 13 L14 21.6 Q9 22.8 4 21.6 Z" fill="#3a2414" {THIN}/>
+<circle cx="9" cy="3.4" r="3.4" fill="url(#hide)" stroke="{INK}" stroke-width="1"/>''')
+    bare_hand(folder, hide)
+    write(folder, "cape", 36, 92, [fur], f'''
+<path d="M18 2 Q29 -0.4 31 6 L29 24 L26 30 L23 25 L20 32 L16 26 L12 31 L10 24 L6 28 Q7 14 10 8 Q12 4 18 2 Z" fill="url(#fur)" {SW}/>''')
+    creature_heads(folder, orc_head, [skin_defs(hide), '''<linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#fbe39a"/><stop offset="1" stop-color="#8e5c17"/></linearGradient>'''])
+
+
+GOBLIN_SKIN = ("#a8c46a", "#7a9a44", "#4a6426")
+HOB_SKIN = ("#f0a060", "#c8743a", "#7a4020")
+ORC_SKIN = ("#9aae72", "#6f8a4a", "#3e5226")
+
+# style: how the rig poses it (HeroPuppet.STYLES) · size: scale of the whole puppet
+# head: [left, top] margins of the head canvas, so the rig pivot is (20+left, 46+top)
+ENEMIES = [
+    dict(id="goblin_raider", name="고블린 약탈자", note="큰 귀와 노란 눈, 굽은 칼과 나무 방패", style="rogue", size=0.76, head=[16, 24]),
+    dict(id="goblin_archer", name="고블린 궁수", note="가죽 모자, 활과 붉은 깃 화살", style="rogue", size=0.74, head=[16, 24]),
+    dict(id="hobgoblin_captain", name="홉고블린 대장", note="볏 달린 투구, 엄니, 청동 갑옷과 도끼", style="knight", size=1.1, head=[16, 24]),
+    dict(id="ember_priest", name="잿불 사제 모르간", note="뿔 달린 금가면, 핏빛 로브, 불꽃 지팡이", style="wizard", size=1.12, head=[16, 24]),
+    dict(id="skeleton_warrior", name="해골 병사", note="녹슨 투구와 가슴판, 푸른 눈빛, 금 간 방패", style="knight", size=1.0, head=[16, 24]),
+    dict(id="cult_zealot", name="교단 광신도", note="붉은 두건과 검은 복면, 제물 단검과 횃불", style="rogue", size=0.98, head=[6, 10]),
+    dict(id="cult_hexer", name="잿불 주술사", note="뼈 가면, 잿빛 로브, 보랏빛 불꽃 구슬", style="wizard", size=1.0, head=[6, 34]),
+    dict(id="orc_berserker", name="오크 광전사", note="맨가슴에 가죽 끈, 모히칸, 쌍날 대도끼", style="knight", size=1.16, head=[16, 24]),
+]
+
+
+def enemy_parts(k, folder):
+    kind = k["id"]
+    if kind == "goblin_raider":
+        rogue_parts(dict(id=kind, leather="#6a4a2a", trim="brass", steel="silver", cloth="#5a2a1a", hood="#6a4a2a",
+                         skin="tan", beard="none", eyes="#000000", helm="none", hair="#000000", blade="steel"), folder)
+        creature_heads(folder, goblin_head, [skin_defs(GOBLIN_SKIN)])
+        bare_hand(folder, GOBLIN_SKIN)
+        scimitar(folder, ("#6b5a4a", "#d8ccb8", "#9a8a78", "#5a4a3a"))
+        buckler(folder)
+    elif kind == "goblin_archer":
+        rogue_parts(dict(id=kind, leather="#5a4a2a", trim="brass", steel="silver", cloth="#3a4a2a", hood="#4a5a2a",
+                         skin="tan", beard="none", eyes="#000000", helm="none", hair="#000000", blade="steel"), folder)
+        creature_heads(folder, lambda mood: goblin_head(mood, cap="#6a4a2a"), [skin_defs(GOBLIN_SKIN)])
+        bare_hand(folder, GOBLIN_SKIN)
+        arrow(folder)
+        bow(folder)
+    elif kind == "hobgoblin_captain":
+        build(dict(id=kind, steel="bronze", trim="brass", tabard=("#6a1a14", "#3a0c08"), emblem="flame", emblem_color="#ff8a2a",
+                   cape=("#3a1a14", "#1a0c08", "#b8321f"), helm="bascinet", plume=None, skin="tan", beard="none",
+                   weapon="axe", shield="round", field=("#2a1a14", "#b8321f"), charge="pale", shield_emblem="flame"), folder)
+        g = gradients(dict(steel="bronze", trim="brass", tabard=("#6a1a14", "#3a0c08")))
+        creature_heads(folder, hobgoblin_head, [skin_defs(HOB_SKIN), g["steel"], g["gold"]])
+    elif kind == "ember_priest":
+        wizard_parts(dict(id=kind, robe="#5a1410", trim="gold", steel="silver", sash="#1a0c08", hood="#2a0a08", hair="#1a0c08",
+                          skin="pale", beard="none", eyes="#ff8a2a", helm="wizard_hat", band="#1a0c08",
+                          orb=("#fff6c0", "#ff9a2a", "#d8301a")), folder)
+        creature_heads(folder, lambda mood: cowl_head(mood, "#3a0c08", "#e0a93e", "#ffb03a"), [
+            skin_defs(("#6a1a14", "#3a0c08", "#1a0604")).replace('id="hide"', 'id="cowl"'),
+            skin_defs(("#fbe39a", "#e0a93e", "#8e5c17")).replace('id="hide"', 'id="mask"'),
+            gradients(dict(steel="silver", trim="gold", tabard=("#000000", "#000000")))["gold"]])
+    elif kind == "skeleton_warrior":
+        build(dict(id=kind, steel="rusted", trim="brass", tabard=("#3a3430", "#1e1a18"), emblem="none",
+                   cape=("#4a4640", "#26221e", "#3a3430"), helm="bascinet", plume=None, skin="tan", beard="none",
+                   weapon="longsword", blade="dark", shield="round", field=("#6b4a2e", "#6b4a2e"), charge="plain",
+                   shield_emblem="none", cracked=True), folder)
+        skeleton_body(folder)
+    elif kind == "cult_zealot":
+        rogue_parts(dict(id=kind, leather="#3a2420", trim="gold", steel="silver", cloth="#5a1410", hood="#8c1c12", mask="#1a1010",
+                         skin="pale", beard="none", eyes="#ff8a2a", eye_glow="#ff8a2a", helm="hood", blade="bright", curved=True), folder)
+        torch(folder)
+    elif kind == "cult_hexer":
+        wizard_parts(dict(id=kind, robe="#3a3440", trim="bone", steel="silver", sash="#8c1c12", hood="#241f2a", hair="#1a1a1a",
+                          skin="grave", beard="none", eyes="#ff6a3a", eye_glow="#c86aff", helm="hood", mask="#e8e0c8", band="#8c1c12",
+                          orb=("#f4e0ff", "#c86aff", "#6a1a9a")), folder)
+    elif kind == "orc_berserker":
+        build(dict(id=kind, steel="rusted", trim="brass", tabard=("#4a3a2a", "#2a1e14"), emblem="none",
+                   cape=("#6a4a2a", "#3a2414", "#3a2414"), helm="none", hair="#000000", plume=None, skin="tan", beard="none",
+                   weapon="axe", shield="none"), folder)
+        orc_body(folder, ORC_SKIN)
+        greataxe(folder)
+
+
 ## Which example each class wears in battle.
 DEFAULTS = {"paladin": "moon_knight", "rogue": "shade", "wizard": "starlight"}
 GROUPS = [
     ("knights", "기사", "knight", VARIANTS, build),
     ("rogues", "도적", "rogue", ROGUES, rogue_parts),
     ("wizards", "마법사", "wizard", WIZARDS, wizard_parts),
+    ("enemies", "적", "knight", ENEMIES, enemy_parts),
 ]
 
 
@@ -804,8 +1156,12 @@ def main():
         entries = []
         for k in variants:
             make(k, os.path.join(ROOT, "art", folder, k["id"]))
-            entries.append({"id": k["id"], "name": k["name"], "note": k["note"], "path": "res://art/%s/%s/" % (folder, k["id"])})
-        gallery.append({"title": title, "style": style, "entries": entries})
+            entry = {"id": k["id"], "name": k["name"], "note": k["note"], "path": "res://art/%s/%s/" % (folder, k["id"])}
+            for key in ("style", "size", "head"):
+                if key in k:
+                    entry[key] = k[key]
+            entries.append(entry)
+        gallery.append({"id": folder, "title": title, "style": style, "entries": entries})
     for hero, pick in DEFAULTS.items():
         for folder, _title, _style, variants, make in GROUPS:
             for k in variants:

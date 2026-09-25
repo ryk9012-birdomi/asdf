@@ -84,7 +84,7 @@ class Figure extends Control:
 		if puppet != null:
 			puppet.position = Vector2(size.x / 2.0, size.y - FighterView.FEET - bob)
 			puppet.rotation = fallen * -PI / 2.0 * 0.95
-			puppet.scale = Vector2.ONE * FighterView.ART_SCALE
+			puppet.scale = Vector2.ONE * FighterView.ART_SCALE * puppet.size
 			puppet.drive(self, delta)
 		queue_redraw()
 
@@ -115,7 +115,8 @@ class Figure extends Control:
 func setup(combatant: CharacterUnit, facing_right: bool) -> void:
 	unit = combatant
 	facing = 1.0 if facing_right else -1.0
-	kind = unit.character_data.id if unit.character_data.id in FighterArt.KINDS else unit.character_data.class_id
+	var id := unit.character_data.id
+	kind = id if HeroPuppet.RIGS.has(id) or id in FighterArt.KINDS else unit.character_data.class_id
 	accent = unit.character_data.display_color
 	size = Vector2(WIDTH, HEIGHT)
 	custom_minimum_size = size

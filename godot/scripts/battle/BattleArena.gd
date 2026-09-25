@@ -5,7 +5,7 @@ extends Control
 
 signal unit_clicked(unit: CharacterUnit)
 
-const RANGED := [&"wizard", &"goblin_archer", &"ember_priest"]
+const RANGED := [&"wizard", &"goblin_archer", &"ember_priest", &"cult_hexer"]
 const SPACING := 200.0
 const MISSILE_COLORS := {
 	SkillData.DamageType.PHYSICAL: Color("e8dcc0"),

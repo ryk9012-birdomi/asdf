@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/characters/EnemyData.gd" id="1_data"]
+[ext_resource type="Script" path="res://scripts/skills/SkillData.gd" id="2_type"]
+[ext_resource type="Resource" path="res://data/skills/skeleton_slash.tres" id="3_skill"]
+[ext_resource type="Resource" path="res://data/skills/bone_guard.tres" id="4_skill"]
+
+[resource]
+script = ExtResource("1_data")
+id = &"skeleton_warrior"
+character_name = "해골 병사"
+class_id = &"undead"
+class_name_label = "Skeleton"
+description = "무너진 순례자 묘지에서 교단의 주문으로 일어난 병사. 느리지만 단단하다."
+display_color = Color(0.88, 0.85, 0.74, 1)
+level = 2
+max_hp = 8
+starting_shield = 2
+max_energy = 3
+speed = 7
+attack = 2
+defense = 2
+hit_bonus = 1
+crit_threshold = 12
+skills = Array[ExtResource("2_type")]([ExtResource("3_skill"), ExtResource("4_skill")])
+action_pattern = Array[int]([0, 0, 1])

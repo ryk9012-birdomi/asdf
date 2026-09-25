@@ -14,6 +14,8 @@ var angles: Dictionary = {}
 var root := Vector2.ZERO
 var phase: float = 0.0
 var last_x: float = NAN
+## Scale of the whole figure on top of the fighter's art scale (goblins are small).
+var size: float = 1.0
 
 
 class Bone:
@@ -35,15 +37,16 @@ class Spring:
 
 
 static func create(kind: StringName) -> Puppet:
-	if not HeroPuppet.CLASSES.has(kind):
+	if not HeroPuppet.RIGS.has(kind):
 		return null
-	var entry: Array = HeroPuppet.CLASSES[kind]
-	return hero(entry[0], entry[1])
+	var rig: Dictionary = HeroPuppet.RIGS[kind]
+	return hero(rig.art, rig.style, rig.get("size", 1.0), rig.get("head", []))
 
 
-## A hero wearing any part set from tools/generate_hero_art.py, posed in that class's style.
-static func hero(art: String, style_id: StringName = &"knight") -> Puppet:
-	var puppet := HeroPuppet.new(art, style_id)
+## Any part set from tools/generate_hero_art.py, posed in that style.
+static func hero(art: String, style_id: StringName = &"knight", scale_by: float = 1.0, head_margins: Array = []) -> Puppet:
+	var puppet := HeroPuppet.new(art, style_id, head_margins)
+	puppet.size = scale_by
 	puppet.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	return puppet
 

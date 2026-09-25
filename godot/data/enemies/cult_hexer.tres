@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/characters/EnemyData.gd" id="1_data"]
+[ext_resource type="Script" path="res://scripts/skills/SkillData.gd" id="2_type"]
+[ext_resource type="Resource" path="res://data/skills/hex_ember.tres" id="3_skill"]
+[ext_resource type="Resource" path="res://data/skills/ash_veil.tres" id="4_skill"]
+
+[resource]
+script = ExtResource("1_data")
+id = &"cult_hexer"
+character_name = "잿불 주술사"
+class_id = &"cultist"
+class_name_label = "Cult Hexer"
+description = "뼈 가면을 쓴 교단의 주술사. 뒤에서 저주를 던지고 동료에게 재의 장막을 두른다."
+display_color = Color(0.72, 0.45, 0.95, 1)
+level = 3
+max_hp = 6
+starting_shield = 1
+max_energy = 5
+speed = 11
+attack = 2
+defense = 0
+hit_bonus = 2
+crit_threshold = 12
+skills = Array[ExtResource("2_type")]([ExtResource("3_skill"), ExtResource("4_skill")])
+action_pattern = Array[int]([0, 1])

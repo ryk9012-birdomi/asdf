@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 60 60">
+<defs><linearGradient id="steel" x1="0" y1="0" x2="1" y2="0.25">
+<stop offset="0" stop-color="#6f7885"/><stop offset="0.38" stop-color="#eef2f6"/>
+<stop offset="0.62" stop-color="#b9c2cd"/><stop offset="1" stop-color="#5a626e"/></linearGradient>
+<linearGradient id="steelv" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#eef2f6"/><stop offset="0.5" stop-color="#b9c2cd"/><stop offset="1" stop-color="#5a626e"/></linearGradient>
+<linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#fbe39a"/><stop offset="0.55" stop-color="#e0a93e"/><stop offset="1" stop-color="#8e5c17"/></linearGradient>
+<linearGradient id="mail" x1="0" y1="0" x2="1" y2="0">
+<stop offset="0" stop-color="#42484f"/><stop offset="0.5" stop-color="#8a9199"/><stop offset="1" stop-color="#3e444d"/></linearGradient>
+<linearGradient id="skin" x1="0" y1="0" x2="1" y2="0">
+<stop offset="0" stop-color="#c0927a"/><stop offset="0.6" stop-color="#fbe6d6"/><stop offset="1" stop-color="#efcdb6"/></linearGradient>
+<linearGradient id="hood" x1="0" y1="0" x2="1" y2="0.4">
+<stop offset="0" stop-color="#54100a"/><stop offset="0.5" stop-color="#8c1c12"/><stop offset="1" stop-color="#69150d"/></linearGradient></defs>
+<g transform="translate(6,10)"><path d="M22 17 Q33 14.5 37 20.5 L38 25 L40.6 27.6 L37.6 29.6 Q37.8 34.5 34.8 38.2 Q28.5 42.5 22.5 40.5 Z" fill="url(#skin)" stroke="#1a0f08" stroke-width="1.5" stroke-linejoin="round"/><path d="M37.8 25 L40.6 27.6 L37.6 29.4" fill="none" stroke="#c0927a" stroke-width="0.8"/><path d="M30.5 36 Q33 36.8 35 35.6" fill="none" stroke="#6b3a2a" stroke-width="0.8"/><path d="M22.8 30.6 Q31 29 40.4 30 L38.8 35.6 Q33 43 23.8 42.4 Q21.4 37 22.8 30.6 Z" fill="#1a1010" stroke="#1a0f08" stroke-width="1.5" stroke-linejoin="round"/><path d="M25 34 Q31 33.4 37.4 33.6 M25.4 38 Q30 38.4 34.6 37.6" fill="none" stroke="#100a0a" stroke-width="0.8"/><ellipse cx="32.6" cy="24.1" rx="2.3" ry="1.1" fill="#ff8a2a"/><ellipse cx="32.6" cy="24.1" rx="3.8" ry="2" fill="#ff8a2a" opacity="0.3"/><path d="M28.4 20.4 Q32 21.4 36.2 23" fill="none" stroke="#482e1b" stroke-width="1.3" stroke-linecap="round"/><path d="M3 34 Q-0.5 8 19 2.4 Q35.5 0.2 41.6 12.5 Q43.4 18.4 40.6 20.6 Q36 13.6 27 14.6 Q21.6 17.4 21.4 27.6 Q21.6 36.6 24.8 42.4 L27 50 L5 50 Q1.6 43 3 34 Z" fill="url(#hood)" stroke="#1a0f08" stroke-width="1.5" stroke-linejoin="round"/><path d="M40.4 20 Q36 14.4 27.2 15.4 Q22.6 18 22.4 27.6 Q22.6 36 25.4 41.8" fill="none" stroke="#4d0f09" stroke-width="2.4"/><path d="M9 9 Q16 4.4 26 4.2 M6 20 Q9 12 17 8.4 M8 38 Q10 30 14 26" fill="none" stroke="#4d0f09" stroke-width="0.9"/><path d="M13 6.4 Q20 3.6 28 4" fill="none" stroke="#b62417" stroke-width="1.3" opacity="0.7"/></g>
+</svg>

@@ -1,5 +1,6 @@
 [
  {
+  "id": "knights",
   "title": "기사",
   "style": "knight",
   "entries": [
@@ -78,6 +79,7 @@
   ]
  },
  {
+  "id": "rogues",
   "title": "도적",
   "style": "rogue",
   "entries": [
@@ -108,6 +110,7 @@
   ]
  },
  {
+  "id": "wizards",
   "title": "마법사",
   "style": "wizard",
   "entries": [
@@ -134,6 +137,109 @@
     "name": "대마법사",
     "note": "흰 로브와 금실, 긴 흰 수염, 수정 지팡이",
     "path": "res://art/wizards/archmage/"
+   }
+  ]
+ },
+ {
+  "id": "enemies",
+  "title": "적",
+  "style": "knight",
+  "entries": [
+   {
+    "id": "goblin_raider",
+    "name": "고블린 약탈자",
+    "note": "큰 귀와 노란 눈, 굽은 칼과 나무 방패",
+    "path": "res://art/enemies/goblin_raider/",
+    "style": "rogue",
+    "size": 0.76,
+    "head": [
+     16,
+     24
+    ]
+   },
+   {
+    "id": "goblin_archer",
+    "name": "고블린 궁수",
+    "note": "가죽 모자, 활과 붉은 깃 화살",
+    "path": "res://art/enemies/goblin_archer/",
+    "style": "rogue",
+    "size": 0.74,
+    "head": [
+     16,
+     24
+    ]
+   },
+   {
+    "id": "hobgoblin_captain",
+    "name": "홉고블린 대장",
+    "note": "볏 달린 투구, 엄니, 청동 갑옷과 도끼",
+    "path": "res://art/enemies/hobgoblin_captain/",
+    "style": "knight",
+    "size": 1.1,
+    "head": [
+     16,
+     24
+    ]
+   },
+   {
+    "id": "ember_priest",
+    "name": "잿불 사제 모르간",
+    "note": "뿔 달린 금가면, 핏빛 로브, 불꽃 지팡이",
+    "path": "res://art/enemies/ember_priest/",
+    "style": "wizard",
+    "size": 1.12,
+    "head": [
+     16,
+     24
+    ]
+   },
+   {
+    "id": "skeleton_warrior",
+    "name": "해골 병사",
+    "note": "녹슨 투구와 가슴판, 푸른 눈빛, 금 간 방패",
+    "path": "res://art/enemies/skeleton_warrior/",
+    "style": "knight",
+    "size": 1.0,
+    "head": [
+     16,
+     24
+    ]
+   },
+   {
+    "id": "cult_zealot",
+    "name": "교단 광신도",
+    "note": "붉은 두건과 검은 복면, 제물 단검과 횃불",
+    "path": "res://art/enemies/cult_zealot/",
+    "style": "rogue",
+    "size": 0.98,
+    "head": [
+     6,
+     10
+    ]
+   },
+   {
+    "id": "cult_hexer",
+    "name": "잿불 주술사",
+    "note": "뼈 가면, 잿빛 로브, 보랏빛 불꽃 구슬",
+    "path": "res://art/enemies/cult_hexer/",
+    "style": "wizard",
+    "size": 1.0,
+    "head": [
+     6,
+     34
+    ]
+   },
+   {
+    "id": "orc_berserker",
+    "name": "오크 광전사",
+    "note": "맨가슴에 가죽 끈, 모히칸, 쌍날 대도끼",
+    "path": "res://art/enemies/orc_berserker/",
+    "style": "knight",
+    "size": 1.16,
+    "head": [
+     16,
+     24
+    ]
    }
   ]
  }

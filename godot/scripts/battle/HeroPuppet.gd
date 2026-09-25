@@ -45,11 +45,20 @@ const STYLES := {
 	&"wizard": {"arm": WIZARD_ARM, "rest": Vector2(-0.3, -0.6), "raise": Vector2(-1.5, -0.25),
 		"glow": Vector2(0, -80), "glow_size": Vector2(0.75, 0.75), "palm": true, "head": Vector2(26, 80)},
 }
-## Battle art per class id; the fighter's kind picks one.
-const CLASSES := {
-	&"paladin": ["res://art/heroes/paladin/", &"knight"],
-	&"rogue": ["res://art/heroes/rogue/", &"rogue"],
-	&"wizard": ["res://art/heroes/wizard/", &"wizard"],
+## Battle art per fighter kind (hero class id or enemy id). size scales the whole figure;
+## head gives the head canvas margins [left, top] when they differ from the style's.
+const RIGS := {
+	&"paladin": {"art": "res://art/heroes/paladin/", "style": &"knight"},
+	&"rogue": {"art": "res://art/heroes/rogue/", "style": &"rogue"},
+	&"wizard": {"art": "res://art/heroes/wizard/", "style": &"wizard"},
+	&"goblin_raider": {"art": "res://art/enemies/goblin_raider/", "style": &"rogue", "size": 0.76, "head": [16, 24]},
+	&"goblin_archer": {"art": "res://art/enemies/goblin_archer/", "style": &"rogue", "size": 0.74, "head": [16, 24]},
+	&"hobgoblin_captain": {"art": "res://art/enemies/hobgoblin_captain/", "style": &"knight", "size": 1.1, "head": [16, 24]},
+	&"ember_priest": {"art": "res://art/enemies/ember_priest/", "style": &"wizard", "size": 1.12, "head": [16, 24]},
+	&"skeleton_warrior": {"art": "res://art/enemies/skeleton_warrior/", "style": &"knight", "size": 1.0, "head": [16, 24]},
+	&"cult_zealot": {"art": "res://art/enemies/cult_zealot/", "style": &"rogue", "size": 0.98},
+	&"cult_hexer": {"art": "res://art/enemies/cult_hexer/", "style": &"wizard", "size": 1.0},
+	&"orc_berserker": {"art": "res://art/enemies/orc_berserker/", "style": &"knight", "size": 1.16, "head": [16, 24]},
 }
 
 var style: Dictionary
@@ -66,9 +75,11 @@ var stride: float = 0.0
 var walk: float = 0.0
 
 
-func _init(art: String, style_id: StringName = &"knight") -> void:
+func _init(art: String, style_id: StringName = &"knight", head_margins: Array = []) -> void:
 	art = art.trim_suffix("/") + "/"
-	style = STYLES[style_id]
+	style = STYLES[style_id].duplicate()
+	if head_margins.size() == 2:
+		style.head = Vector2(20 + head_margins[0], 46 + head_margins[1])
 	for face in ["head", "head_blink", "head_shout", "head_hurt", "head_down"]:
 		faces[face] = load(art + face + ".svg")
 	var thigh: Texture2D = load(art + "thigh.svg")

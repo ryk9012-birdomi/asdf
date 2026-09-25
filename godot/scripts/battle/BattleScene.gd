@@ -64,12 +64,7 @@ func _ready() -> void:
 	battle.dice_rolled.connect(view.show_dice)
 	battle.shield_granted.connect(view.show_shield)
 	pace.timeout.connect(on_pace_timeout)
-	if run != null:
-		match run.current_node().type:
-			RunMap.NodeType.ELITE:
-				battle.opening_line = "주도권 굴림! 홉고블린 대장이 부하를 이끌고 길을 막았습니다."
-			RunMap.NodeType.BOSS:
-				battle.opening_line = "주도권 굴림! 잿불 사제 모르간이 성소 앞에서 잿불을 피워 올립니다."
+	battle.opening_line = "주도권 굴림! " + Encounters.opening_line(foes.map(func(foe): return foe.character_data.id))
 	if not battle.start_battle(players, foes, battle_seed):
 		push_error("Encounter requires 1–3 heroes and 1–5 enemies.")
 		return

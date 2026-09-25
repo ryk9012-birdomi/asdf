@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="28" height="110" viewBox="0 0 28 110">
+<defs><linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#f4ecd6"/><stop offset="0.55" stop-color="#cbbd98"/><stop offset="1" stop-color="#7d7056"/></linearGradient>
+<radialGradient id="orb" cx="0.38" cy="0.35" r="0.65">
+<stop offset="0" stop-color="#f4e0ff"/><stop offset="0.5" stop-color="#c86aff"/><stop offset="1" stop-color="#6a1a9a"/></radialGradient>
+<linearGradient id="wood" x1="0" y1="0" x2="1" y2="0">
+<stop offset="0" stop-color="#3a2412"/><stop offset="0.5" stop-color="#8a5a32"/><stop offset="1" stop-color="#2e1c0e"/></linearGradient></defs>
+<path d="M12.4 108 Q11.4 80 12.6 56 Q11 40 12.8 22 L15.6 22 Q16.6 40 15.6 56 Q16.6 80 15.8 108 Z" fill="url(#wood)" stroke="#1a0f08" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M13 40 Q15 44 13.6 48 M14.6 70 Q12.6 74 14.2 78" fill="none" stroke="#2a180a" stroke-width="0.8"/>
+<path d="M11.6 22 Q6.4 16 8.4 6 Q10.6 12 12.8 14 Z M16.4 22 Q21.6 16 19.6 6 Q17.4 12 15.2 14 Z" fill="url(#wood)" stroke="#1a0f08" stroke-width="0.9" stroke-linejoin="round"/>
+<circle cx="14" cy="10" r="6" fill="url(#orb)" stroke="#1a0f08" stroke-width="1.2"/>
+<circle cx="12" cy="8" r="1.6" fill="#ffffff" opacity="0.8"/>
+<rect x="11.6" y="84" width="4.8" height="9" rx="1" fill="url(#gold)" stroke="#1a0f08" stroke-width="0.9" stroke-linejoin="round"/>
+</svg>

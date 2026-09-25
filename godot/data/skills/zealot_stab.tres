@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/skills/SkillData.gd" id="1_skill"]
+
+[resource]
+script = ExtResource("1_skill")
+id = &"zealot_stab"
+skill_name = "제물 단검"
+description = "적 하나를 광기 어린 칼질로 두 번 찔러 공격력 60%씩 피해. 뒷줄을 노리면 한 줄마다 명중 −2."
+target_type = 5
+damage_type = 0
+effect_type = 0
+attack_multiplier = 0.60
+flat_value = 0
+hit_count = 2
+energy_cost = 0
+cooldown = 0

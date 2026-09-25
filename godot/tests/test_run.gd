@@ -296,9 +296,35 @@ func test_gear_and_upgrades() -> void:
 	options = Encounters.reward_options(run, fight)
 	check(options.size() == 3 and options[0] != options[1] and options[1] != options[2] and options[0] != options[2], "Battle spoils are three different items")
 	check(options == Encounters.reward_options(run, fight), "Spoils are seeded per node")
-	var shallow := RunMap.MapNode.new(900, 1, 0)
-	var deep := RunMap.MapNode.new(901, 8, 0)
-	var raider_low: EnemyData = Encounters.enemies_for(run, shallow)[0]
-	var raider_high: EnemyData = Encounters.enemies_for(run, deep)[0]
+	var raider_low := Encounters.scaled(load(Encounters.RAIDER), 1)
+	var raider_high := Encounters.scaled(load(Encounters.RAIDER), 8)
 	check(raider_high.max_hp == raider_low.max_hp + 4 and raider_high.hit_bonus == raider_low.hit_bonus + 1, "Deeper floors field tougher goblins")
+	# Who turns up where: goblins early, the dead and the cult deeper, orcs as late elites.
+	var seen := {}
+	var lines_ok := true
+	for floor_index in 10:
+		for id in 40:
+			var node := node_at(1000 + floor_index * 100 + id, floor_index, RunMap.NodeType.BATTLE)
+			var foes := Encounters.enemies_for(run, node)
+			lines_ok = lines_ok and foes.size() == (2 if floor_index < 3 else 3) and foes[0].id in [&"goblin_raider", &"skeleton_warrior", &"cult_zealot"]
+			for foe in foes:
+				seen[foe.id] = mini(seen.get(foe.id, 99), floor_index)
+	check(lines_ok, "Every fight has the right size and a front-line foe first")
+	check(seen.get(&"goblin_archer") == 2 and seen.get(&"skeleton_warrior") == 3 and seen.get(&"cult_zealot") == 4 and seen.get(&"cult_hexer") == 5, "New foes join the pools floor by floor")
+	var elites := {}
+	for id in 40:
+		for foe in Encounters.enemies_for(run, node_at(3000 + id, 7, RunMap.NodeType.ELITE)):
+			elites[foe.id] = true
+	check(elites.has(&"orc_berserker") and elites.has(&"hobgoblin_captain"), "Deep elites are either the hobgoblin captain or the orc berserker")
+	check(Encounters.enemies_for(run, node_at(3100, 5, RunMap.NodeType.ELITE))[0].id == &"hobgoblin_captain", "Early elites are always the captain")
+	check(Encounters.opening_line([&"cult_zealot", &"orc_berserker"]).begins_with("오크 광전사") and Encounters.opening_line([&"skeleton_warrior", &"cult_hexer"]).ends_with("읊조립니다."), "The opening line names who leads the fight")
+	for path in [Encounters.RAIDER, Encounters.ARCHER, Encounters.CAPTAIN, Encounters.PRIEST, Encounters.SKELETON, Encounters.ZEALOT, Encounters.HEXER, Encounters.BERSERKER]:
+		var data: EnemyData = load(path)
+		check(data.get_validation_errors().is_empty() and HeroPuppet.RIGS.has(data.id), "%s is valid and has a puppet" % data.character_name)
 	check(load(Encounters.RAIDER).max_hp == 6, "Scaling never edits the shared enemy data")
+
+
+func node_at(id: int, floor_index: int, type: RunMap.NodeType) -> RunMap.MapNode:
+	var node := RunMap.MapNode.new(id, floor_index, 0)
+	node.type = type
+	return node

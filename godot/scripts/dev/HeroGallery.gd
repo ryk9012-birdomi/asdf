@@ -29,8 +29,8 @@ func _ready() -> void:
 	add_child(tab_bar)
 	for group in groups:
 		var tab := FantasyTheme.button(tab_bar, "%s %d" % [group.title, group.entries.size()], func(): show_group(group))
-		tab.name = "Tab_" + group.style
-		tabs[group.style] = tab
+		tab.name = "Tab_" + group.id
+		tabs[group.id] = tab
 	var bar := HBoxContainer.new()
 	bar.position = Vector2(28, 64)
 	bar.add_theme_constant_override("separation", 8)
@@ -52,15 +52,15 @@ func show_group(group: Dictionary) -> void:
 		shelf.remove_child(child)
 		child.queue_free()
 	figures.clear()
-	for style in tabs:
-		tabs[style].modulate = Color.WHITE if style == group.style else Color(1, 1, 1, 0.55)
+	for id in tabs:
+		tabs[id].modulate = Color.WHITE if id == group.id else Color(1, 1, 1, 0.55)
 	var entries: Array = group.entries
 	for index in entries.size():
-		add_hero(entries[index], index, entries.size(), group.style)
+		add_hero(entries[index], index, entries.size(), group)
 	status.text = "%s %d종 · tools/generate_hero_art.py에서 만든 예시입니다. (기본)이 붙은 견본을 전투에서 씁니다." % [group.title, figures.size()]
 
 
-func add_hero(entry: Dictionary, index: int, count: int, style: String) -> void:
+func add_hero(entry: Dictionary, index: int, count: int, group: Dictionary) -> void:
 	# Short rows are centred; long ones wrap at COLUMNS.
 	var in_row := mini(count - (index / COLUMNS) * COLUMNS, COLUMNS)
 	var left := 18.0 + (COLUMNS - in_row) * CELL.x / 2.0
@@ -70,7 +70,11 @@ func add_hero(entry: Dictionary, index: int, count: int, style: String) -> void:
 	figure.size = Vector2(CELL.x, 300)
 	figure.position = cell
 	figure.phase = index * 0.9
-	figure.puppet = Puppet.hero(entry.path, StringName(style))
+	figure.puppet = Puppet.hero(entry.path, StringName(entry.get("style", group.style)), entry.get("size", 1.0), entry.get("head", []))
+	if group.id == "enemies":
+		# Foes face the party, as in battle.
+		figure.pivot_offset = Vector2(CELL.x / 2.0, 300 - FighterView.FEET)
+		figure.scale = Vector2(-1, 1)
 	figure.puppet.phase = figure.phase
 	figure.add_child(figure.puppet)
 	figure.set_meta("home", cell)

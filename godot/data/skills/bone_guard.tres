@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/skills/SkillData.gd" id="1_skill"]
+
+[resource]
+script = ExtResource("1_skill")
+id = &"bone_guard"
+skill_name = "뼈 방패"
+description = "금 간 방패를 들어 자신에게 보호막 3을 두릅니다."
+target_type = 0
+damage_type = 0
+effect_type = 1
+attack_multiplier = 0.00
+flat_value = 3
+hit_count = 1
+energy_cost = 0
+cooldown = 0

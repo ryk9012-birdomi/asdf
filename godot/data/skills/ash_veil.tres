@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/skills/SkillData.gd" id="1_skill"]
+
+[resource]
+script = ExtResource("1_skill")
+id = &"ash_veil"
+skill_name = "재의 장막"
+description = "잿빛 장막으로 아군 전체에게 보호막 2를 두릅니다."
+target_type = 2
+damage_type = 1
+effect_type = 1
+attack_multiplier = 0.00
+flat_value = 2
+hit_count = 1
+energy_cost = 2
+cooldown = 0

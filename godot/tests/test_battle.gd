@@ -264,7 +264,7 @@ func test_ui() -> void:
 	check(foe_view.info.text.begins_with("▸"), "Enemy intent shows above the enemy")
 	check(hero_view.kind == &"paladin" and foe_view.kind == &"goblin_raider", "Each unit gets its own drawing")
 	var puppet: Puppet = hero_view.figure.puppet
-	check(puppet is HeroPuppet and foe_view.figure.puppet == null, "Heroes are jointed cut-out puppets; enemies keep the drawn art")
+	check(puppet is HeroPuppet and foe_view.figure.puppet is HeroPuppet and foe_view.figure.puppet.size < 1.0, "Heroes and foes are cut-out puppets; goblins are drawn small")
 	check(puppet.get_child_count() >= 17 and puppet.bones.head.sprite.texture != null, "Puppet assembles every SVG part")
 	var resting_sword: float = puppet.world_angle(&"sword")
 	hero_view.figure.arm = 1.5
@@ -333,6 +333,9 @@ func test_knight_gallery() -> void:
 	var black: Puppet = gallery.find_child("Hero_black_knight", true, false).puppet
 	var templar: Puppet = gallery.find_child("Hero_templar", true, false).puppet
 	check(not black.shielded and templar.shielded, "Shieldless knights are detected from empty shield art")
+	var foes: Dictionary = gallery.groups.filter(func(group): return group.id == "enemies")[0]
+	gallery.show_group(foes)
+	check(gallery.figures.size() == 8 and gallery.figures.all(func(figure): return figure.scale.x < 0), "The enemy tab shows eight foes facing the party")
 	gallery.play_all("쓰러짐")
 	check(not gallery.auto, "A motion button stops the automatic cycle")
 	gallery.free()

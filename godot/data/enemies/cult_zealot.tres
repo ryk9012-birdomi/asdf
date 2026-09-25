@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/characters/EnemyData.gd" id="1_data"]
+[ext_resource type="Script" path="res://scripts/skills/SkillData.gd" id="2_type"]
+[ext_resource type="Resource" path="res://data/skills/zealot_stab.tres" id="3_skill"]
+[ext_resource type="Resource" path="res://data/skills/zealot_torch.tres" id="4_skill"]
+
+[resource]
+script = ExtResource("1_data")
+id = &"cult_zealot"
+character_name = "교단 광신도"
+class_id = &"cultist"
+class_name_label = "Cult Zealot"
+description = "잿불 교단에 목숨을 바친 광신도. 빠르고 무모하게 달려든다."
+display_color = Color(0.8, 0.25, 0.18, 1)
+level = 2
+max_hp = 6
+starting_shield = 0
+max_energy = 4
+speed = 13
+attack = 3
+defense = 0
+hit_bonus = 2
+crit_threshold = 12
+skills = Array[ExtResource("2_type")]([ExtResource("3_skill"), ExtResource("4_skill")])
+action_pattern = Array[int]([0, 1])
