@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://5y8k0cgthaij"
-path="res://.godot/imported/sword.svg-72148f7f2e2e36f885069b4311e5d2f5.ctex"
+uid="uid://d3nkb3sqsyk18"
+path="res://.godot/imported/head_blink.svg-c59b44eb5b2a84d170f1810f3db73fec.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/heroes/paladin/sword.svg"
-dest_files=["res://.godot/imported/sword.svg-72148f7f2e2e36f885069b4311e5d2f5.ctex"]
+source_file="res://art/knights/crimson_knight/head_blink.svg"
+dest_files=["res://.godot/imported/head_blink.svg-c59b44eb5b2a84d170f1810f3db73fec.ctex"]
 
 [params]
 

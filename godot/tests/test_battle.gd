@@ -61,6 +61,7 @@ func run_tests() -> void:
 	test_group_skills()
 	test_endings()
 	await test_ui()
+	await test_knight_gallery()
 	print("Battle system: %d checks, %d failures" % [checks, failures])
 	AudioDirector.shutdown()
 	# Let the audio thread drop its playbacks before the leak check at exit.
@@ -316,3 +317,23 @@ func test_ui() -> void:
 		step(current_scene.battle, false)
 	check(not current_scene.battle.victory and current_scene.view.result_label.visible and current_scene.pace.is_stopped(), "Defeat panel appears and AI timer stops")
 	current_scene.free()
+
+
+func test_knight_gallery() -> void:
+	var gallery: Control = load("res://scenes/dev/KnightGallery.tscn").instantiate()
+	root.add_child(gallery)
+	await process_frame
+	await process_frame
+	check(gallery.figures.size() == 12, "Knight gallery shows all twelve examples")
+	var complete := true
+	for figure in gallery.figures:
+		for id in [&"torso", &"head", &"sword", &"shield", &"cape"]:
+			complete = complete and figure.puppet.bones[id].sprite.texture != null
+	check(complete, "Every example knight has every part")
+	var black: Puppet = gallery.find_child("Knight_black_knight", true, false).puppet
+	var templar: Puppet = gallery.find_child("Knight_templar", true, false).puppet
+	check(not black.shielded and templar.shielded, "Shieldless knights are detected from empty shield art")
+	gallery.play_all("쓰러짐")
+	check(not gallery.auto, "A motion button stops the automatic cycle")
+	gallery.free()
+

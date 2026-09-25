@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 60 60">
+<defs><linearGradient id="steel" x1="0" y1="0" x2="1" y2="0.25">
+<stop offset="0" stop-color="#2a2c33"/><stop offset="0.38" stop-color="#7d808a"/>
+<stop offset="0.62" stop-color="#4a4d57"/><stop offset="1" stop-color="#1c1d22"/></linearGradient>
+<linearGradient id="steelv" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#7d808a"/><stop offset="0.5" stop-color="#4a4d57"/><stop offset="1" stop-color="#1c1d22"/></linearGradient>
+<linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#ff9c8a"/><stop offset="0.55" stop-color="#c63c2c"/><stop offset="1" stop-color="#6d1a12"/></linearGradient>
+<linearGradient id="mail" x1="0" y1="0" x2="1" y2="0">
+<stop offset="0" stop-color="#191a1e"/><stop offset="0.5" stop-color="#373941"/><stop offset="1" stop-color="#131417"/></linearGradient>
+<linearGradient id="skin" x1="0" y1="0" x2="1" y2="0">
+<stop offset="0" stop-color="#c0927a"/><stop offset="0.6" stop-color="#fbe6d6"/><stop offset="1" stop-color="#efcdb6"/></linearGradient></defs>
+<g transform="translate(6,10)"><path d="M7.5 29 Q6 43 13 48.5 L31 48.5 Q29 41 27 36 Z" fill="url(#mail)" stroke="#1a0f08" stroke-width="1.5" stroke-linejoin="round"/><path d="M9.0 34.0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0" fill="none" stroke="#14161b" stroke-width="0.55" opacity="0.7"/>
+<path d="M9.0 36.6 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0" fill="none" stroke="#14161b" stroke-width="0.55" opacity="0.7"/>
+<path d="M9.0 39.2 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0" fill="none" stroke="#14161b" stroke-width="0.55" opacity="0.7"/>
+<path d="M9.0 41.8 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0" fill="none" stroke="#14161b" stroke-width="0.55" opacity="0.7"/>
+<path d="M9.0 44.4 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0" fill="none" stroke="#14161b" stroke-width="0.55" opacity="0.7"/>
+<path d="M9.0 47.0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0" fill="none" stroke="#14161b" stroke-width="0.55" opacity="0.7"/><path d="M5.5 28 Q3.5 8 20 3.6 Q35.5 2 41.5 12 L42 36 Q34 41.5 22 41 L14.8 39 Q7.5 35 5.5 28 Z" fill="url(#steel)" stroke="#1a0f08" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 12 Q14 6.2 22 5.4" fill="none" stroke="#ffffff" stroke-width="1.6" opacity="0.55"/><path d="M31 5 Q33 22 32.5 40" fill="none" stroke="url(#gold)" stroke-width="2"/><path d="M24 22 L40.5 21 L40.5 23.4 L24 24.4 Z" fill="#1a0f08"/><ellipse cx="34" cy="22.6" rx="2.6" ry="1" fill="#ff4a2a"/><path d="M24.5 29 L41.5 28.5 M24.5 32 L41.5 31.6" stroke="#000000" stroke-opacity="0.45" stroke-width="0.8"/><circle cx="36" cy="34.0" r="0.6" fill="#1a0f08"/><circle cx="39" cy="34.0" r="0.6" fill="#1a0f08"/><circle cx="36" cy="36.4" r="0.6" fill="#1a0f08"/><circle cx="39" cy="36.4" r="0.6" fill="#1a0f08"/><circle cx="10" cy="24" r="0.9" fill="url(#gold)" stroke="#1a0f08" stroke-width="0.5"/><circle cx="16" cy="32" r="0.9" fill="url(#gold)" stroke="#1a0f08" stroke-width="0.5"/><circle cx="26" cy="36" r="0.9" fill="url(#gold)" stroke="#1a0f08" stroke-width="0.5"/></g>
+</svg>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="28" height="110" viewBox="0 0 28 110">
+<defs><linearGradient id="blade" x1="0" y1="0" x2="1" y2="0">
+<stop offset="0" stop-color="#8d97a4"/><stop offset="0.48" stop-color="#ffffff"/><stop offset="0.52" stop-color="#c6ced8"/><stop offset="1" stop-color="#7b8592"/></linearGradient>
+<linearGradient id="wood" x1="0" y1="0" x2="1" y2="0">
+<stop offset="0" stop-color="#4a2e18"/><stop offset="0.5" stop-color="#8a5a32"/><stop offset="1" stop-color="#3a2412"/></linearGradient>
+<linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#f6d38a"/><stop offset="0.55" stop-color="#b8893c"/><stop offset="1" stop-color="#6e4e1a"/></linearGradient>
+<linearGradient id="steel" x1="0" y1="0" x2="1" y2="0.25">
+<stop offset="0" stop-color="#5b4436"/><stop offset="0.38" stop-color="#c7a58a"/>
+<stop offset="0.62" stop-color="#8a6a55"/><stop offset="1" stop-color="#3e2e24"/></linearGradient>
+<linearGradient id="steelv" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#c7a58a"/><stop offset="0.5" stop-color="#8a6a55"/><stop offset="1" stop-color="#3e2e24"/></linearGradient></defs>
+<rect x="12.2" y="46" width="3.6" height="50" rx="1.2" fill="url(#wood)" stroke="#1a0f08" stroke-width="0.9" stroke-linejoin="round"/><rect x="11.6" y="84" width="4.8" height="10" rx="1" fill="#3a2414" stroke="#1a0f08" stroke-width="0.9" stroke-linejoin="round"/><circle cx="14" cy="97" r="2.4" fill="url(#steelv)" stroke="#1a0f08" stroke-width="0.9"/><path d="M14 36 L22.50 40.00 L14 50 Z" fill="url(#steelv)" stroke="#1a0f08" stroke-width="0.9" stroke-linejoin="round"/><path d="M14 36 L18.25 46.06 L14 50 Z" fill="url(#steelv)" stroke="#1a0f08" stroke-width="0.9" stroke-linejoin="round"/><path d="M14 36 L9.75 46.06 L14 50 Z" fill="url(#steelv)" stroke="#1a0f08" stroke-width="0.9" stroke-linejoin="round"/><path d="M14 36 L5.50 40.00 L14 50 Z" fill="url(#steelv)" stroke="#1a0f08" stroke-width="0.9" stroke-linejoin="round"/><path d="M14 36 L9.75 33.94 L14 50 Z" fill="url(#steelv)" stroke="#1a0f08" stroke-width="0.9" stroke-linejoin="round"/><path d="M14 36 L18.25 33.94 L14 50 Z" fill="url(#steelv)" stroke="#1a0f08" stroke-width="0.9" stroke-linejoin="round"/><ellipse cx="14" cy="43" rx="5.4" ry="7.4" fill="url(#steel)" stroke="#1a0f08" stroke-width="1.5" stroke-linejoin="round"/><circle cx="14" cy="34.6" r="2" fill="url(#gold)" stroke="#1a0f08" stroke-width="0.7"/><rect x="10.5" y="50" width="7" height="2.6" fill="url(#gold)" stroke="#1a0f08" stroke-width="0.9" stroke-linejoin="round"/>
+</svg>

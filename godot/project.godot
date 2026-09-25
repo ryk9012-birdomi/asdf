@@ -27,3 +27,10 @@ window/stretch/mode="canvas_items"
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
 environment/defaults/default_clear_color=Color(0.027, 0.043, 0.075, 1)
+
+[importer_defaults]
+
+texture={
+"mipmaps/generate": true,
+"svg/scale": 3.0
+}

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="22" height="36" viewBox="0 0 22 36">
+<defs><linearGradient id="steel" x1="0" y1="0" x2="1" y2="0.25">
+<stop offset="0" stop-color="#a67c2e"/><stop offset="0.38" stop-color="#fff1c2"/>
+<stop offset="0.62" stop-color="#e2c07a"/><stop offset="1" stop-color="#7a5716"/></linearGradient>
+<linearGradient id="mail" x1="0" y1="0" x2="1" y2="0">
+<stop offset="0" stop-color="#634a1b"/><stop offset="0.5" stop-color="#a9905b"/><stop offset="1" stop-color="#553c0f"/></linearGradient>
+<linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#fbe39a"/><stop offset="0.55" stop-color="#e0a93e"/><stop offset="1" stop-color="#8e5c17"/></linearGradient></defs>
+<rect x="4.5" y="1" width="13" height="31" rx="5" fill="url(#mail)" stroke="#1a0f08" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M5.5 4.0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0" fill="none" stroke="#14161b" stroke-width="0.55" opacity="0.7"/>
+<path d="M5.5 6.6 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0" fill="none" stroke="#14161b" stroke-width="0.55" opacity="0.7"/>
+<path d="M5.5 9.2 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0" fill="none" stroke="#14161b" stroke-width="0.55" opacity="0.7"/>
+<path d="M5.5 11.8 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0" fill="none" stroke="#14161b" stroke-width="0.55" opacity="0.7"/>
+<path d="M5.5 14.4 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0" fill="none" stroke="#14161b" stroke-width="0.55" opacity="0.7"/>
+<path d="M5.5 17.0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0" fill="none" stroke="#14161b" stroke-width="0.55" opacity="0.7"/>
+<path d="M5.5 19.6 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0" fill="none" stroke="#14161b" stroke-width="0.55" opacity="0.7"/>
+<path d="M5.5 22.2 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0" fill="none" stroke="#14161b" stroke-width="0.55" opacity="0.7"/>
+<path d="M5.5 24.8 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0" fill="none" stroke="#14161b" stroke-width="0.55" opacity="0.7"/>
+<path d="M5.5 27.4 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0 q1.3 1.8 2.6 0" fill="none" stroke="#14161b" stroke-width="0.55" opacity="0.7"/>
+<path d="M4 3 Q11 -0.5 18.2 3 L17.4 23 Q11 27.5 4.8 23 Z" fill="url(#steel)" stroke="#1a0f08" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M5.5 8 Q11 5.8 16.8 8" fill="none" stroke="url(#gold)" stroke-width="1.6"/>
+<path d="M6 17 Q11 15.5 16.2 17" fill="none" stroke="#000000" stroke-opacity="0.35" stroke-width="0.8"/>
+<path d="M7 5 L7.4 21" stroke="#ffffff" stroke-width="1" opacity="0.45"/>
+<circle cx="7.2" cy="11" r="0.9" fill="url(#gold)" stroke="#1a0f08" stroke-width="0.5"/><circle cx="14.8" cy="11" r="0.9" fill="url(#gold)" stroke="#1a0f08" stroke-width="0.5"/>
+</svg>

@@ -1,6 +1,7 @@
 class_name PaladinPuppet
 extends Puppet
-## Aldric: plate, tabard and cape, longsword in the near hand and kite shield in the far one.
+## A knight: plate, tabard and cape, a weapon in the near hand and a shield in the far one.
+## Any part set made by tools/generate_knight_art.py fits; Aldric wears art/heroes/paladin.
 
 const ART := "res://art/heroes/paladin/"
 const FAR_SIDE := Color(0.7, 0.72, 0.8)
@@ -20,39 +21,44 @@ var faces: Dictionary = {}
 var head: Sprite2D
 var glow: Sprite2D
 var ward: Sprite2D
+## Some knights fight two-handed with no shield; their guard light goes to the weapon.
+var shielded := true
 var cape := Spring.new()
 var plume := Spring.new()
 var stride: float = 0.0
 var walk: float = 0.0
 
 
-func _init() -> void:
+func _init(art: String = ART) -> void:
+	art = art.trim_suffix("/") + "/"
 	for face in ["head", "head_blink", "head_shout", "head_hurt", "head_down"]:
-		faces[face] = load(ART + face + ".svg")
-	var thigh: Texture2D = load(ART + "thigh.svg")
-	var shin: Texture2D = load(ART + "shin.svg")
-	var upper: Texture2D = load(ART + "arm_upper.svg")
-	var lower: Texture2D = load(ART + "arm_lower.svg")
-	var fist: Texture2D = load(ART + "hand.svg")
+		faces[face] = load(art + face + ".svg")
+	var thigh: Texture2D = load(art + "thigh.svg")
+	var shin: Texture2D = load(art + "shin.svg")
+	var upper: Texture2D = load(art + "arm_upper.svg")
+	var lower: Texture2D = load(art + "arm_lower.svg")
+	var fist: Texture2D = load(art + "hand.svg")
 	root = Vector2(0, -60)
 	bone(&"hip", null, Vector2.ZERO)
 	bone(&"thigh_b", thigh, Vector2(11, 4), &"hip", Vector2(-3, 0))
 	bone(&"shin_b", shin, Vector2(11, 4), &"thigh_b", Vector2(0, 28))
 	bone(&"thigh_f", thigh, Vector2(11, 4), &"hip", Vector2(3, 0))
 	bone(&"shin_f", shin, Vector2(11, 4), &"thigh_f", Vector2(0, 28))
-	bone(&"torso", load(ART + "torso.svg"), Vector2(24, 64), &"hip")
-	bone(&"cape", load(ART + "cape.svg"), Vector2(24, 4), &"torso", Vector2(-9, -46))
-	head = bone(&"head", faces.head, Vector2(20, 46), &"torso", Vector2(1, -48))
-	bone(&"plume", load(ART + "plume.svg"), Vector2(24, 20), &"head", Vector2(-7, -40))
+	bone(&"torso", load(art + "torso.svg"), Vector2(24, 64), &"hip")
+	bone(&"cape", load(art + "cape.svg"), Vector2(24, 4), &"torso", Vector2(-9, -46))
+	head = bone(&"head", faces.head, Vector2(26, 56), &"torso", Vector2(1, -48))
+	bone(&"plume", load(art + "plume.svg"), Vector2(24, 20), &"head", Vector2(-7, -40))
 	bone(&"upper_b", upper, Vector2(14, 7), &"torso", Vector2(-6, -42))
 	bone(&"lower_b", lower, Vector2(9, 3), &"upper_b", Vector2(0, 20))
 	bone(&"hand_b", fist, Vector2(8, 2), &"lower_b", Vector2(0, 18))
-	bone(&"shield", load(ART + "shield.svg"), Vector2(17, 20), &"hand_b", Vector2(0, 7))
+	var buckler: Texture2D = load(art + "shield.svg")
+	shielded = not buckler.get_image().is_invisible()
+	bone(&"shield", buckler, Vector2(20, 22), &"hand_b", Vector2(0, 7))
 	bone(&"upper_f", upper, Vector2(14, 7), &"torso", Vector2(4, -42))
 	bone(&"lower_f", lower, Vector2(9, 3), &"upper_f", Vector2(0, 20))
 	bone(&"hand_f", fist, Vector2(8, 2), &"lower_f", Vector2(0, 18))
-	bone(&"sword", load(ART + "sword.svg"), Vector2(8, 62), &"hand_f", Vector2(0, 7))
-	glow = bone(&"glow", load(ART + "glow.svg"), Vector2(32, 32), &"sword", Vector2(0, -30))
+	bone(&"sword", load(art + "weapon.svg"), Vector2(14, 90), &"hand_f", Vector2(0, 7))
+	glow = bone(&"glow", load(art + "glow.svg"), Vector2(32, 32), &"sword", Vector2(0, -30))
 	var additive := CanvasItemMaterial.new()
 	additive.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
 	glow.material = additive
@@ -110,7 +116,7 @@ func drive(figure: Control, delta: float) -> void:
 
 	# Holy light gathers on the blade for a prayer and on the shield for a guard.
 	var light := clampf(glow_amount, 0.0, 1.0)
-	var guarding := 1.0 if arm > -1.6 else 0.0
+	var guarding := 1.0 if arm > -1.6 and shielded else 0.0
 	glow.visible = light * (1.0 - guarding) > 0.01
 	glow.modulate = Color(1, 1, 1, light * (1.0 - guarding))
 	ward.visible = light * guarding > 0.01
