@@ -1,5 +1,7 @@
 # 잿불 서약 / Oath of Embers
 
+> 아트 방향은 [`godot/docs/ART_BIBLE.md`](godot/docs/ART_BIBLE.md)(어두운 페인터리 판타지)를 따릅니다.
+
 용의 교단이 왕국을 잠식하는 시대, 맹세로 묶인 세 모험가가 잿빛 고갯길을 넘어 교단의 심장부로 향하는 **D&D풍 판타지 파티 로그라이트**입니다. 발더스 게이트 3처럼 주도권 순서, 전열과 후열, 주문과 기술로 싸우고, 모든 공격은 **6면체 주사위 2개(2d6)** 로 판정합니다.
 
 - 엔진: **Godot 4.7.2 stable** / GDScript / Compatibility(OpenGL) 렌더러
