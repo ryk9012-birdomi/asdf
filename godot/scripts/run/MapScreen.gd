@@ -86,8 +86,10 @@ func build() -> void:
 	FantasyTheme.label(titles, "OATH OF EMBERS   ·   CHAPTER I", 14, FantasyTheme.TRIM)
 	var title := FantasyTheme.label(titles, "잿빛 고갯길  ·  여정 지도", 32, Color("f4e2b8"), true)
 	FantasyTheme.glow(title, Color("ff8a2a"), 10)
-	var camp := FantasyTheme.button(header, "야영지  (장비 · 기술 강화)", func(): SceneRouter.go(get_tree(), SceneRouter.CAMP))
+	header.add_theme_constant_override("separation", 10)
+	var camp := FantasyTheme.button(header, "야영지", func(): SceneRouter.go(get_tree(), SceneRouter.CAMP))
 	camp.name = "CampButton"
+	camp.tooltip_text = "장비를 갈아입고 골드로 기술을 강화합니다. 노드를 쓰지 않습니다."
 	FantasyTheme.button(header, "메인 메뉴", func(): SceneRouter.go(get_tree(), SceneRouter.MAIN_MENU))
 	var body := HBoxContainer.new()
 	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -147,12 +149,13 @@ func legend_panel() -> PanelContainer:
 	column.add_theme_constant_override("separation", 8)
 	panel.add_child(column)
 	FantasyTheme.label(column, "범례", 18, FantasyTheme.TRIM, true)
-	var notes := ["고블린 무리와 전투", "강력한 정예. 골드 더 많음", "모닥불. HP 40% 회복", "선택지와 2d6 판정. 여정은 이벤트로 시작", "보물 상자", "잿불 사제. 막의 끝"]
+	var notes := ["적 무리와 전투", "강력한 정예. 골드 더 많음", "모닥불. HP 40% 회복", "선택지와 2d6 판정. 여정은 이벤트로 시작", "보물 상자", "잿불 사제. 막의 끝"]
 	for type in RunMap.NodeType.values():
 		var line := VBoxContainer.new()
 		column.add_child(line)
 		FantasyTheme.label(line, RunMap.TYPE_NAMES[type], 17, Color("f4e6c4"), true)
-		FantasyTheme.label(line, notes[type], 14, FantasyTheme.MUTED)
+		var note := FantasyTheme.label(line, notes[type], 14, FantasyTheme.MUTED)
+		note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	column.add_child(HSeparator.new())
 	var hint := FantasyTheme.label(column, "빛나는 노드를 클릭해 다음 목적지를 고릅니다. 한 번 고른 길은 되돌릴 수 없습니다.", 14, FantasyTheme.MUTED)
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
