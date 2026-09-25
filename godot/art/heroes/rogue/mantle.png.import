@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dyne0vk80odbv"
-path="res://.godot/imported/thigh.svg-506dc4a8ed4a51ac722528b3151661cf.ctex"
+uid="uid://doj4ff5iwv0r0"
+path="res://.godot/imported/mantle.png-f34f26fda0b5ca52e09ca7e32d205012.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/heroes/rogue/thigh.svg"
-dest_files=["res://.godot/imported/thigh.svg-506dc4a8ed4a51ac722528b3151661cf.ctex"]
+source_file="res://art/heroes/rogue/mantle.png"
+dest_files=["res://.godot/imported/mantle.png-f34f26fda0b5ca52e09ca7e32d205012.ctex"]
 
 [params]
 
@@ -38,6 +38,3 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
-svg/scale=3.0
-editor/scale_with_editor_scale=false
-editor/convert_colors_with_editor_theme=false

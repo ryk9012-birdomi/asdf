@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://umg7jh8uivx3"
-path="res://.godot/imported/torso.svg-a3347c89bcf3d1beb24771668b5d7737.ctex"
+uid="uid://ynvnhistf40i"
+path="res://.godot/imported/hand.png-6553ae659e953d11d93701dc63b32c47.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/heroes/rogue/torso.svg"
-dest_files=["res://.godot/imported/torso.svg-a3347c89bcf3d1beb24771668b5d7737.ctex"]
+source_file="res://art/heroes/rogue/hand.png"
+dest_files=["res://.godot/imported/hand.png-6553ae659e953d11d93701dc63b32c47.ctex"]
 
 [params]
 
@@ -38,6 +38,3 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
-svg/scale=3.0
-editor/scale_with_editor_scale=false
-editor/convert_colors_with_editor_theme=false

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://wmb725qikve"
-path="res://.godot/imported/head_shout.svg-fd8a3e95d6ff9fc746151089928bc26e.ctex"
+uid="uid://dac513atknn70"
+path="res://.godot/imported/thigh.png-103c2d2ae4089051926add796ecc5073.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/heroes/rogue/head_shout.svg"
-dest_files=["res://.godot/imported/head_shout.svg-fd8a3e95d6ff9fc746151089928bc26e.ctex"]
+source_file="res://art/heroes/rogue/thigh.png"
+dest_files=["res://.godot/imported/thigh.png-103c2d2ae4089051926add796ecc5073.ctex"]
 
 [params]
 
@@ -38,6 +38,3 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
-svg/scale=3.0
-editor/scale_with_editor_scale=false
-editor/convert_colors_with_editor_theme=false

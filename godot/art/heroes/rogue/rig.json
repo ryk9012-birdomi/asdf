@@ -1,0 +1,174 @@
+{
+ "hip": 72,
+ "parts": {
+  "head": {
+   "pivot": [
+    95.0,
+    158.8
+   ],
+   "density": 5.222
+  },
+  "head_blink": {
+   "pivot": [
+    95.0,
+    158.8
+   ],
+   "density": 5.222
+  },
+  "head_shout": {
+   "pivot": [
+    95.0,
+    158.8
+   ],
+   "density": 5.222
+  },
+  "head_hurt": {
+   "pivot": [
+    95.0,
+    158.8
+   ],
+   "density": 5.222
+  },
+  "head_down": {
+   "pivot": [
+    95.0,
+    158.8
+   ],
+   "density": 5.222
+  },
+  "torso": {
+   "pivot": [
+    106.5,
+    379.4
+   ],
+   "density": 5.699
+  },
+  "mantle": {
+   "pivot": [
+    110,
+    14
+   ],
+   "density": 5.806
+  },
+  "cape": {
+   "pivot": [
+    136.0,
+    48.6
+   ],
+   "density": 3.36
+  },
+  "arm_upper": {
+   "pivot": [
+    43.0,
+    11.4
+   ],
+   "density": 6.514
+  },
+  "arm_lower": {
+   "pivot": [
+    39.5,
+    8.7
+   ],
+   "density": 6.38
+  },
+  "hand": {
+   "pivot": [
+    35.0,
+    12.8
+   ],
+   "density": 9.244
+  },
+  "thigh": {
+   "pivot": [
+    50.5,
+    7.6
+   ],
+   "density": 5.64
+  },
+  "shin": {
+   "pivot": [
+    39.1,
+    9.2
+   ],
+   "density": 4.55
+  },
+  "weapon": {
+   "pivot": [
+    43.5,
+    195.2
+   ],
+   "density": 6.505
+  },
+  "shield": {
+   "pivot": [
+    43.5,
+    195.2
+   ],
+   "density": 8.132
+  }
+ },
+ "overlays": false,
+ "far_arm_behind": true,
+ "rest": [
+  0.15,
+  -0.35
+ ],
+ "raise": [
+  -1.2,
+  -0.6
+ ],
+ "joints": {
+  "thigh_b": [
+   -8,
+   0
+  ],
+  "thigh_f": [
+   8,
+   0
+  ],
+  "shin": [
+   0,
+   35
+  ],
+  "head": [
+   1,
+   -63
+  ],
+  "cape": [
+   0,
+   -56
+  ],
+  "mantle": [
+   0,
+   -56
+  ],
+  "upper_b": [
+   -16,
+   -49
+  ],
+  "upper_f": [
+   16,
+   -49
+  ],
+  "lower": [
+   0,
+   17
+  ],
+  "hand": [
+   0,
+   19
+  ],
+  "shield": [
+   0,
+   7
+  ],
+  "sword": [
+   0,
+   7
+  ],
+  "plume": [
+   -7,
+   -40
+  ]
+ }
+}

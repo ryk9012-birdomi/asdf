@@ -1330,8 +1330,8 @@ def use_lines(ink, width, thin):
 
 
 ## The battle heroes: the Art Bible's weathered knight, scout and hedge mage.
-HEROES = {"paladin": ("grey_warden", VARIANTS, build), "rogue": ("ashen_scout", ROGUES, rogue_parts),
-          "wizard": ("hedge_mage", WIZARDS, wizard_parts)}
+## The rogue is cut from its painted parts sheet instead (tools/sheet_rig.py).
+HEROES = {"paladin": ("grey_warden", VARIANTS, build), "wizard": ("hedge_mage", WIZARDS, wizard_parts)}
 
 
 def build_heroes():
@@ -1339,6 +1339,12 @@ def build_heroes():
         for k in variants:
             if k["id"] == pick:
                 make(k, os.path.join(ROOT, "art", "heroes", role))
+    import sheet_rig
+    folder = os.path.join(ROOT, "art", "heroes", "rogue")
+    sheet_rig.rogue_painterly(folder)
+    # Vector extras the rig still loads: the skill light and an empty plume.
+    glow(folder, ("#fff6e8", "#ffd9a0", "#ff9a5a"))
+    write(folder, "plume", 30, 24, [], "")
 
 
 def main():

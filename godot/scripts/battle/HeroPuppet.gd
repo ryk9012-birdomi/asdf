@@ -49,7 +49,7 @@ const STYLES := {
 ## head gives the head canvas margins [left, top] when they differ from the style's.
 const RIGS := {
 	&"paladin": {"art": "res://art/heroes/paladin/", "style": &"knight", "shape": "realistic"},
-	&"rogue": {"art": "res://art/heroes/rogue/", "style": &"rogue", "shape": "realistic"},
+	&"rogue": {"art": "res://art/heroes/rogue/", "style": &"rogue"},
 	&"wizard": {"art": "res://art/heroes/wizard/", "style": &"wizard", "shape": "realistic"},
 	&"goblin_raider": {"art": "res://art/enemies/goblin_raider/", "style": &"rogue", "size": 0.76, "head": [16, 24], "shape": "realistic"},
 	&"goblin_archer": {"art": "res://art/enemies/goblin_archer/", "style": &"rogue", "size": 0.74, "head": [16, 24], "shape": "realistic"},
@@ -125,6 +125,9 @@ func _init(art: String, style_id: StringName = &"knight", head_margins: Array = 
 	var buckler := limb(&"shield", "shield", Vector2(20, 22), &"hand_b", at("shield", Vector2(0, 7)))
 	shielded = not buckler.texture.get_image().is_invisible()
 	limb(&"upper_f", "arm_upper", Vector2(14, 7), &"torso", at("upper_f", Vector2(4, -42)))
+	# A painted sheet may carry a capelet that sits over both shoulders.
+	if sheet.get("parts", {}).has("mantle"):
+		limb(&"mantle", "mantle", Vector2.ZERO, &"torso", at("mantle", Vector2.ZERO))
 	limb(&"lower_f", "arm_lower", Vector2(9, 3), &"upper_f", at("lower", Vector2(0, 20)))
 	limb(&"hand_f", "hand", Vector2(8, 2), &"lower_f", at("hand", Vector2(0, 18)))
 	limb(&"sword", "weapon", Vector2(14, 90), &"hand_f", at("sword", Vector2(0, 7)))
@@ -151,7 +154,8 @@ func _init(art: String, style_id: StringName = &"knight", head_margins: Array = 
 	if sheet.get("far_arm_behind", false):
 		body = far_arm + body
 		far_arm = []
-	layer(body + far_arm + [&"upper_f", &"sleeve_f", &"lower_f", &"sword", &"glow", &"hand_f"])
+	var near_arm: Array = [&"upper_f", &"sleeve_f", &"mantle", &"lower_f", &"sword", &"glow", &"hand_f"]
+	layer((body + far_arm + near_arm).filter(func(id): return bones.has(id)))
 
 
 ## A part's texture: the sheet's PNG when it has one, else the vector drawing.
