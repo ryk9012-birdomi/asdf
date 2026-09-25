@@ -4,7 +4,6 @@ extends Control
 signal skill_requested(skill: SkillData, target: CharacterUnit)
 signal pass_requested
 signal restart_requested
-signal lab_requested
 signal menu_requested
 signal continue_requested
 
@@ -68,7 +67,6 @@ class DicePair extends Control:
 				draw_circle(rect.get_center() + pip * SIDE * 0.26, 3.4, Color("5a1d14"))
 var screen_tween: Tween
 var title_label: Label
-var lab_button: Button
 var restart_button: Button
 var continue_button: Button
 var result_note: Label
@@ -111,7 +109,6 @@ func _ready() -> void:
 	title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	glow_text(title_label, Color("ff9a3c"), 10)
 	button(header, "메인 메뉴", func(): menu_requested.emit())
-	lab_button = button(header, "훈련장", func(): lab_requested.emit())
 	restart_button = button(header, "전투 재시작", func(): restart_requested.emit())
 	var turn_strip := HBoxContainer.new()
 	turn_strip.add_theme_constant_override("separation", 12)
@@ -505,7 +502,6 @@ func on_unit_down(unit: CharacterUnit) -> void:
 func set_run_mode(heading: String) -> void:
 	run_mode = true
 	title_label.text = heading
-	lab_button.visible = false
 	restart_button.visible = false
 
 

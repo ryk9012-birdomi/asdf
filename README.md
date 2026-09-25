@@ -31,9 +31,8 @@ godot --headless --path godot --script res://tests/test_run.gd
 
 - **새 여정**: 새 지도를 만들고 여정을 시작합니다.
 - **이어하기**: 진행 중인 여정으로 돌아갑니다. 게임을 끄면 사라지며, 파일 저장은 5단계에서 추가합니다.
-- **훈련장**: 개발용 화면입니다. 피해·회복 버튼으로 캐릭터 상태를 시험해 볼 수 있습니다.
 - **종료**
-- 전투·지도·훈련장 화면에도 `메인 메뉴` 버튼이 있습니다. 화면이 바뀔 때마다 어둠이 걷히는 전환 효과가 공통으로 적용됩니다.
+- 전투·지도 화면에도 `메인 메뉴` 버튼이 있습니다. 화면이 바뀔 때마다 어둠이 걷히는 전환 효과가 공통으로 적용됩니다.
 
 ## 여정 지도
 
@@ -126,7 +125,7 @@ godot --headless --path godot --script res://tests/test_run.gd
 ```text
 godot/
 ├─ project.godot
-├─ scenes/     battle(전투), main(메인 메뉴·야영지), run(지도·노드·결과), ui(카드/전투 UI)
+├─ scenes/     battle(전투), main(메인 메뉴), run(지도·노드·결과), ui(전투 UI·공용 테마)
 ├─ scripts/    core(화면 전환·오디오), run(지도 생성·여정 상태·전투 구성·지도 화면), battle(규칙), characters(유닛/데이터), skills, ui(테마·표시·연출)
 ├─ data/       classes · enemies · skills  (.tres 데이터)
 ├─ assets/     audio/music(.ogg) · audio/sfx(.wav)  — tools/generate_audio.py로 생성

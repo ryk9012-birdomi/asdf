@@ -54,7 +54,6 @@ func _ready() -> void:
 	view.skill_requested.connect(battle.player_action)
 	view.pass_requested.connect(battle.player_pass)
 	view.restart_requested.connect(func(): get_tree().reload_current_scene())
-	view.lab_requested.connect(func(): SceneRouter.go(get_tree(), SceneRouter.TRAINING))
 	view.menu_requested.connect(func(): SceneRouter.go(get_tree(), SceneRouter.MAIN_MENU))
 	view.continue_requested.connect(on_continue)
 	battle.battle_finished.connect(on_battle_finished)

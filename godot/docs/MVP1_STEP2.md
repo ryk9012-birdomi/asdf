@@ -30,6 +30,8 @@ BattleScene (Control)                ← BattleScene.gd
 └─ ActionTimer (Timer, One Shot)
 ```
 
+> 현재는 CharacterLab(야영지 → 훈련장)이 삭제되어 전투에 해당 버튼이 없습니다. 아래는 2단계 당시 기록입니다.
+
 CharacterLab의 `모험 떠나기` 버튼은 BattleScene으로, 전투의 `야영지` 버튼은 CharacterLab으로 이동합니다. 야영지 조작 결과를 전투에 가져오지는 않습니다. 이번 단계는 매번 시작 데이터로 생성하는 독립 전투이며, Run 사이의 상태 유지 책임은 다음 RunManager에 둡니다.
 
 ## 3. 필요한 파일

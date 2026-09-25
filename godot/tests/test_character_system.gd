@@ -67,40 +67,9 @@ func run_tests() -> void:
 		check(second.initialize(sample), "All class definitions can initialize a unit: " + role)
 	first.free()
 	second.free()
-	await test_ui()
 	print("Character system: %d checks, %d failures" % [checks, failures])
 	AudioDirector.shutdown()
 	# Let the audio thread drop its playbacks before the leak check at exit.
 	await create_timer(0.35).timeout
 	quit(0 if failures == 0 else 1)
 
-
-func test_ui() -> void:
-	var lab: Control = load("res://scenes/main/CharacterLab.tscn").instantiate()
-	root.add_child(lab)
-	await process_frame
-	var cards: HBoxContainer = lab.get_node("%Party")
-	check(cards.get_child_count() == 3, "Main scene creates exactly three cards")
-	var card = cards.get_child(0)
-	check(card.unit.is_alive() and card.health_label.text == "HP   10 / 10", "Scene renders initial Paladin HP")
-	card.action_buttons[0].pressed.emit()
-	check(card.unit.current_hp == 9 and card.health_label.text == "HP   9 / 10", "Damage button updates model and UI")
-	card.action_buttons[1].pressed.emit()
-	check(card.unit.current_hp == 10, "Heal button routes the correct action")
-	card.action_buttons[2].pressed.emit()
-	check(card.unit.current_shield == 2, "Shield button routes the correct action")
-	card.action_buttons[3].pressed.emit()
-	check(card.unit.current_energy == 3, "Energy button routes the correct action")
-	card.action_buttons[4].pressed.emit()
-	check(card.unit.current_energy == 5, "Recharge button routes the correct action")
-	card.action_buttons[5].pressed.emit()
-	check(not card.unit.is_alive() and card.action_buttons[0].disabled, "Death disables lab actions")
-	lab.get_node("%ResetButton").pressed.emit()
-	check(card.unit.is_alive() and not card.action_buttons[0].disabled, "Reset restores UI interaction")
-	if "--capture" in OS.get_cmdline_user_args():
-		await process_frame
-		await RenderingServer.frame_post_draw
-		DirAccess.make_dir_recursive_absolute("res://test-output")
-		var capture_result := root.get_texture().get_image().save_png("res://test-output/character-lab.png")
-		check(capture_result == OK, "Rendered screenshot saved")
-	lab.free()

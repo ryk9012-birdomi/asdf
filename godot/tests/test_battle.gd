@@ -299,14 +299,6 @@ func test_ui() -> void:
 	await process_frame
 	await process_frame
 	check(current_scene != scene and current_scene.battle.party[0].current_hp == 10, "Restart creates a fresh encounter")
-	current_scene.view.lab_requested.emit()
-	await process_frame
-	await process_frame
-	check(current_scene.name == "CharacterLab", "Battle can navigate to lab")
-	current_scene.get_node("%BattleButton").pressed.emit()
-	await process_frame
-	await process_frame
-	check(current_scene.name == "BattleScene", "Lab can return to battle")
 	for _index in 1000:
 		if current_scene.battle.phase == BattleManager.Phase.FINISHED:
 			break
