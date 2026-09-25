@@ -8,7 +8,8 @@ const HEIGHT := 440.0
 const HUD_HEIGHT := 150.0
 const ART_SCALE := 1.4
 const FEET := 34.0
-const OUTLINE := Color("1a0f08")
+## Cream halo behind overhead names and numbers, so dark ink reads on the painted field.
+const OUTLINE := Color("fff6e0")
 
 var unit: CharacterUnit
 var kind: StringName
@@ -49,7 +50,7 @@ class ShieldRow extends Control:
 		shield(Vector2(left + 10.0, size.y / 2.0))
 		var baseline := Vector2(left + 25.0, size.y / 2.0 + 6.0)
 		draw_string_outline(font, baseline, text, HORIZONTAL_ALIGNMENT_LEFT, -1, 17, 5, FighterView.OUTLINE)
-		draw_string(font, baseline, text, HORIZONTAL_ALIGNMENT_LEFT, -1, 17, Color("cfe0ff"))
+		draw_string(font, baseline, text, HORIZONTAL_ALIGNMENT_LEFT, -1, 17, Color("2a5ab0"))
 
 	func shield(center: Vector2) -> void:
 		var outline := PackedVector2Array([Vector2(-8, -9), Vector2(8, -9), Vector2(8, 1), Vector2(0, 10), Vector2(-8, 1)])
@@ -232,24 +233,24 @@ func setup(combatant: CharacterUnit, facing_right: bool) -> void:
 	hud.size = Vector2(WIDTH - 12, HUD_HEIGHT)
 	hud.add_theme_constant_override("separation", 3)
 	add_child(hud)
-	name_label = small_label(19, Color("f4e6c4"))
+	name_label = small_label(19, Color("4a3222"))
 	name_label.theme_type_variation = "HeadingLabel"
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	name_label.add_theme_color_override("font_outline_color", OUTLINE)
 	name_label.add_theme_constant_override("outline_size", 6)
 	var hp_row := bar_row(20)
-	hp_trail = make_bar(hp_row, Color("f3dcb0"), Color(0.08, 0.05, 0.03, 0.9))
-	hp_bar = make_bar(hp_row, Color("c0392b") if facing < 0 else Color("4caf50"), Color(0, 0, 0, 0))
+	hp_trail = make_bar(hp_row, Color("f7e3b8"), Color(0.35, 0.25, 0.18, 0.85))
+	hp_bar = make_bar(hp_row, Color("d0574a") if facing < 0 else Color("6fb34a"), Color(0, 0, 0, 0))
 	hp_text = bar_text(hp_row, 14)
 	var mp_row := bar_row(15)
-	mp_bar = make_bar(mp_row, Color("3f7bff"), Color(0.05, 0.07, 0.16, 0.9))
+	mp_bar = make_bar(mp_row, Color("5a8ae0"), Color(0.2, 0.22, 0.32, 0.85))
 	mp_bar.max_value = maxi(1, unit.max_energy)
 	mp_text = bar_text(mp_row, 12)
 	shields = ShieldRow.new()
 	shields.custom_minimum_size.y = 22
 	shields.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	hud.add_child(shields)
-	info = small_label(14, Color("e8dcc0"))
+	info = small_label(14, Color("4a3222"))
 	info.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	info.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	info.add_theme_color_override("font_outline_color", OUTLINE)
@@ -276,7 +277,7 @@ func bar_text(row: Control, font_size: int) -> Label:
 	text.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	text.add_theme_font_size_override("font_size", font_size)
 	text.add_theme_color_override("font_color", Color.WHITE)
-	text.add_theme_color_override("font_outline_color", OUTLINE)
+	text.add_theme_color_override("font_outline_color", Color("3a2414"))
 	text.add_theme_constant_override("outline_size", 4)
 	row.add_child(text)
 	return text
@@ -315,7 +316,7 @@ func refresh(active: bool, targetable: bool, line: String) -> void:
 	var alive := unit.is_alive()
 	disabled = not targetable
 	name_label.text = ("▶ " if active and alive else "") + unit.display_name
-	name_label.add_theme_color_override("font_color", Color("7ee89a") if targetable else (Color("ffd27a") if active else Color("f4e6c4")))
+	name_label.add_theme_color_override("font_color", Color("2e8a3e") if targetable else (Color("c0702a") if active else Color("4a3222")))
 	mp_bar.value = unit.current_energy
 	mp_text.text = "MP %d / %d" % [unit.current_energy, unit.max_energy]
 	info.text = line if alive else "쓰러짐"

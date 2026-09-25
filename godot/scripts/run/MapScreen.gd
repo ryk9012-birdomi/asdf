@@ -31,11 +31,11 @@ class MapBubble extends Control:
 		column.position = PAD
 		column.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(column)
-		title = line(17, Color("f4e2b8"))
-		note = line(14, Color("e8dcc0"))
+		title = line(17, Color("6a3a1a"))
+		note = line(14, Color("4a3222"))
 		note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		note.custom_minimum_size.x = 210
-		state = line(13, Color("9fe0a0"))
+		state = line(13, Color("3a8a3a"))
 
 	func line(font_size: int, color: Color) -> Label:
 		var label := Label.new()
@@ -49,7 +49,7 @@ class MapBubble extends Control:
 		title.text = heading
 		note.text = text
 		state.text = status
-		state.add_theme_color_override("font_color", Color("9fe0a0") if open else Color("b0a08a"))
+		state.add_theme_color_override("font_color", Color("3a8a3a") if open else Color("8c7458"))
 		column.reset_size()
 		size = column.get_combined_minimum_size() + PAD * 2.0
 		below = anchor.y - GAP - TAIL - size.y < 4.0
@@ -62,8 +62,8 @@ class MapBubble extends Control:
 
 	func _draw() -> void:
 		var box := StyleBoxFlat.new()
-		box.bg_color = Color(0.1, 0.07, 0.05, 0.94)
-		box.border_color = Color("c9a45a")
+		box.bg_color = Color(FantasyTheme.PAPER, 0.97)
+		box.border_color = FantasyTheme.EDGE
 		box.set_border_width_all(2)
 		box.set_corner_radius_all(10)
 		box.shadow_color = Color(0, 0, 0, 0.45)
@@ -73,10 +73,10 @@ class MapBubble extends Control:
 		var base_y := 0.0 if below else size.y
 		var point_y := -TAIL if below else size.y + TAIL
 		var tail := PackedVector2Array([Vector2(tip_x - 9, base_y), Vector2(tip_x + 9, base_y), Vector2(tip_x, point_y)])
-		draw_colored_polygon(tail, Color(0.1, 0.07, 0.05, 0.94))
-		draw_polyline(PackedVector2Array([tail[0], tail[2], tail[1]]), Color("c9a45a"), 2.0, true)
+		draw_colored_polygon(tail, Color(FantasyTheme.PAPER, 0.97))
+		draw_polyline(PackedVector2Array([tail[0], tail[2], tail[1]]), FantasyTheme.EDGE, 2.0, true)
 		# Cover the border under the tail's mouth so bubble and tail read as one shape.
-		draw_line(Vector2(tip_x - 7, base_y), Vector2(tip_x + 7, base_y), Color(0.1, 0.07, 0.05, 1.0), 3.0)
+		draw_line(Vector2(tip_x - 7, base_y), Vector2(tip_x + 7, base_y), Color(FantasyTheme.PAPER, 1.0), 3.0)
 
 const PARCHMENT_SHADER := """
 shader_type canvas_item;
@@ -110,14 +110,14 @@ void fragment() {
 	vec2 px = UV * resolution;
 	float grain = fbm(px / 60.0);
 	float stain = fbm(px / 260.0 + 7.0);
-	vec3 base = mix(vec3(0.50, 0.41, 0.28), vec3(0.68, 0.58, 0.41), grain);
-	base *= 1.0 - smoothstep(0.5, 0.85, stain) * 0.35;
-	// Soot towards the edges, as if the map had been carried through fire and rain.
-	base *= 1.0 - smoothstep(0.25, 0.75, distance(UV, vec2(0.5, 0.5))) * 0.45;
+	vec3 base = mix(vec3(0.90, 0.82, 0.66), vec3(0.98, 0.93, 0.80), grain);
+	base *= 1.0 - smoothstep(0.55, 0.85, stain) * 0.12;
+	// A little warmth towards the edges, like an old storybook page.
+	base *= 1.0 - smoothstep(0.35, 0.8, distance(UV, vec2(0.5, 0.5))) * 0.14;
 	vec2 edge_distance = min(px, resolution - px);
 	float ragged = min(edge_distance.x, edge_distance.y) + (fbm(px / 18.0) - 0.5) * 22.0;
 	float burn = smoothstep(4.0, 34.0, ragged);
-	base = mix(vec3(0.10, 0.05, 0.02), base, burn);
+	base = mix(vec3(0.62, 0.44, 0.28), base, burn);
 	COLOR = vec4(base, smoothstep(0.0, 5.0, ragged));
 }
 """
@@ -147,7 +147,7 @@ func _ready() -> void:
 func build() -> void:
 	theme = FantasyTheme.build()
 	AudioDirector.music("map")
-	add_child(EmberBackdrop.new())
+	add_child(StoryBackdrop.new())
 	var margin := MarginContainer.new()
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	for side in ["left", "right"]:
@@ -164,7 +164,7 @@ func build() -> void:
 	titles.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(titles)
 	FantasyTheme.label(titles, "OATH OF EMBERS   ·   CHAPTER I", 14, FantasyTheme.TRIM)
-	var title := FantasyTheme.label(titles, "잿빛 고갯길  ·  여정 지도", 32, Color("f4e2b8"), true)
+	var title := FantasyTheme.label(titles, "잿빛 고갯길  ·  여정 지도", 32, Color("6a3a1a"), true)
 	FantasyTheme.glow(title, Color("ff8a2a"), 10)
 	header.add_theme_constant_override("separation", 10)
 	var camp := FantasyTheme.button(header, "야영지", func(): SceneRouter.go(get_tree(), SceneRouter.CAMP))
@@ -223,7 +223,7 @@ func party_panel() -> PanelContainer:
 	FantasyTheme.label(column, "위치   %s" % floor_text, 16, FantasyTheme.TEXT)
 	FantasyTheme.label(column, "승리한 전투   %d" % run.battles_won, 16, FantasyTheme.TEXT)
 	if run.ward > 0:
-		FantasyTheme.label(column, "축복   다음 전투 보호막 +%d" % run.ward, 15, Color("9fc6ff"))
+		FantasyTheme.label(column, "축복   다음 전투 보호막 +%d" % run.ward, 15, Color("3a6ab0"))
 	return panel
 
 

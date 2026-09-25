@@ -20,7 +20,7 @@ var start_button: Button
 func _ready() -> void:
 	theme = FantasyTheme.build()
 	AudioDirector.music("menu")
-	add_child(EmberBackdrop.new())
+	add_child(StoryBackdrop.new())
 	rng.randomize()
 	for index in classes.size():
 		names[index] = Names.random(classes[index], rng, names)
@@ -34,7 +34,7 @@ func _ready() -> void:
 	var page := VBoxContainer.new()
 	page.add_theme_constant_override("separation", 10)
 	margin.add_child(page)
-	var title := FantasyTheme.label(page, "일행 꾸리기", 34, Color("f4e2b8"), true)
+	var title := FantasyTheme.label(page, "일행 꾸리기", 34, Color("6a3a1a"), true)
 	FantasyTheme.glow(title, Color("ff8a2a"), 10)
 	FantasyTheme.label(page, "세 자리마다 직업을 고르세요. 같은 직업을 여러 명 둘 수도 있습니다. 이름은 무작위로 정해지며 다시 뽑을 수 있습니다.", 16, FantasyTheme.MUTED)
 	var row := HBoxContainer.new()
@@ -86,7 +86,7 @@ func build_slot(row: HBoxContainer, index: int) -> Dictionary:
 	var naming := HBoxContainer.new()
 	naming.add_theme_constant_override("separation", 8)
 	column.add_child(naming)
-	var name_label := FantasyTheme.label(naming, "", 26, Color("f4e6c4"), true)
+	var name_label := FantasyTheme.label(naming, "", 26, Color("4a3222"), true)
 	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var reroll := FantasyTheme.button(naming, "다른 이름", func(): rename(index))
 	reroll.name = "Reroll_%d" % index

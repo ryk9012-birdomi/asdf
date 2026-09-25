@@ -12,54 +12,27 @@ var music_slider: HSlider
 var sfx_slider: HSlider
 
 
-class Sigil extends Control:
-	## Slowly turning rune circle drawn behind the title.
-	var turn: float = 0.0
-
-	func _process(delta: float) -> void:
-		turn += delta * 0.08
-		queue_redraw()
-
-	func _draw() -> void:
-		var center := size / 2.0
-		var radius := minf(size.x, size.y) / 2.0 - 6.0
-		var gold := Color("d8b25a")
-		draw_arc(center, radius, 0, TAU, 128, Color(gold, 0.22), 2.0, true)
-		draw_arc(center, radius * 0.9, 0, TAU, 128, Color(gold, 0.14), 1.0, true)
-		draw_arc(center, radius * 0.62, 0, TAU, 96, Color(gold, 0.12), 1.0, true)
-		for index in 48:
-			var angle := TAU * index / 48.0 + turn
-			var reach := 0.9 if index % 4 else 0.84
-			draw_line(center + Vector2.from_angle(angle) * radius * reach, center + Vector2.from_angle(angle) * radius, Color(gold, 0.3), 1.5, true)
-		for index in 7:
-			var angle := TAU * index / 7.0 - turn * 1.6
-			var point := center + Vector2.from_angle(angle) * radius * 0.76
-			draw_colored_polygon(PackedVector2Array([point + Vector2(0, -7), point + Vector2(5, 0), point + Vector2(0, 7), point + Vector2(-5, 0)]), Color(gold, 0.35))
-		var star := PackedVector2Array()
-		for index in 8:
-			star.append(center + Vector2.from_angle(TAU * index * 3.0 / 8.0 + turn * 0.5) * radius * 0.62)
-		star.append(star[0])
-		draw_polyline(star, Color(gold, 0.1), 1.0, true)
-
-
 func _ready() -> void:
 	theme = FantasyTheme.build()
 	AudioDirector.music("menu")
-	add_child(EmberBackdrop.new())
-	var sigil := Sigil.new()
-	sigil.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	sigil.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
-	sigil.custom_minimum_size = Vector2(560, 560)
-	sigil.size = Vector2(560, 560)
-	sigil.position = Vector2(-280, 40)
-	add_child(sigil)
+	add_child(StoryBackdrop.new())
+	# A paper card behind the title and choices, like a storybook's title page.
+	var card := Panel.new()
+	card.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	card.add_theme_stylebox_override("panel", FantasyTheme.panel(FantasyTheme.EDGE, 0.9, 0))
+	card.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	card.offset_left = -330
+	card.offset_right = 330
+	card.offset_top = -300
+	card.offset_bottom = 290
+	add_child(card)
 	var column := VBoxContainer.new()
 	column.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	column.alignment = BoxContainer.ALIGNMENT_CENTER
 	column.add_theme_constant_override("separation", 10)
 	add_child(column)
 	centered(column, "잿빛 왕국 연대기   ·   제 1 막", 14, TRIM)
-	var title := centered(column, "잿불 서약", 84, Color("f4e2b8"))
+	var title := centered(column, "잿불 서약", 84, Color("6a3a1a"))
 	title.theme_type_variation = "HeadingLabel"
 	glow(title, Color("ff8a2a"), 18)
 	var subtitle := centered(column, "O A T H    O F    E M B E R S", 18, TRIM)
@@ -87,7 +60,7 @@ func _ready() -> void:
 	var footer := Label.new()
 	footer.text = "MVP 1 프로토타입   ·   Godot 4.7   ·   Enter / 방향키로도 선택할 수 있습니다"
 	footer.add_theme_font_size_override("font_size", 12)
-	footer.add_theme_color_override("font_color", Color("7d6f58"))
+	footer.add_theme_color_override("font_color", Color("8c7458"))
 	footer.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
 	footer.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	footer.position.y -= 34

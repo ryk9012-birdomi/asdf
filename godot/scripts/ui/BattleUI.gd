@@ -8,13 +8,12 @@ signal menu_requested
 signal continue_requested
 
 const STAGGER := 40
-const TRIM := Color("d8b25a")
-const GOLD := Color("ffc15a")
-const RED := Color("d9533f")
-const TEXT := Color("eadcc0")
-const MUTED := Color("a8977a")
-const WARD := Color("9fc6ff")
-const SERIF := ["Batang", "Noto Serif CJK KR", "Noto Serif KR", "Nanum Myeongjo", "serif"]
+const TRIM := FantasyTheme.TRIM
+const GOLD := FantasyTheme.GOLD
+const RED := Color("c0443a")
+const TEXT := FantasyTheme.TEXT
+const MUTED := Color("8c7458")
+const WARD := Color("3a6ab0")
 
 var battle: BattleManager
 var selected_skill: SkillData
@@ -81,7 +80,7 @@ var last_turn_actor: CharacterUnit
 
 func _ready() -> void:
 	theme = build_theme()
-	add_child(EmberBackdrop.new())
+	add_child(StoryBackdrop.new())
 	scroll = ScrollContainer.new()
 	scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -104,10 +103,10 @@ func _ready() -> void:
 	var header := HBoxContainer.new()
 	header.add_theme_constant_override("separation", 10)
 	content.add_child(header)
-	title_label = label(header, "잿불 서약  ·  고갯길 매복", 34, Color("f4e2b8"))
+	title_label = label(header, "잿불 서약  ·  고갯길 매복", 34, Color("6a3a1a"))
 	title_label.theme_type_variation = "HeadingLabel"
 	title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	glow_text(title_label, Color("ff9a3c"), 10)
+	glow_text(title_label, Color("8a4a1e"), 10)
 	button(header, "메인 메뉴", func(): menu_requested.emit())
 	restart_button = button(header, "전투 재시작", func(): restart_requested.emit())
 	var turn_strip := HBoxContainer.new()
@@ -180,7 +179,7 @@ func _ready() -> void:
 	log_box = RichTextLabel.new()
 	log_box.custom_minimum_size.y = 96
 	log_box.add_theme_font_size_override("normal_font_size", 15)
-	log_box.add_theme_color_override("default_color", Color("d6c7a8"))
+	log_box.add_theme_color_override("default_color", FantasyTheme.TEXT)
 	log_box.scroll_following = true
 	log_body.add_child(log_box)
 
@@ -242,8 +241,8 @@ func refresh_turn_order() -> void:
 		var color: Color = unit.character_data.display_color
 		var chip := PanelContainer.new()
 		var style := StyleBoxFlat.new()
-		style.bg_color = color.darkened(0.78 if not first else 0.55)
-		style.border_color = color if first else color.darkened(0.4)
+		style.bg_color = color.lightened(0.55) if first else Color(color.lightened(0.78), 0.9)
+		style.border_color = color.darkened(0.2) if first else color.darkened(0.05)
 		style.set_border_width_all(2 if first else 1)
 		style.set_corner_radius_all(12)
 		style.content_margin_left = 10
@@ -251,11 +250,11 @@ func refresh_turn_order() -> void:
 		style.content_margin_top = 3
 		style.content_margin_bottom = 3
 		if first:
-			style.shadow_color = Color(color, 0.45)
+			style.shadow_color = Color(1.0, 0.75, 0.35, 0.6)
 			style.shadow_size = 8
 		chip.add_theme_stylebox_override("panel", style)
 		turn_row.add_child(chip)
-		label(chip, unit.display_name, 15, TEXT if first else color.lightened(0.2))
+		label(chip, unit.display_name, 15, FantasyTheme.INK if first else TEXT)
 		first = false
 
 
@@ -392,7 +391,7 @@ func impact_fx(actor: CharacterUnit, targets: Array[CharacterUnit], skill: Skill
 					AudioDirector.sfx("slash")
 					spawn_slash(to, Color("f2efe6"), skill.hit_count)
 				elif arena == null:
-					spawn_beam(from, to, Color("e8dcc0"), 4.0, 0.02)
+					spawn_beam(from, to, Color("4a3222"), 4.0, 0.02)
 
 
 ## Screen point for effects on `unit`: "chest" of the figure, or "hud" above its readout.
@@ -735,74 +734,38 @@ func append_log(message: String) -> void:
 
 
 func build_theme() -> Theme:
-	var ui_theme := Theme.new()
-	var font := SystemFont.new()
-	font.font_names = PackedStringArray(["Malgun Gothic", "Noto Sans CJK KR", "sans-serif"])
-	ui_theme.default_font = font
-	ui_theme.default_font_size = 17
-	var serif := SystemFont.new()
-	serif.font_names = PackedStringArray(SERIF)
-	serif.font_weight = 600
-	ui_theme.set_type_variation("HeadingLabel", "Label")
-	ui_theme.set_font("font", "HeadingLabel", serif)
-	ui_theme.set_color("font_color", "Label", TEXT)
-	ui_theme.set_color("font_color", "Button", TEXT)
-	ui_theme.set_color("font_hover_color", "Button", Color.WHITE)
-	ui_theme.set_color("font_disabled_color", "Button", Color("6f6352"))
+	var ui_theme := FantasyTheme.build()
 	for state in ["normal", "hover", "pressed", "disabled", "focus"]:
 		ui_theme.set_stylebox(state, "Button", button_style(TRIM, state))
 	return ui_theme
 
 
+## Paper button with a coloured rim (skill buttons carry their hero's colour).
 func button_style(accent: Color, state: String) -> StyleBoxFlat:
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color("2a1d12")
-	style.border_color = accent.darkened(0.3)
-	style.set_border_width_all(1)
-	style.border_width_bottom = 3
-	style.set_corner_radius_all(4)
+	var style := FantasyTheme.button_style(state, true)
 	style.content_margin_left = 16
 	style.content_margin_right = 16
 	style.content_margin_top = 8
 	style.content_margin_bottom = 8
-	match state:
-		"hover":
-			style.bg_color = Color("3a2716").lerp(accent, 0.15)
-			style.border_color = accent
-			style.shadow_color = Color(accent, 0.45)
-			style.shadow_size = 10
-		"pressed":
-			style.bg_color = accent.darkened(0.55)
-			style.border_color = accent.lightened(0.2)
-		"disabled":
-			style.bg_color = Color("17110b")
-			style.border_color = Color("3b2f22")
-		"focus":
-			style.draw_center = false
-			style.border_color = Color(accent, 0.0)
+	if state in ["normal", "hover"]:
+		style.border_color = accent.darkened(0.15)
+		style.border_width_bottom = 4
+	if state == "focus":
+		style.draw_center = false
+		style.border_color = Color(accent, 0.0)
+		style.shadow_size = 0
 	return style
 
 
 func panel_style(border: Color, alpha: float, padding: int = 14) -> StyleBoxFlat:
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.09, 0.06, 0.04, alpha)
-	style.border_color = Color(border, 0.9)
-	style.set_border_width_all(1)
-	style.border_width_top = 2
-	style.border_width_bottom = 2
-	style.set_corner_radius_all(4)
-	style.shadow_color = Color(border, 0.18)
-	style.shadow_size = 12
-	for side in [SIDE_LEFT, SIDE_TOP, SIDE_RIGHT, SIDE_BOTTOM]:
-		style.set_content_margin(side, padding)
-	return style
+	return FantasyTheme.panel(border, maxf(alpha, 0.9), padding)
 
 
+## Title lettering with a cream halo; the colour stays (gold for victory, red for defeat).
 func glow_text(item: Label, color: Color, strength: int) -> void:
-	item.add_theme_color_override("font_shadow_color", Color(color, 0.4))
-	item.add_theme_constant_override("shadow_outline_size", strength)
-	item.add_theme_constant_override("shadow_offset_x", 0)
-	item.add_theme_constant_override("shadow_offset_y", 0)
+	item.add_theme_color_override("font_color", color.darkened(0.25))
+	item.add_theme_color_override("font_outline_color", FantasyTheme.HALO)
+	item.add_theme_constant_override("outline_size", clampi(strength, 6, 12))
 
 
 func label(parent: Node, text_value: String, font_size: int, color: Color = TEXT) -> Label:

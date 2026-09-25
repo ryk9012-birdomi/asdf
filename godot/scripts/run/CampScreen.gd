@@ -74,7 +74,7 @@ class ItemCell extends Panel:
 
 	func restyle() -> void:
 		var box := StyleBoxFlat.new()
-		box.bg_color = Color("0d0907") if item_id.is_empty() else Color("1a120c")
+		box.bg_color = Color("e8dabb") if item_id.is_empty() else Color("fbf3e0")
 		box.border_color = mark if mark.a > 0.0 else (BRONZE if not slot.is_empty() else Color("3a2c1c"))
 		box.set_border_width_all(2 if mark.a > 0.0 or not slot.is_empty() else 1)
 		box.set_corner_radius_all(3)
@@ -132,7 +132,7 @@ func _ready() -> void:
 		return
 	theme = FantasyTheme.build()
 	AudioDirector.music("menu")
-	add_child(EmberBackdrop.new())
+	add_child(StoryBackdrop.new())
 	var margin := MarginContainer.new()
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	for side in ["left", "right"]:
@@ -146,7 +146,7 @@ func _ready() -> void:
 	var header := HBoxContainer.new()
 	header.add_theme_constant_override("separation", 14)
 	page.add_child(header)
-	var title := FantasyTheme.label(header, "야영지  ·  정비", 30, Color("f4e2b8"), true)
+	var title := FantasyTheme.label(header, "야영지  ·  정비", 30, Color("6a3a1a"), true)
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	FantasyTheme.glow(title, Color("ff8a2a"), 10)
 	gold_label = FantasyTheme.label(header, "", 22, FantasyTheme.GOLD, true)
@@ -169,7 +169,7 @@ func leave(path: String) -> void:
 
 func frame_style(border: Color) -> StyleBoxFlat:
 	var box := StyleBoxFlat.new()
-	box.bg_color = Color(0.06, 0.04, 0.03, 0.94)
+	box.bg_color = Color(FantasyTheme.PAPER, 0.95)
 	box.border_color = border
 	box.set_border_width_all(2)
 	box.set_corner_radius_all(4)
@@ -350,7 +350,7 @@ func item_tooltip(id: String) -> Control:
 	var info := Items.item(id)
 	var panel := PanelContainer.new()
 	var box := StyleBoxFlat.new()
-	box.bg_color = Color(0.02, 0.015, 0.01, 0.96)
+	box.bg_color = Color(FantasyTheme.PAPER, 0.98)
 	box.border_color = BRONZE
 	box.set_border_width_all(1)
 	box.set_content_margin_all(10)
