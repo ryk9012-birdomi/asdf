@@ -76,6 +76,10 @@ var restart_button: Button
 var continue_button: Button
 var result_note: Label
 var run_mode: bool = false
+var stage: BattleStage
+## Effects of the action being resolved; played when the 3D blow lands.
+var pending_fx: Array[Callable] = []
+var missed_now: Array[CharacterUnit] = []
 
 
 func _ready() -> void:
@@ -94,13 +98,12 @@ func _ready() -> void:
 	margin.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	for side in ["left", "right"]:
 		margin.add_theme_constant_override("margin_" + side, 28)
-	margin.add_theme_constant_override("margin_top", 22)
-	margin.add_theme_constant_override("margin_bottom", 18)
+	margin.add_theme_constant_override("margin_top", 14)
+	margin.add_theme_constant_override("margin_bottom", 14)
 	scroll.add_child(margin)
 	var content := VBoxContainer.new()
-	content.add_theme_constant_override("separation", 12)
+	content.add_theme_constant_override("separation", 10)
 	margin.add_child(content)
-	label(content, "OATH OF EMBERS   ·   CHAPTER I   ·   잿빛 고갯길", 12, TRIM)
 	var header := HBoxContainer.new()
 	header.add_theme_constant_override("separation", 10)
 	content.add_child(header)
@@ -119,7 +122,15 @@ func _ready() -> void:
 	glow_text(turn_label, GOLD, 6)
 	turn_row = HBoxContainer.new()
 	turn_row.add_theme_constant_override("separation", 6)
+	turn_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	turn_strip.add_child(turn_row)
+	var rules := label(turn_strip, "판정 2d6 + 명중 − 방어 · 7+ 스침 · 10+ 명중", 12, MUTED)
+	rules.tooltip_text = "주사위 두 개의 합에 공격자 명중을 더하고 대상 방어를 뺍니다.\n6 이하 빗나감 · 7~9 스침(피해 절반) · 10 이상 명중\n보정 전 눈의 합이 치명 기준 이상이면 치명타(피해 2배)\n보호막이 피해를 먼저 흡수하고, 자기 차례마다 기력 +1"
+	rules.mouse_filter = Control.MOUSE_FILTER_PASS
+	stage = BattleStage.new()
+	stage.custom_minimum_size = Vector2(0, 280)
+	stage.unit_clicked.connect(choose_target)
+	content.add_child(stage)
 	content.add_child(build_battlefield())
 	result_banner = PanelContainer.new()
 	result_banner.add_theme_stylebox_override("panel", panel_style(GOLD, 0.92, 18))
@@ -140,34 +151,39 @@ func _ready() -> void:
 	continue_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	continue_button.custom_minimum_size = Vector2(260, 44)
 	continue_button.visible = false
+	var bottom := HBoxContainer.new()
+	bottom.add_theme_constant_override("separation", 10)
+	content.add_child(bottom)
 	var command := PanelContainer.new()
-	command.add_theme_stylebox_override("panel", panel_style(Color("7a5c2e"), 0.86))
-	content.add_child(command)
+	command.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	command.add_theme_stylebox_override("panel", panel_style(Color("7a5c2e"), 0.86, 12))
+	bottom.add_child(command)
 	var command_body := VBoxContainer.new()
-	command_body.add_theme_constant_override("separation", 10)
+	command_body.add_theme_constant_override("separation", 8)
 	command.add_child(command_body)
-	prompt = label(command_body, "", 16)
+	prompt = label(command_body, "", 15)
 	prompt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	skill_row = row(command_body)
 	skill_row.custom_minimum_size.y = 56
 	var log_panel := PanelContainer.new()
-	log_panel.add_theme_stylebox_override("panel", panel_style(Color("5e4526"), 0.8))
-	content.add_child(log_panel)
+	log_panel.custom_minimum_size.x = 440
+	log_panel.add_theme_stylebox_override("panel", panel_style(Color("5e4526"), 0.8, 12))
+	bottom.add_child(log_panel)
 	var log_body := VBoxContainer.new()
 	log_panel.add_child(log_body)
 	label(log_body, "모험 일지  ·  ADVENTURE LOG", 12, TRIM)
 	log_box = RichTextLabel.new()
-	log_box.custom_minimum_size.y = 92
-	log_box.add_theme_font_size_override("normal_font_size", 13)
+	log_box.custom_minimum_size.y = 84
+	log_box.add_theme_font_size_override("normal_font_size", 12)
 	log_box.add_theme_color_override("default_color", Color("d6c7a8"))
 	log_box.scroll_following = true
 	log_body.add_child(log_box)
-	label(content, "판정: 2d6 + 명중 − 방어  →  7~9 스침(피해 절반) · 10+ 명중 · 주사위 눈이 치명 기준 이상이면 치명타(2배)  |  보호막이 피해를 먼저 흡수  |  자기 차례 기력 +1", 12, MUTED)
 
 
 func build_battlefield() -> Control:
 	var field := HBoxContainer.new()
 	field.add_theme_constant_override("separation", 10)
+	field.custom_minimum_size.y = 0
 	party_column = side_column(field, "일행  ·  잿불 서약단", TRIM, HORIZONTAL_ALIGNMENT_LEFT)
 	var divider := VBoxContainer.new()
 	divider.custom_minimum_size.x = 64
@@ -186,7 +202,7 @@ func build_battlefield() -> Control:
 func side_column(parent: Node, heading: String, color: Color, align: HorizontalAlignment) -> VBoxContainer:
 	var column := VBoxContainer.new()
 	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	column.add_theme_constant_override("separation", 10)
+	column.add_theme_constant_override("separation", 6)
 	parent.add_child(column)
 	var caption := label(column, heading, 12, color)
 	caption.horizontal_alignment = align
@@ -207,7 +223,7 @@ func beam_rule() -> TextureRect:
 	rule.texture = texture
 	rule.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	rule.stretch_mode = TextureRect.STRETCH_SCALE
-	rule.custom_minimum_size = Vector2(2, 150)
+	rule.custom_minimum_size = Vector2(2, 60)
 	rule.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	rule.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	return rule
@@ -226,10 +242,12 @@ func bind(manager: BattleManager) -> void:
 		lane.add_theme_constant_override("margin_left" if hostile else "margin_right", 2 * STAGGER - inset)
 		(enemy_column if hostile else party_column).add_child(lane)
 		lane.add_child(card)
-		card.setup(unit, hostile)
+		card.setup(unit, hostile, stage != null)
 		card.pressed.connect(func(): choose_target(unit))
 		unit.unit_died.connect(func(_unit: CharacterUnit): on_unit_down(unit))
 		cards[unit] = card
+	stage.setup(battle.party, battle.enemies)
+	battle.battle_finished.connect(stage.celebrate)
 	refresh()
 
 
@@ -317,6 +335,9 @@ func refresh_cards() -> void:
 		elif unit is EnemyUnit and unit.is_alive():
 			detail = intent_text(unit)
 		cards[unit].refresh(unit == battle.actor and battle.phase != BattleManager.Phase.FINISHED, unit in legal, detail)
+		if unit in legal:
+			cards[unit].tooltip_text = forecast_detail(battle.actor, unit, selected_skill)
+	stage.set_marks(battle.actor if battle.phase != BattleManager.Phase.FINISHED else null, legal)
 
 
 ## Exact outcome chances of `skill` from `attacker` against `defender`, as card text.
@@ -327,11 +348,20 @@ func forecast(attacker: CharacterUnit, defender: CharacterUnit, skill: SkillData
 	var odds := DamageCalculator.odds(attacker, defender, skill)
 	var hits := " × %d회" % skill.hit_count if skill.hit_count > 1 else ""
 	if skill.auto_hit:
-		return "적중 100%%  ·  자동 명중\n피해 %d%s" % [base, hits]
-	return "적중 %d%%  —  명중 %d%% · 스침 %d%% · 치명 %d%%\n피해 %d (스침 %d · 치명 %d)%s  ·  2d6 %+d" % [
-		percent(odds.land), percent(odds.hit), percent(odds.glance), percent(odds.critical),
-		base, DamageCalculator.damage_for(DamageCalculator.Outcome.GLANCE, base), base * 2, hits,
-		DamageCalculator.modifier(attacker, defender, skill)]
+		return "적중 100%% (자동 명중)  ·  피해 %d%s" % [base, hits]
+	return "적중 %d%% (명중 %d · 스침 %d · 치명 %d)  ·  피해 %d%s" % [
+		percent(odds.land), percent(odds.hit), percent(odds.glance), percent(odds.critical), base, hits]
+
+
+## Full breakdown for the target card's tooltip.
+func forecast_detail(attacker: CharacterUnit, defender: CharacterUnit, skill: SkillData) -> String:
+	if skill.effect_type == SkillData.EffectType.SHIELD or skill.auto_hit:
+		return "클릭하여 대상 확정"
+	var base := DamageCalculator.base_damage(attacker, skill)
+	return "2d6 %+d (명중 %+d, 방어 −%d)\n7~9 스침: 피해 %d  ·  10+ 명중: 피해 %d\n주사위 %d 이상 치명타: 피해 %d\n클릭하여 대상 확정" % [
+		DamageCalculator.modifier(attacker, defender, skill), attacker.hit_bonus,
+		0 if skill.damage_type == SkillData.DamageType.TRUE_DAMAGE else defender.defense,
+		DamageCalculator.damage_for(DamageCalculator.Outcome.GLANCE, base), base, attacker.crit_threshold, base * 2]
 
 
 func intent_text(enemy: EnemyUnit) -> String:
@@ -344,7 +374,7 @@ func intent_text(enemy: EnemyUnit) -> String:
 		return "예고 ▸ %s · 보호막 %d" % [intent.skill_name, DamageCalculator.base_damage(enemy, intent)]
 	var odds := DamageCalculator.odds(enemy, targets[0], intent)
 	var aimed_at: String = "일행 전체" if intent.target_type == SkillData.TargetType.ALL_ENEMIES else targets[0].display_name
-	return "예고 ▸ %s → %s\n적중 %d%% · 피해 %d" % [intent.skill_name, aimed_at, percent(odds.land), DamageCalculator.base_damage(enemy, intent)]
+	return "예고 ▸ %s → %s  ·  적중 %d%%  ·  피해 %d" % [intent.skill_name, aimed_at, percent(odds.land), DamageCalculator.base_damage(enemy, intent)]
 
 
 func percent(chance: float) -> int:
@@ -352,48 +382,86 @@ func percent(chance: float) -> int:
 
 
 func animate_action(actor: CharacterUnit, targets: Array[CharacterUnit], skill: SkillData) -> void:
+	var impact := stage.perform(actor, targets, skill, missed_now) if stage != null else 0.0
+	missed_now = []
+	var effects := pending_fx
+	pending_fx = []
 	if cards.has(actor):
 		cards[actor].flash(actor.character_data.display_color)
+	var land := func() -> void:
+		impact_fx(actor, targets, skill)
+		for effect in effects:
+			effect.call()
+	if impact <= 0.0:
+		land.call()
+	else:
+		var wait := create_tween()
+		wait.tween_interval(impact)
+		wait.tween_callback(land)
+
+
+## Seconds of 3D choreography still playing; the scene waits this long between actions.
+func animation_time_left() -> float:
+	return stage.animation_time_left() if stage != null else 0.0
+
+
+func impact_fx(actor: CharacterUnit, targets: Array[CharacterUnit], skill: SkillData) -> void:
 	for target in targets:
 		if not cards.has(target):
 			continue
-		var to := card_center(target)
+		var to := anchor_of(target, 1.2)
 		if skill.effect_type == SkillData.EffectType.SHIELD:
 			spawn_ring(to, WARD)
 			spawn_ring(to, TRIM, 0.12)
 			cards[target].flash(WARD)
 			continue
-		var from := card_center(actor) if cards.has(actor) else to
+		var from := anchor_of(actor, 1.2) if cards.has(actor) else to
 		match skill.damage_type:
 			SkillData.DamageType.FIRE:
-				spawn_beam(from, to, Color("ff7a1f"), 18.0, 0.18)
+				if stage == null:
+					spawn_beam(from, to, Color("ff7a1f"), 18.0, 0.18)
 				spawn_burst(to, Color("ffb347"), 40)
 			SkillData.DamageType.ARCANE:
-				for bolt in 3:
-					spawn_beam(from, to, Color("b48cff"), 6.0, 0.08 + bolt * 0.16, bolt * 0.09)
+				if stage == null:
+					for bolt in 3:
+						spawn_beam(from, to, Color("b48cff"), 6.0, 0.08 + bolt * 0.16, bolt * 0.09)
 				spawn_burst(to, Color("c9a8ff"), 24)
 			SkillData.DamageType.RADIANT:
 				spawn_pillar(to, Color("ffe08a"))
 			_:
 				if skill.target_type == SkillData.TargetType.FRONT_ENEMY:
 					spawn_slash(to, Color("f2efe6"), skill.hit_count)
-				else:
+				elif stage == null:
 					spawn_beam(from, to, Color("e8dcc0"), 4.0, 0.02)
+
+
+## Screen point for effects on `unit`: above its 3D figure, or its card without a stage.
+func anchor_of(unit: CharacterUnit, height: float = 2.3) -> Vector2:
+	if stage != null and stage.figures.has(unit):
+		return stage.get_global_rect().position + stage.screen_point(unit, height) - fx_layer.get_global_rect().position
+	return card_center(unit)
+
+
+func defer_fx(effect: Callable) -> void:
+	if stage == null:
+		effect.call()
+	else:
+		pending_fx.append(effect)
 
 
 func show_hit(target: CharacterUnit, health_damage: int, shield_damage: int, critical: bool) -> void:
 	if not cards.has(target):
 		return
-	var center := card_center(target)
-	cards[target].flash(Color("ffb09a"), 9.0 if critical else 5.0)
-	spawn_burst(center, Color("ffcf6b") if critical else Color("e0503f"), 34 if critical else 18)
-	if shield_damage > 0:
-		spawn_popup(target, "−%d" % shield_damage, WARD, 18)
-	if critical:
-		spawn_popup(target, "치명타!  −%d" % health_damage, GOLD, 30)
-		shake_screen(7.0)
-	elif health_damage > 0 or shield_damage == 0:
-		spawn_popup(target, "−%d" % health_damage, Color("ff7a66"), 24)
+	defer_fx(func() -> void:
+		cards[target].flash(Color("ffb09a"), 9.0 if critical else 5.0)
+		spawn_burst(anchor_of(target, 1.2), Color("ffcf6b") if critical else Color("e0503f"), 34 if critical else 18)
+		if shield_damage > 0:
+			spawn_popup(target, "−%d" % shield_damage, WARD, 18)
+		if critical:
+			spawn_popup(target, "치명타!  −%d" % health_damage, GOLD, 30)
+			shake_screen(7.0)
+		elif health_damage > 0 or shield_damage == 0:
+			spawn_popup(target, "−%d" % health_damage, Color("ff7a66"), 24))
 
 
 func show_dice(target: CharacterUnit, roll: Dictionary) -> void:
@@ -424,9 +492,10 @@ func show_dice(target: CharacterUnit, roll: Dictionary) -> void:
 	verdict.position = Vector2(dice.size.x + 10, 4)
 	verdict.modulate.a = 0.0
 	holder.add_child(verdict)
-	var card: Control = cards[target]
-	var rect := card.get_global_rect()
-	holder.position = Vector2(rect.position.x + 16 + order * 190, rect.position.y - 24) - fx_layer.get_global_rect().position
+	var head := anchor_of(target, 2.7)
+	var stage_top := stage.get_global_rect().position.y - fx_layer.get_global_rect().position.y if stage != null else -INF
+	holder.position = head + Vector2(-60 + order * 200, -40)
+	holder.position.y = maxf(holder.position.y, stage_top + 6.0)
 	var final_faces: Array = roll.dice
 	var spin := func(progress: float) -> void:
 		dice.rotation = sin(progress * 18.0) * 0.35 * (1.0 - progress)
@@ -447,20 +516,22 @@ func show_dice(target: CharacterUnit, roll: Dictionary) -> void:
 
 
 func show_miss(target: CharacterUnit) -> void:
-	spawn_popup(target, "빗나감", Color("c9bda5"), 20)
+	missed_now.append(target)
+	defer_fx(func() -> void: spawn_popup(target, "빗나감", Color("c9bda5"), 20))
 
 
 func show_shield(target: CharacterUnit, amount: int) -> void:
 	if amount > 0:
-		spawn_popup(target, "+%d 보호막" % amount, WARD, 22)
+		defer_fx(func() -> void: spawn_popup(target, "+%d 보호막" % amount, WARD, 22))
 
 
 func on_unit_down(unit: CharacterUnit) -> void:
 	if not cards.has(unit):
 		return
-	spawn_burst(card_center(unit), unit.character_data.display_color, 60)
-	spawn_ring(card_center(unit), RED)
-	shake_screen(10.0)
+	defer_fx(func() -> void:
+		spawn_burst(anchor_of(unit, 1.0), unit.character_data.display_color, 60)
+		spawn_ring(anchor_of(unit, 0.3), RED)
+		shake_screen(10.0))
 
 
 ## In a run there is no retry or detour: the only way out of a finished fight is onward.
@@ -521,7 +592,7 @@ func spawn_popup(unit: CharacterUnit, text_value: String, color: Color, font_siz
 	popup.add_theme_constant_override("shadow_offset_y", 0)
 	fx_layer.add_child(popup)
 	popup.reset_size()
-	var origin := card_center(unit) - popup.size / 2.0 + Vector2(randf_range(-20, 20), 24 - order * 28)
+	var origin := anchor_of(unit) - popup.size / 2.0 + Vector2(randf_range(-20, 20), 24 - order * 28)
 	popup.position = origin
 	popup.pivot_offset = popup.size / 2.0
 	popup.scale = Vector2.ONE * 0.3

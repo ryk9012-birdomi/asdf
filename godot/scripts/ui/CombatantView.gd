@@ -100,10 +100,11 @@ class Ornament extends Control:
 			draw_colored_polygon(diamond, Color(gold, 0.85))
 
 
-func setup(combatant: CharacterUnit, mirrored: bool = false) -> void:
+## Compact cards drop the crest: the 3D stage already shows who is who.
+func setup(combatant: CharacterUnit, mirrored: bool = false, compact: bool = false) -> void:
 	unit = combatant
 	accent = unit.character_data.display_color
-	custom_minimum_size = Vector2(0, 134)
+	custom_minimum_size = Vector2(0, 100 if compact else 134)
 	size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	focus_mode = Control.FOCUS_NONE
@@ -139,6 +140,7 @@ func setup(combatant: CharacterUnit, mirrored: bool = false) -> void:
 	body.add_theme_constant_override("separation", 3)
 	layout.add_child(body)
 	layout.add_child(emblem)
+	emblem.visible = not compact
 	if not mirrored:
 		layout.move_child(emblem, 0)
 	var title := HBoxContainer.new()

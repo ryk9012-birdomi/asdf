@@ -3,8 +3,10 @@ extends Control
 
 @export var party_definitions: Array[CharacterData] = []
 @export var enemy_definitions: Array[EnemyData] = []
-@export_range(0.05, 3.0) var action_delay: float = 0.65
+@export_range(0.05, 3.0) var action_delay: float = 0.55
 @export var battle_seed: int = -1
+## Hold the next action until the 3D blow has played out. Tests switch it off.
+@export var wait_for_animations: bool = true
 
 @onready var battle: BattleManager = $BattleManager
 @onready var view: Control = $BattleUI
@@ -81,7 +83,9 @@ func _ready() -> void:
 func on_battle_changed() -> void:
 	view.refresh()
 	pace.stop()
-	if battle.phase in [BattleManager.Phase.RESOLVING, BattleManager.Phase.ENEMY_TURN]:
+	if battle.phase == BattleManager.Phase.RESOLVING and wait_for_animations:
+		pace.start(maxf(action_delay, view.animation_time_left() + 0.1))
+	elif battle.phase in [BattleManager.Phase.RESOLVING, BattleManager.Phase.ENEMY_TURN]:
 		pace.start(action_delay)
 
 

@@ -241,10 +241,20 @@ func test_ui() -> void:
 	var scene: Control = load("res://scenes/battle/BattleScene.tscn").instantiate()
 	scene.battle_seed = 42
 	scene.action_delay = 0.05
+	scene.wait_for_animations = false
 	root.add_child(scene)
 	current_scene = scene
 	await process_frame
 	check(scene.view.cards.size() == 6, "Battle UI displays six combatants")
+	var stage: BattleStage = scene.view.stage
+	check(stage.figures.size() == 6, "3D stage places a figure for every combatant")
+	var hero_figure = stage.figures[scene.battle.party[0]]
+	var foe_figure = stage.figures[scene.battle.enemies[0]]
+	check(hero_figure.home.x < 0.0 and foe_figure.home.x > 0.0, "Party stands on the left, enemies on the right")
+	check(hero_figure.player != null and hero_figure.player.current_animation != "", "Figures play an idle animation")
+	var hidden_gear: Array = hero_figure.find_children("*", "MeshInstance3D", true, false).filter(func(mesh): return mesh.name == "2H_Sword")
+	check(not hidden_gear.is_empty() and not hidden_gear[0].visible, "Unused gear is hidden from the loadout")
+	check(stage.figures[scene.battle.enemies[0]].look.has("tint"), "Goblins use a tinted model")
 	scene.view.skill_row.get_child(0).pressed.emit()
 	var front: CharacterUnit = scene.battle.enemies[0]
 	check(not scene.view.cards[front].disabled and scene.view.cards[scene.battle.enemies[1]].disabled, "Skill button highlights only legal target")
@@ -253,8 +263,10 @@ func test_ui() -> void:
 		await RenderingServer.frame_post_draw
 		DirAccess.make_dir_recursive_absolute("res://test-output")
 		check(root.get_texture().get_image().save_png("res://test-output/battle.png") == OK, "Battle screenshot saved")
+	check(stage.figures[front].ring.visible, "Legal target gets a ring on stage")
 	scene.view.cards[front].pressed.emit()
 	check(scene.battle.phase == BattleManager.Phase.RESOLVING and scene.view.selected_skill == null, "Target click resolves and locks commands")
+	check(stage.animation_time_left() > 0.5, "Melee strike plays out on stage")
 	await create_timer(0.15).timeout
 	check(scene.battle.actor == scene.battle.party[2], "Scene timer advances to next hero")
 	for enemy in scene.battle.enemies:
