@@ -79,7 +79,7 @@ func _draw() -> void:
 	var horizon := h * 0.5
 	# Cave wall silhouettes, far to near.
 	for layer in 3:
-		var shade := Color("1c120b").lerp(Color("3a2717"), layer / 2.0)
+		var shade := Color("0c0806").lerp(Color("20150e"), layer / 2.0)
 		var points := PackedVector2Array([Vector2(0, 0)])
 		var steps := 14
 		for step in steps + 1:
@@ -88,7 +88,7 @@ func _draw() -> void:
 			points.append(Vector2(x, y + layer * 22.0))
 		points.append(Vector2(w, 0))
 		if layer == 0:
-			draw_rect(Rect2(Vector2.ZERO, Vector2(w, h)), Color("150d08"))
+			draw_rect(Rect2(Vector2.ZERO, Vector2(w, h)), Color("070504"))
 		var floor_points := points.duplicate()
 		floor_points[0] = Vector2(0, h)
 		floor_points[floor_points.size() - 1] = Vector2(w, h)
@@ -97,14 +97,14 @@ func _draw() -> void:
 	for pillar in [[0.3, 0.62, 0.55], [0.71, 0.4, 0.5]]:
 		var px: float = w * pillar[0]
 		var top: float = horizon * pillar[1]
-		draw_rect(Rect2(Vector2(px - 22, top), Vector2(44, horizon * 1.25 - top)), Color("4a3a2c"))
-		draw_rect(Rect2(Vector2(px - 28, top - 10), Vector2(56, 12)), Color("5a4838"))
+		draw_rect(Rect2(Vector2(px - 22, top), Vector2(44, horizon * 1.25 - top)), Color("2a2019"))
+		draw_rect(Rect2(Vector2(px - 28, top - 10), Vector2(56, 12)), Color("352a20"))
 		draw_line(Vector2(px - 8, top + 20), Vector2(px - 12, horizon * 1.1), Color("2a1f16"), 2.0)
 	# Ground band with pebbles.
 	var ground_top := h * 0.66
 	for band in 8:
 		var y := ground_top + (h - ground_top) * band / 8.0
-		draw_rect(Rect2(Vector2(0, y), Vector2(w, (h - ground_top) / 8.0 + 1.0)), Color("3a2a1c").lerp(Color("5a4230"), band / 8.0))
+		draw_rect(Rect2(Vector2(0, y), Vector2(w, (h - ground_top) / 8.0 + 1.0)), Color("1c140e").lerp(Color("2e2218"), band / 8.0))
 	draw_line(Vector2(0, ground_top), Vector2(w, ground_top), Color("22170f"), 3.0)
 	for rock in rocks:
 		var rock_pos := Vector2(rock[0] * w, ground_top + 12.0 + rock[1] * (h - ground_top - 20.0))
@@ -112,15 +112,22 @@ func _draw() -> void:
 		for step in 10:
 			var angle := TAU * step / 10.0
 			flat.append(rock_pos + Vector2(cos(angle) * rock[2], sin(angle) * rock[2] * 0.4 - (rock[2] * 0.25 if sin(angle) < 0.0 else 0.0)))
-		draw_colored_polygon(flat, Color("3a2b1f"))
-		draw_line(rock_pos + Vector2(-rock[2] * 0.6, -rock[2] * 0.35), rock_pos + Vector2(rock[2] * 0.3, -rock[2] * 0.45), Color("6b5240"), 2.0)
+		draw_colored_polygon(flat, Color("1e1610"))
+		draw_line(rock_pos + Vector2(-rock[2] * 0.6, -rock[2] * 0.35), rock_pos + Vector2(rock[2] * 0.3, -rock[2] * 0.45), Color("3e2f24"), 2.0)
 	# Torches at both edges with a flickering glow.
 	for side in [0.035, 0.965]:
 		var tx: float = w * side
 		var ty := ground_top - 110.0
 		var flicker := 0.85 + 0.15 * sin(time * 9.0 + side * 10.0) * sin(time * 4.3)
 		for ring in 6:
-			draw_circle(Vector2(tx, ty), (40.0 + ring * 38.0) * flicker, Color(1.0, 0.55, 0.2, 0.07 - ring * 0.01))
+			draw_circle(Vector2(tx, ty), (40.0 + ring * 38.0) * flicker, Color(1.0, 0.5, 0.18, 0.08 - ring * 0.011))
+		# A warm pool of light on the ground under each torch; everything else stays dark.
+		for ring in 5:
+			var pool := PackedVector2Array()
+			for step in 24:
+				var angle := TAU * step / 24.0
+				pool.append(Vector2(tx, ground_top + 30.0) + Vector2(cos(angle) * (70.0 + ring * 36.0), sin(angle) * (16.0 + ring * 8.0)) * flicker)
+			draw_colored_polygon(pool, Color(1.0, 0.52, 0.2, 0.06 - ring * 0.01))
 		draw_line(Vector2(tx, ty + 6), Vector2(tx, ground_top + 20), Color("2a1a10"), 6.0)
 		var flame := PackedVector2Array()
 		for step in 13:
@@ -129,11 +136,14 @@ func _draw() -> void:
 			flame.append(Vector2(tx, ty) + Vector2(sin(t) * reach * 0.7, -cos(t) * reach - (reach * 0.9 if cos(t) > 0.0 else 0.0)))
 		draw_colored_polygon(flame, Color(1.0, 0.55, 0.15, 0.9))
 		draw_circle(Vector2(tx, ty), 5.0, Color(1.0, 0.9, 0.55))
-	# Soft vignette on the sides.
-	for step in 10:
-		var alpha := 0.05 * (10 - step) / 10.0
-		draw_rect(Rect2(Vector2(step * 8.0, 0), Vector2(8, h)), Color(0, 0, 0, alpha * 3.0))
-		draw_rect(Rect2(Vector2(w - (step + 1) * 8.0, 0), Vector2(8, h)), Color(0, 0, 0, alpha * 3.0))
+	# Heavy vignette: sides, the cave roof and the near floor sink into darkness. It is
+	# drawn under the fighters, so they stand out against it.
+	for step in 16:
+		var alpha := 0.07 * (16 - step) / 16.0
+		draw_rect(Rect2(Vector2(step * 10.0, 0), Vector2(10, h)), Color(0, 0, 0, alpha * 2.4))
+		draw_rect(Rect2(Vector2(w - (step + 1) * 10.0, 0), Vector2(10, h)), Color(0, 0, 0, alpha * 2.4))
+		draw_rect(Rect2(Vector2(0, step * 10.0), Vector2(w, 10)), Color(0, 0, 0, alpha * 2.2))
+		draw_rect(Rect2(Vector2(0, h - (step + 1) * 6.0), Vector2(w, 6)), Color(0, 0, 0, alpha * 1.6))
 
 
 func setup(party: Array[CharacterUnit], enemies: Array[CharacterUnit]) -> void:

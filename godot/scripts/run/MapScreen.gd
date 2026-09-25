@@ -110,12 +110,14 @@ void fragment() {
 	vec2 px = UV * resolution;
 	float grain = fbm(px / 60.0);
 	float stain = fbm(px / 260.0 + 7.0);
-	vec3 base = mix(vec3(0.80, 0.69, 0.50), vec3(0.93, 0.85, 0.68), grain);
-	base *= 1.0 - smoothstep(0.55, 0.85, stain) * 0.22;
+	vec3 base = mix(vec3(0.50, 0.41, 0.28), vec3(0.68, 0.58, 0.41), grain);
+	base *= 1.0 - smoothstep(0.5, 0.85, stain) * 0.35;
+	// Soot towards the edges, as if the map had been carried through fire and rain.
+	base *= 1.0 - smoothstep(0.25, 0.75, distance(UV, vec2(0.5, 0.5))) * 0.45;
 	vec2 edge_distance = min(px, resolution - px);
 	float ragged = min(edge_distance.x, edge_distance.y) + (fbm(px / 18.0) - 0.5) * 22.0;
 	float burn = smoothstep(4.0, 34.0, ragged);
-	base = mix(vec3(0.28, 0.15, 0.07), base, burn);
+	base = mix(vec3(0.10, 0.05, 0.02), base, burn);
 	COLOR = vec4(base, smoothstep(0.0, 5.0, ragged));
 }
 """

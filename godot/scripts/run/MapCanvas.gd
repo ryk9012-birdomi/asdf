@@ -12,7 +12,7 @@ const RADIUS := 22.0
 const BOSS_RADIUS := 42.0
 const INK := Color("3a2414")
 const FADED_INK := Color(0.23, 0.14, 0.08, 0.45)
-const PARCHMENT := Color("efe2c4")
+const PARCHMENT := Color("cdbb94")
 const ROUTE := Color("8e2a1c")
 
 var run: RunState
