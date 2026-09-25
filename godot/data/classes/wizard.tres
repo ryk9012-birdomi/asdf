@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/characters/CharacterData.gd" id="1_data"]
+[ext_resource type="Script" path="res://scripts/skills/SkillData.gd" id="2_type"]
+[ext_resource type="Resource" path="res://data/skills/fire_bolt.tres" id="3_skill"]
+[ext_resource type="Resource" path="res://data/skills/magic_missile.tres" id="4_skill"]
+
+[resource]
+script = ExtResource("1_data")
+id = &"elowen"
+character_name = "엘로웬"
+class_id = &"wizard"
+class_name_label = "Wizard"
+description = "별빛 탑에서 수학한 엘프 마법사. 잊힌 주문서의 불꽃을 다룬다."
+display_color = Color(0.45, 0.66, 1, 1)
+max_hp = 80
+starting_shield = 5
+max_energy = 6
+speed = 12
+attack = 28
+defense = 3
+accuracy = 0.99
+evasion = 0.08
+critical_chance = 0.2
+skills = Array[ExtResource("2_type")]([ExtResource("3_skill"), ExtResource("4_skill")])

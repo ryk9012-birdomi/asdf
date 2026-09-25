@@ -4,10 +4,10 @@
 
 [resource]
 script = ExtResource("1_skill")
-id = &"plasma_burst"
-skill_name = "Plasma Burst"
-description = "전열의 적 하나에게 공격력 100%의 플라즈마 피해."
-target_type = 5
+id = &"fire_bolt"
+skill_name = "화염 화살"
+description = "거리에 관계없이 적 하나에게 공격력 100%의 화염 피해."
+target_type = 3
 damage_type = 2
 effect_type = 0
 attack_multiplier = 1.00

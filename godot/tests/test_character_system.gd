@@ -19,7 +19,7 @@ func check(condition: bool, description: String) -> void:
 
 
 func run_tests() -> void:
-	var definition: CharacterData = load("res://data/classes/sword_master.tres")
+	var definition: CharacterData = load("res://data/classes/rogue.tres")
 	var unit_scene: PackedScene = load("res://scenes/battle/CharacterUnit.tscn")
 	var first: CharacterUnit = unit_scene.instantiate()
 	var second: CharacterUnit = unit_scene.instantiate()
@@ -60,7 +60,7 @@ func run_tests() -> void:
 	check(first.current_shield == 10 and first.current_energy == 5, "Reset restores original resources")
 	first.receive_damage(9999)
 	check(deaths == 2, "New life can emit a new death event")
-	for role in ["sword_master", "vanguard", "sharpshooter"]:
+	for role in ["rogue", "paladin", "wizard"]:
 		var sample: CharacterData = load("res://data/classes/%s.tres" % role)
 		check(sample != null and sample.get_validation_errors().is_empty(), "Valid serialized class: " + role)
 		check(sample.skills.size() == 2, "Two serialized skills: " + role)
@@ -79,7 +79,7 @@ func test_ui() -> void:
 	var cards: HBoxContainer = lab.get_node("%Party")
 	check(cards.get_child_count() == 3, "Main scene creates exactly three cards")
 	var card = cards.get_child(0)
-	check(card.unit.is_alive() and card.health_label.text == "HP   140 / 140", "Scene renders initial Vanguard HP")
+	check(card.unit.is_alive() and card.health_label.text == "HP   140 / 140", "Scene renders initial Paladin HP")
 	card.action_buttons[0].pressed.emit()
 	check(card.unit.current_hp == 135 and card.health_label.text == "HP   135 / 140", "Damage button updates model and UI")
 	card.action_buttons[1].pressed.emit()

@@ -20,7 +20,7 @@ func fixture(seed_value: int = 42) -> BattleManager:
 	root.add_child(battle)
 	var party: Array[CharacterUnit] = []
 	var enemies: Array[CharacterUnit] = []
-	for role in ["vanguard", "sword_master", "sharpshooter"]:
+	for role in ["paladin", "rogue", "wizard"]:
 		var unit := CharacterUnit.new()
 		battle.add_child(unit)
 		unit.initialize(load("res://data/classes/%s.tres" % role))
@@ -29,7 +29,7 @@ func fixture(seed_value: int = 42) -> BattleManager:
 	for index in 3:
 		var unit := EnemyUnit.new()
 		battle.add_child(unit)
-		unit.initialize(load("res://data/enemies/soldier.tres"))
+		unit.initialize(load("res://data/enemies/goblin_raider.tres"))
 		unit.formation_slot = index as CharacterUnit.FormationSlot
 		enemies.append(unit)
 	check(battle.start_battle(party, enemies, seed_value), "Valid 3v3 encounter starts")
@@ -127,17 +127,17 @@ func test_targets_and_costs() -> void:
 func test_turns_and_intent() -> void:
 	var battle := fixture()
 	var enemy := battle.enemies[0] as EnemyUnit
-	check(enemy.intended_skill().id == &"soldier_shot", "Soldier opens with attack")
+	check(enemy.intended_skill().id == &"goblin_slash", "Goblin opens with attack")
 	for _index in 20:
 		if battle.actor == enemy and battle.phase == BattleManager.Phase.ENEMY_TURN:
 			break
 		step(battle, false)
 	battle.enemy_action()
-	check(enemy.pattern_cursor == 1 and enemy.intended_skill(true).id == &"soldier_guard", "Next intent advances to shield")
+	check(enemy.pattern_cursor == 1 and enemy.intended_skill(true).id == &"goblin_guard", "Next intent advances to shield")
 	enemy.pattern_cursor = 2
-	check(enemy.intended_skill(true).id == &"soldier_burst", "Third pattern entry is heavy shot")
+	check(enemy.intended_skill(true).id == &"goblin_firebomb", "Third pattern entry is firebomb")
 	enemy.current_energy = 0
-	check(enemy.intended_skill().id == &"soldier_shot", "Unaffordable AI action falls back to basic")
+	check(enemy.intended_skill().id == &"goblin_slash", "Unaffordable AI action falls back to basic")
 	battle.enemies[1].receive_damage(9999)
 	battle.advance_turn()
 	check(battle.actor == battle.enemies[2], "Dead queued actor is skipped; equal-speed order stays stable")
@@ -150,7 +150,7 @@ func test_encounter_limits() -> void:
 	for index in 2:
 		var extra := EnemyUnit.new()
 		battle.add_child(extra)
-		extra.initialize(load("res://data/enemies/soldier.tres"))
+		extra.initialize(load("res://data/enemies/goblin_raider.tres"))
 		extra.formation_slot = CharacterUnit.FormationSlot.BACK
 		foes.append(extra)
 	check(battle.start_battle(battle.party, foes, 7), "Three heroes versus five enemies is supported")

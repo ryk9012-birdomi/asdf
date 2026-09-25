@@ -8,11 +8,13 @@ signal lab_requested
 
 const CARD_SCRIPT = preload("res://scripts/ui/CombatantView.gd")
 const STAGGER := 40
-const CYAN := Color("69e6c3")
-const GOLD := Color("ffc76b")
-const RED := Color("ff6b73")
-const TEXT := Color("e0e9f8")
-const MUTED := Color("93a5bd")
+const TRIM := Color("d8b25a")
+const GOLD := Color("ffc15a")
+const RED := Color("d9533f")
+const TEXT := Color("eadcc0")
+const MUTED := Color("a8977a")
+const WARD := Color("9fc6ff")
+const SERIF := ["Batang", "Noto Serif CJK KR", "Noto Serif KR", "Nanum Myeongjo", "serif"]
 
 var battle: BattleManager
 var selected_skill: SkillData
@@ -36,7 +38,7 @@ var screen_tween: Tween
 
 func _ready() -> void:
 	theme = build_theme()
-	add_child(SpaceBackdrop.new())
+	add_child(EmberBackdrop.new())
 	scroll = ScrollContainer.new()
 	scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -56,19 +58,21 @@ func _ready() -> void:
 	var content := VBoxContainer.new()
 	content.add_theme_constant_override("separation", 12)
 	margin.add_child(content)
-	label(content, "AFTERLIGHT TRAVERSE   /   COMBAT PROTOTYPE   /   002", 12, CYAN)
+	label(content, "OATH OF EMBERS   ·   CHAPTER I   ·   잿빛 고갯길", 12, TRIM)
 	var header := HBoxContainer.new()
 	header.add_theme_constant_override("separation", 10)
 	content.add_child(header)
-	var title := label(header, "잔광 항로  /  봉쇄선 돌파", 32)
+	var title := label(header, "잿불 서약  ·  고갯길 매복", 34, Color("f4e2b8"))
+	title.theme_type_variation = "HeadingLabel"
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	glow_text(title, CYAN, 10)
-	button(header, "준비실", func(): lab_requested.emit())
+	glow_text(title, Color("ff9a3c"), 10)
+	button(header, "야영지", func(): lab_requested.emit())
 	button(header, "전투 재시작", func(): restart_requested.emit())
 	var turn_strip := HBoxContainer.new()
 	turn_strip.add_theme_constant_override("separation", 12)
 	content.add_child(turn_strip)
-	turn_label = label(turn_strip, "", 15, GOLD)
+	turn_label = label(turn_strip, "", 16, GOLD)
+	turn_label.theme_type_variation = "HeadingLabel"
 	glow_text(turn_label, GOLD, 6)
 	turn_row = HBoxContainer.new()
 	turn_row.add_theme_constant_override("separation", 6)
@@ -78,12 +82,13 @@ func _ready() -> void:
 	result_banner.add_theme_stylebox_override("panel", panel_style(GOLD, 0.92, 18))
 	result_banner.visible = false
 	content.add_child(result_banner)
-	result_label = label(result_banner, "", 28, GOLD)
+	result_label = label(result_banner, "", 30, GOLD)
+	result_label.theme_type_variation = "HeadingLabel"
 	result_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	glow_text(result_label, GOLD, 14)
 	result_label.visible = false
 	var command := PanelContainer.new()
-	command.add_theme_stylebox_override("panel", panel_style(Color("34506f"), 0.78))
+	command.add_theme_stylebox_override("panel", panel_style(Color("7a5c2e"), 0.86))
 	content.add_child(command)
 	var command_body := VBoxContainer.new()
 	command_body.add_theme_constant_override("separation", 10)
@@ -93,34 +98,35 @@ func _ready() -> void:
 	skill_row = row(command_body)
 	skill_row.custom_minimum_size.y = 56
 	var log_panel := PanelContainer.new()
-	log_panel.add_theme_stylebox_override("panel", panel_style(Color("25384f"), 0.7))
+	log_panel.add_theme_stylebox_override("panel", panel_style(Color("5e4526"), 0.8))
 	content.add_child(log_panel)
 	var log_body := VBoxContainer.new()
 	log_panel.add_child(log_body)
-	label(log_body, "COMBAT LOG  /  전투 기록", 12, CYAN)
+	label(log_body, "모험 일지  ·  ADVENTURE LOG", 12, TRIM)
 	log_box = RichTextLabel.new()
 	log_box.custom_minimum_size.y = 92
 	log_box.add_theme_font_size_override("normal_font_size", 13)
-	log_box.add_theme_color_override("default_color", Color("c3d0e3"))
+	log_box.add_theme_color_override("default_color", Color("d6c7a8"))
 	log_box.scroll_following = true
 	log_body.add_child(log_box)
-	label(content, "스킬 선택 → 빛나는 대상 클릭  |  실드는 피해를 먼저 흡수  |  자기 차례 EN +1  |  재사용 대기는 자신의 턴 기준", 12, MUTED)
+	label(content, "스킬 선택 → 초록빛 대상 클릭  |  보호막은 피해를 먼저 흡수  |  자기 차례 기력 +1  |  재사용 대기는 자신의 턴 기준  |  d20은 명중 굴림", 12, MUTED)
 
 
 func build_battlefield() -> Control:
 	var field := HBoxContainer.new()
 	field.add_theme_constant_override("separation", 10)
-	party_column = side_column(field, "CREW  /  잔광 인양단", CYAN, HORIZONTAL_ALIGNMENT_LEFT)
+	party_column = side_column(field, "일행  ·  잿불 서약단", TRIM, HORIZONTAL_ALIGNMENT_LEFT)
 	var divider := VBoxContainer.new()
 	divider.custom_minimum_size.x = 64
 	divider.alignment = BoxContainer.ALIGNMENT_CENTER
 	field.add_child(divider)
 	divider.add_child(beam_rule())
-	var versus := label(divider, "VS", 26, Color("f4f7ff"))
+	var versus := label(divider, "VS", 28, Color("f4e2b8"))
+	versus.theme_type_variation = "HeadingLabel"
 	versus.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	glow_text(versus, Color("b58cff"), 14)
+	glow_text(versus, Color("ff8a2a"), 14)
 	divider.add_child(beam_rule())
-	enemy_column = side_column(field, "HOSTILES  /  적 행동 예고 · 방어 적용 전", RED, HORIZONTAL_ALIGNMENT_RIGHT)
+	enemy_column = side_column(field, "적대  ·  행동 예고는 방어 적용 전 수치", RED, HORIZONTAL_ALIGNMENT_RIGHT)
 	return field
 
 
@@ -136,8 +142,8 @@ func side_column(parent: Node, heading: String, color: Color, align: HorizontalA
 
 func beam_rule() -> TextureRect:
 	var gradient := Gradient.new()
-	gradient.set_color(0, Color(0.41, 0.9, 0.76, 0.0))
-	gradient.set_color(1, Color(0.71, 0.55, 1.0, 0.9))
+	gradient.set_color(0, Color(0.85, 0.7, 0.35, 0.0))
+	gradient.set_color(1, Color(1.0, 0.55, 0.2, 0.9))
 	var texture := GradientTexture2D.new()
 	texture.gradient = gradient
 	texture.fill_from = Vector2(0, 0)
@@ -189,7 +195,7 @@ func refresh() -> void:
 		prompt.text = "%s의 차례 · 사용할 스킬을 선택하세요." % battle.actor.display_name
 		for skill in battle.actor.character_data.skills:
 			var reason := battle.skill_block_reason(skill)
-			var caption := "%s\nEN %d  ·  CD %d" % [skill.skill_name, skill.energy_cost, skill.cooldown]
+			var caption := "%s\n기력 %d  ·  대기 %d턴" % [skill.skill_name, skill.energy_cost, skill.cooldown]
 			if not reason.is_empty():
 				caption = "%s\n%s" % [skill.skill_name, reason]
 			var skill_button := button(skill_row, caption, func(): select_skill(skill), battle.actor.character_data.display_color)
@@ -208,7 +214,7 @@ func refresh() -> void:
 
 
 func refresh_turn_order() -> void:
-	turn_label.text = "ROUND %02d" % battle.turns.round_number
+	turn_label.text = "제 %d 라운드  ·  주도권" % battle.turns.round_number
 	for child in turn_row.get_children():
 		turn_row.remove_child(child)
 		child.queue_free()
@@ -238,7 +244,7 @@ func select_skill(skill: SkillData) -> void:
 	if battle.phase != BattleManager.Phase.PLAYER_INPUT or not battle.skill_block_reason(skill).is_empty():
 		return
 	selected_skill = skill
-	prompt.text = "%s · %s  /  빛나는 대상을 클릭하세요." % [skill.skill_name, skill.description]
+	prompt.text = "%s · %s  /  초록빛 대상을 클릭하세요." % [skill.skill_name, skill.description]
 	refresh_cards()
 
 
@@ -258,48 +264,64 @@ func refresh_cards() -> void:
 			var intent: SkillData = unit.intended_skill(before_turn)
 			if intent != null:
 				var amount := roundi(unit.attack * intent.attack_multiplier) + intent.flat_value
-				detail = "예고 ▸ %s · %s %d" % [intent.skill_name, "실드" if intent.effect_type == SkillData.EffectType.SHIELD else "공격", amount]
+				detail = "예고 ▸ %s · %s %d" % [intent.skill_name, "보호막" if intent.effect_type == SkillData.EffectType.SHIELD else "공격", amount]
 			else:
 				detail = "예고 ▸ 대기"
 		cards[unit].refresh(unit == battle.actor and battle.phase != BattleManager.Phase.FINISHED, unit in legal, detail)
 
 
 func animate_action(actor: CharacterUnit, targets: Array[CharacterUnit], skill: SkillData) -> void:
-	var shielding := skill.effect_type == SkillData.EffectType.SHIELD
 	if cards.has(actor):
 		cards[actor].flash(actor.character_data.display_color)
 	for target in targets:
 		if not cards.has(target):
 			continue
-		if shielding:
-			spawn_ring(card_center(target), Color("7eeaff"))
-			cards[target].flash(Color("7eddeb"))
-		elif cards.has(actor):
-			spawn_beam(card_center(actor), card_center(target), actor.character_data.display_color)
+		var to := card_center(target)
+		if skill.effect_type == SkillData.EffectType.SHIELD:
+			spawn_ring(to, WARD)
+			spawn_ring(to, TRIM, 0.12)
+			cards[target].flash(WARD)
+			continue
+		var from := card_center(actor) if cards.has(actor) else to
+		match skill.damage_type:
+			SkillData.DamageType.FIRE:
+				spawn_beam(from, to, Color("ff7a1f"), 18.0, 0.18)
+				spawn_burst(to, Color("ffb347"), 40)
+			SkillData.DamageType.ARCANE:
+				for bolt in 3:
+					spawn_beam(from, to, Color("b48cff"), 6.0, 0.08 + bolt * 0.16, bolt * 0.09)
+				spawn_burst(to, Color("c9a8ff"), 24)
+			SkillData.DamageType.RADIANT:
+				spawn_pillar(to, Color("ffe08a"))
+			_:
+				if skill.target_type == SkillData.TargetType.FRONT_ENEMY:
+					spawn_slash(to, Color("f2efe6"), skill.hit_count)
+				else:
+					spawn_beam(from, to, Color("e8dcc0"), 4.0, 0.02)
 
 
 func show_hit(target: CharacterUnit, health_damage: int, shield_damage: int, critical: bool) -> void:
 	if not cards.has(target):
 		return
 	var center := card_center(target)
-	cards[target].flash(Color("ffaaa4"), 9.0 if critical else 5.0)
-	spawn_burst(center, Color("ffb46b") if critical else Color("ff8a7a"), 34 if critical else 18)
+	cards[target].flash(Color("ffb09a"), 9.0 if critical else 5.0)
+	spawn_burst(center, Color("ffcf6b") if critical else Color("e0503f"), 34 if critical else 18)
 	if shield_damage > 0:
-		spawn_popup(target, "−%d" % shield_damage, Color("7eeaff"), 18)
+		spawn_popup(target, "−%d" % shield_damage, WARD, 18)
 	if critical:
-		spawn_popup(target, "CRITICAL  −%d" % health_damage, GOLD, 30)
+		spawn_popup(target, "치명타!  −%d" % health_damage, GOLD, 30)
 		shake_screen(7.0)
 	elif health_damage > 0 or shield_damage == 0:
-		spawn_popup(target, "−%d" % health_damage, Color("ff8f8f"), 24)
+		spawn_popup(target, "−%d" % health_damage, Color("ff7a66"), 24)
 
 
 func show_miss(target: CharacterUnit) -> void:
-	spawn_popup(target, "MISS", Color("b8c4d6"), 20)
+	spawn_popup(target, "빗나감", Color("c9bda5"), 20)
 
 
 func show_shield(target: CharacterUnit, amount: int) -> void:
 	if amount > 0:
-		spawn_popup(target, "+%d 실드" % amount, Color("7eeaff"), 22)
+		spawn_popup(target, "+%d 보호막" % amount, WARD, 22)
 
 
 func on_unit_down(unit: CharacterUnit) -> void:
@@ -311,7 +333,7 @@ func on_unit_down(unit: CharacterUnit) -> void:
 
 
 func reveal_result() -> void:
-	result_label.text = "작전 성공  ·  봉쇄선을 돌파했습니다" if battle.victory else "작전 실패  ·  파티가 전멸했습니다"
+	result_label.text = "승리  ·  고갯길을 되찾았습니다" if battle.victory else "패배  ·  일행이 모두 쓰러졌습니다"
 	var color := GOLD if battle.victory else RED
 	result_label.add_theme_color_override("font_color", color)
 	glow_text(result_label, color, 14)
@@ -343,7 +365,8 @@ func spawn_popup(unit: CharacterUnit, text_value: String, color: Color, font_siz
 	popup.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	popup.add_theme_font_size_override("font_size", font_size)
 	popup.add_theme_color_override("font_color", color)
-	popup.add_theme_color_override("font_outline_color", Color(0.02, 0.03, 0.07, 0.9))
+	popup.theme_type_variation = "HeadingLabel"
+	popup.add_theme_color_override("font_outline_color", Color(0.06, 0.03, 0.02, 0.9))
 	popup.add_theme_constant_override("outline_size", 7)
 	popup.add_theme_color_override("font_shadow_color", Color(color, 0.6))
 	popup.add_theme_constant_override("shadow_outline_size", 12)
@@ -365,14 +388,14 @@ func spawn_popup(unit: CharacterUnit, text_value: String, color: Color, font_siz
 	motion.tween_callback(popup.queue_free)
 
 
-func spawn_beam(from: Vector2, to: Vector2, color: Color) -> void:
-	var lift := Vector2(0, -minf(90.0, from.distance_to(to) * 0.18))
+func spawn_beam(from: Vector2, to: Vector2, color: Color, width: float = 5.0, arc: float = 0.18, delay: float = 0.0) -> void:
+	var lift := Vector2(0, -minf(140.0, from.distance_to(to) * arc))
 	var control := (from + to) / 2.0 + lift
 	var points := PackedVector2Array()
 	for index in 17:
 		var t := index / 16.0
 		points.append(from.lerp(control, t).lerp(control.lerp(to, t), t))
-	for layer in [[14.0, Color(color, 0.35)], [5.0, color.lightened(0.3)], [2.0, Color.WHITE]]:
+	for layer in [[width * 2.8, Color(color, 0.35)], [width, color.lightened(0.3)], [maxf(1.5, width * 0.35), Color("fff6e0")]]:
 		var line := Line2D.new()
 		line.points = points
 		line.width = layer[0]
@@ -382,13 +405,56 @@ func spawn_beam(from: Vector2, to: Vector2, color: Color) -> void:
 		line.joint_mode = Line2D.LINE_JOINT_ROUND
 		fx_layer.add_child(line)
 		var fade := line.create_tween()
+		if delay > 0.0:
+			line.visible = false
+			fade.tween_interval(delay)
+			fade.tween_callback(line.show)
 		fade.tween_property(line, "modulate:a", 0.0, 0.45).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 		fade.parallel().tween_property(line, "width", 0.0, 0.45)
 		fade.tween_callback(line.queue_free)
-	spawn_burst(to, color, 14)
 
 
-func spawn_ring(center: Vector2, color: Color) -> void:
+func spawn_slash(center: Vector2, color: Color, strokes: int) -> void:
+	for index in maxi(1, strokes):
+		var direction := 1.0 if index % 2 == 0 else -1.0
+		var line := Line2D.new()
+		line.points = PackedVector2Array([Vector2(-70 * direction, -44), Vector2(-10 * direction, -6), Vector2(70 * direction, 44)])
+		line.width = 7.0
+		line.width_curve = Curve.new()
+		line.width_curve.add_point(Vector2(0, 0))
+		line.width_curve.add_point(Vector2(0.5, 1))
+		line.width_curve.add_point(Vector2(1, 0))
+		line.default_color = color
+		line.position = center
+		line.scale = Vector2(0.1, 0.1)
+		line.visible = false
+		fx_layer.add_child(line)
+		var cut := line.create_tween()
+		cut.tween_interval(index * 0.14)
+		cut.tween_callback(line.show)
+		cut.tween_property(line, "scale", Vector2.ONE, 0.09).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
+		cut.tween_property(line, "modulate:a", 0.0, 0.3)
+		cut.tween_callback(line.queue_free)
+
+
+func spawn_pillar(center: Vector2, color: Color) -> void:
+	for layer in [[64.0, Color(color, 0.25)], [26.0, Color(color, 0.7)], [8.0, Color("fffbe8")]]:
+		var beam := Line2D.new()
+		beam.points = PackedVector2Array([Vector2(0, -260), Vector2(0, 30)])
+		beam.width = layer[0]
+		beam.default_color = layer[1]
+		beam.position = center
+		beam.scale = Vector2(0.2, 1)
+		fx_layer.add_child(beam)
+		var shine := beam.create_tween()
+		shine.tween_property(beam, "scale", Vector2.ONE, 0.12).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		shine.tween_property(beam, "modulate:a", 0.0, 0.5)
+		shine.tween_callback(beam.queue_free)
+	spawn_ring(center, color)
+	spawn_burst(center, color, 30)
+
+
+func spawn_ring(center: Vector2, color: Color, delay: float = 0.0) -> void:
 	var ring := Line2D.new()
 	var points := PackedVector2Array()
 	for index in 49:
@@ -400,6 +466,10 @@ func spawn_ring(center: Vector2, color: Color) -> void:
 	ring.scale = Vector2.ONE * 0.3
 	fx_layer.add_child(ring)
 	var expand := ring.create_tween()
+	if delay > 0.0:
+		ring.visible = false
+		expand.tween_interval(delay)
+		expand.tween_callback(ring.show)
 	expand.tween_property(ring, "scale", Vector2.ONE * 1.6, 0.55).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	expand.parallel().tween_property(ring, "modulate:a", 0.0, 0.55)
 	expand.tween_callback(ring.queue_free)
@@ -456,29 +526,34 @@ func build_theme() -> Theme:
 	font.font_names = PackedStringArray(["Malgun Gothic", "Noto Sans CJK KR", "sans-serif"])
 	ui_theme.default_font = font
 	ui_theme.default_font_size = 14
+	var serif := SystemFont.new()
+	serif.font_names = PackedStringArray(SERIF)
+	serif.font_weight = 600
+	ui_theme.set_type_variation("HeadingLabel", "Label")
+	ui_theme.set_font("font", "HeadingLabel", serif)
 	ui_theme.set_color("font_color", "Label", TEXT)
 	ui_theme.set_color("font_color", "Button", TEXT)
 	ui_theme.set_color("font_hover_color", "Button", Color.WHITE)
-	ui_theme.set_color("font_disabled_color", "Button", Color("66758c"))
+	ui_theme.set_color("font_disabled_color", "Button", Color("6f6352"))
 	for state in ["normal", "hover", "pressed", "disabled", "focus"]:
-		ui_theme.set_stylebox(state, "Button", button_style(CYAN, state))
+		ui_theme.set_stylebox(state, "Button", button_style(TRIM, state))
 	return ui_theme
 
 
 func button_style(accent: Color, state: String) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color("16253b")
-	style.border_color = accent.darkened(0.35)
+	style.bg_color = Color("2a1d12")
+	style.border_color = accent.darkened(0.3)
 	style.set_border_width_all(1)
 	style.border_width_bottom = 3
-	style.set_corner_radius_all(8)
+	style.set_corner_radius_all(4)
 	style.content_margin_left = 16
 	style.content_margin_right = 16
 	style.content_margin_top = 8
 	style.content_margin_bottom = 8
 	match state:
 		"hover":
-			style.bg_color = Color("1f3551").lerp(accent, 0.15)
+			style.bg_color = Color("3a2716").lerp(accent, 0.15)
 			style.border_color = accent
 			style.shadow_color = Color(accent, 0.45)
 			style.shadow_size = 10
@@ -486,8 +561,8 @@ func button_style(accent: Color, state: String) -> StyleBoxFlat:
 			style.bg_color = accent.darkened(0.55)
 			style.border_color = accent.lightened(0.2)
 		"disabled":
-			style.bg_color = Color("0f1828")
-			style.border_color = Color("2a3649")
+			style.bg_color = Color("17110b")
+			style.border_color = Color("3b2f22")
 		"focus":
 			style.draw_center = false
 			style.border_color = Color(accent, 0.0)
@@ -496,10 +571,12 @@ func button_style(accent: Color, state: String) -> StyleBoxFlat:
 
 func panel_style(border: Color, alpha: float, padding: int = 14) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.04, 0.07, 0.12, alpha)
-	style.border_color = Color(border, 0.8)
+	style.bg_color = Color(0.09, 0.06, 0.04, alpha)
+	style.border_color = Color(border, 0.9)
 	style.set_border_width_all(1)
-	style.set_corner_radius_all(12)
+	style.border_width_top = 2
+	style.border_width_bottom = 2
+	style.set_corner_radius_all(4)
 	style.shadow_color = Color(border, 0.18)
 	style.shadow_size = 12
 	for side in [SIDE_LEFT, SIDE_TOP, SIDE_RIGHT, SIDE_BOTTOM]:
@@ -530,11 +607,11 @@ func row(parent: Node) -> HBoxContainer:
 	return container
 
 
-func button(parent: Node, text_value: String, callback: Callable, accent: Color = CYAN) -> Button:
+func button(parent: Node, text_value: String, callback: Callable, accent: Color = TRIM) -> Button:
 	var item := Button.new()
 	item.text = text_value
 	item.pressed.connect(callback)
-	if accent != CYAN:
+	if accent != TRIM:
 		for state in ["normal", "hover", "pressed", "disabled"]:
 			item.add_theme_stylebox_override(state, button_style(accent, state))
 	parent.add_child(item)

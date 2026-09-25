@@ -10,7 +10,7 @@ config_version=5
 
 [application]
 
-config/name="잔광 항로 | Afterlight Traverse"
+config/name="잿불 서약 | Oath of Embers"
 run/main_scene="res://scenes/battle/BattleScene.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 

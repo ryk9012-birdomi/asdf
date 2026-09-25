@@ -4,11 +4,11 @@
 
 [resource]
 script = ExtResource("1_skill")
-id = &"quick_slash"
-skill_name = "Quick Slash"
-description = "전열의 적 하나에게 공격력 100%의 에너지 피해."
+id = &"goblin_slash"
+skill_name = "녹슨 신월도"
+description = "전열의 적에게 공격력 100%의 물리 피해."
 target_type = 5
-damage_type = 1
+damage_type = 0
 effect_type = 0
 attack_multiplier = 1.00
 flat_value = 0

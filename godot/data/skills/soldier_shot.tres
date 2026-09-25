@@ -1,9 +1,0 @@
-[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3]
-[ext_resource type="Script" path="res://scripts/skills/SkillData.gd" id="1"]
-[resource]
-script = ExtResource("1")
-id = &"soldier_shot"
-skill_name = "압박 사격"
-description = "노출된 전열에 공격력 100%의 에너지 피해."
-target_type = 5
-attack_multiplier = 1.0

@@ -3,7 +3,7 @@ extends Resource
 ## Shared skill definition. BattleManager resolves costs, cooldowns and effects.
 
 enum TargetType { SELF, ALLY, ALL_ALLIES, SINGLE_ENEMY, ALL_ENEMIES, FRONT_ENEMY, BACK_ENEMY, RANDOM_ENEMY }
-enum DamageType { PHYSICAL, ENERGY, PLASMA, TRUE_DAMAGE }
+enum DamageType { PHYSICAL, ARCANE, FIRE, RADIANT, TRUE_DAMAGE }
 enum EffectType { DAMAGE, SHIELD }
 
 @export var id: StringName = &""
@@ -11,7 +11,7 @@ enum EffectType { DAMAGE, SHIELD }
 @export_multiline var description: String = ""
 @export var icon: Texture2D
 @export var target_type: TargetType = TargetType.SINGLE_ENEMY
-@export var damage_type: DamageType = DamageType.ENERGY
+@export var damage_type: DamageType = DamageType.PHYSICAL
 @export var effect_type: EffectType = EffectType.DAMAGE
 @export_range(0.0, 10.0, 0.05) var attack_multiplier: float = 1.0
 @export_range(0, 10000) var flat_value: int = 0

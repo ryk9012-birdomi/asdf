@@ -2,20 +2,20 @@
 
 [ext_resource type="Script" path="res://scripts/main/CharacterLab.gd" id="1_main"]
 [ext_resource type="PackedScene" path="res://scenes/ui/UnitCard.tscn" id="2_card"]
-[ext_resource type="Resource" path="res://data/classes/vanguard.tres" id="3_vanguard"]
-[ext_resource type="Resource" path="res://data/classes/sword_master.tres" id="4_sword"]
-[ext_resource type="Resource" path="res://data/classes/sharpshooter.tres" id="5_sharpshooter"]
+[ext_resource type="Resource" path="res://data/classes/paladin.tres" id="3_paladin"]
+[ext_resource type="Resource" path="res://data/classes/rogue.tres" id="4_rogue"]
+[ext_resource type="Resource" path="res://data/classes/wizard.tres" id="5_wizard"]
 
 [sub_resource type="SystemFont" id="Font_ui"]
 font_names = PackedStringArray("Malgun Gothic", "Noto Sans CJK KR", "sans-serif")
 
 [sub_resource type="StyleBoxFlat" id="Button_normal"]
-bg_color = Color(0.10, 0.16, 0.25, 1)
+bg_color = Color(0.16, 0.11, 0.07, 1)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.20, 0.29, 0.40, 1)
+border_color = Color(0.48, 0.36, 0.18, 1)
 corner_radius_top_left = 5
 corner_radius_top_right = 5
 corner_radius_bottom_left = 5
@@ -26,7 +26,7 @@ content_margin_top = 5.0
 content_margin_bottom = 5.0
 
 [sub_resource type="StyleBoxFlat" id="Button_hover"]
-bg_color = Color(0.16, 0.28, 0.37, 1)
+bg_color = Color(0.26, 0.18, 0.10, 1)
 corner_radius_top_left = 5
 corner_radius_top_right = 5
 corner_radius_bottom_left = 5
@@ -42,18 +42,18 @@ border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.38, 0.88, 0.80, 1)
+border_color = Color(0.85, 0.70, 0.35, 1)
 
 [sub_resource type="Theme" id="Theme_ui"]
 default_font = SubResource("Font_ui")
 default_font_size = 14
-Button/colors/font_color = Color(0.88, 0.93, 1, 1)
+Button/colors/font_color = Color(0.92, 0.86, 0.75, 1)
 Button/styles/normal = SubResource("Button_normal")
 Button/styles/hover = SubResource("Button_hover")
 Button/styles/pressed = SubResource("Button_hover")
 Button/styles/disabled = SubResource("Button_normal")
 Button/styles/focus = SubResource("Button_focus")
-Label/colors/font_color = Color(0.88, 0.93, 1, 1)
+Label/colors/font_color = Color(0.92, 0.86, 0.75, 1)
 
 [node name="CharacterLab" type="Control"]
 layout_mode = 3
@@ -83,60 +83,60 @@ theme_override_constants/margin_bottom = 22
 theme_override_constants/separation = 12
 
 [node name="Eyebrow" type="Label" parent="Scroll/Margin/Content"]
-theme_override_colors/font_color = Color(0.38, 0.88, 0.80, 1)
+theme_override_colors/font_color = Color(0.85, 0.70, 0.35, 1)
 theme_override_font_sizes/font_size = 13
-text = "AFTERLIGHT TRAVERSE     /     CREW SYSTEMS     /     001"
+text = "OATH OF EMBERS     ·     CAMP     ·     001"
 
 [node name="Header" type="HBoxContainer" parent="Scroll/Margin/Content"]
 
 [node name="Title" type="Label" parent="Scroll/Margin/Content/Header"]
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 34
-text = "잔광 항로  /  대원 준비실"
+text = "잿불 서약  ·  야영지"
 
 [node name="ResetButton" type="Button" parent="Scroll/Margin/Content/Header"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(150, 42)
 size_flags_vertical = 4
-text = "전체 초기화"
+text = "긴 휴식"
 
 [node name="BattleButton" type="Button" parent="Scroll/Margin/Content/Header"]
 unique_name_in_owner = true
-text = "전투 시작"
+text = "모험 떠나기"
 
 [node name="Subtitle" type="Label" parent="Scroll/Margin/Content"]
-theme_override_colors/font_color = Color(0.64, 0.71, 0.81, 1)
-text = "항로가 끊어진 우주, 세 명의 인양 대원이 출항을 준비합니다."
+theme_override_colors/font_color = Color(0.72, 0.66, 0.54, 1)
+text = "용의 교단이 왕국을 잠식하는 시대, 맹세로 묶인 세 모험가가 모닥불 곁에서 다음 여정을 준비합니다."
 
 [node name="Party" type="HBoxContainer" parent="Scroll/Margin/Content"]
 unique_name_in_owner = true
 theme_override_constants/separation = 18
 
-[node name="Vanguard" parent="Scroll/Margin/Content/Party" instance=ExtResource("2_card")]
-character_data = ExtResource("3_vanguard")
+[node name="Paladin" parent="Scroll/Margin/Content/Party" instance=ExtResource("2_card")]
+character_data = ExtResource("3_paladin")
 formation_slot = 0
 
-[node name="SwordMaster" parent="Scroll/Margin/Content/Party" instance=ExtResource("2_card")]
-character_data = ExtResource("4_sword")
+[node name="Rogue" parent="Scroll/Margin/Content/Party" instance=ExtResource("2_card")]
+character_data = ExtResource("4_rogue")
 formation_slot = 1
 
-[node name="Sharpshooter" parent="Scroll/Margin/Content/Party" instance=ExtResource("2_card")]
-character_data = ExtResource("5_sharpshooter")
+[node name="Wizard" parent="Scroll/Margin/Content/Party" instance=ExtResource("2_card")]
+character_data = ExtResource("5_wizard")
 formation_slot = 2
 
 [node name="LogTitle" type="Label" parent="Scroll/Margin/Content"]
-theme_override_colors/font_color = Color(0.38, 0.88, 0.80, 1)
+theme_override_colors/font_color = Color(0.85, 0.70, 0.35, 1)
 theme_override_font_sizes/font_size = 12
-text = "SYSTEM LOG  /  상태 변경 기록"
+text = "야영 일지  ·  상태 변경 기록"
 
 [node name="EventLog" type="RichTextLabel" parent="Scroll/Margin/Content"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 80)
-theme_override_colors/default_color = Color(0.64, 0.71, 0.81, 1)
+theme_override_colors/default_color = Color(0.84, 0.78, 0.66, 1)
 theme_override_font_sizes/normal_font_size = 13
 scroll_following = true
 
 [node name="Footer" type="Label" parent="Scroll/Margin/Content"]
-theme_override_colors/font_color = Color(0.46, 0.55, 0.68, 1)
+theme_override_colors/font_color = Color(0.56, 0.50, 0.40, 1)
 theme_override_font_sizes/font_size = 12
-text = "MVP 1 · STEP 01   |   캐릭터 상태 테스트   ·   스킬 위에 마우스를 올리면 설명 표시   ·   전투 시작으로 교전 화면 이동"
+text = "MVP 1 · STEP 01   |   모험가 상태 시험   ·   스킬 위에 마우스를 올리면 설명 표시   ·   모험 떠나기로 전투 화면 이동"

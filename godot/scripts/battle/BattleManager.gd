@@ -42,7 +42,7 @@ func start_battle(players: Array[CharacterUnit], foes: Array[CharacterUnit], bat
 	actor = null
 	turns.reset(all_units)
 	phase = Phase.RESOLVING
-	message_logged.emit("교전 시작 · 봉쇄 부대를 돌파하세요.")
+	message_logged.emit("주도권 굴림! 고블린 약탈자들이 고갯길을 막아섰습니다.")
 	advance_turn()
 	return true
 
@@ -73,7 +73,7 @@ func skill_block_reason(skill: SkillData) -> String:
 	if actor.remaining_cooldown(skill) > 0:
 		return "재사용 대기 %d턴" % actor.remaining_cooldown(skill)
 	if not actor.can_spend_energy(skill.energy_cost):
-		return "에너지 부족"
+		return "기력 부족"
 	if available_targets(skill).is_empty():
 		return "유효한 대상 없음"
 	return ""
@@ -134,7 +134,7 @@ func perform_action(skill: SkillData, target: CharacterUnit) -> bool:
 				var amount := roundi(actor.attack * skill.attack_multiplier) + skill.flat_value
 				var gained := recipient.add_shield(amount)
 				shield_granted.emit(recipient, gained)
-				message_logged.emit("  %s · 실드 +%d" % [recipient.display_name, gained])
+				message_logged.emit("  %s · 보호막 +%d" % [recipient.display_name, gained])
 			else:
 				apply_hit(recipient, skill)
 	action_resolved.emit(actor, targets, skill)
@@ -146,14 +146,14 @@ func apply_hit(recipient: CharacterUnit, skill: SkillData) -> void:
 	var roll := DamageCalculator.roll(actor, recipient, skill, rng)
 	if roll.miss:
 		hit_missed.emit(recipient)
-		message_logged.emit("  %s · 빗나감" % recipient.display_name)
+		message_logged.emit("  %s · 빗나감 (d20 %d)" % [recipient.display_name, roll.d20])
 		return
 	var old_shield := recipient.current_shield
 	var hp_damage := recipient.receive_damage(roll.damage)
 	hit_resolved.emit(recipient, hp_damage, old_shield - recipient.current_shield, roll.critical)
-	message_logged.emit("  %s · HP −%d / 실드 −%d%s" % [recipient.display_name, hp_damage, old_shield - recipient.current_shield, " / 치명타" if roll.critical else ""])
+	message_logged.emit("  %s · HP −%d / 보호막 −%d%s  (d20 %d)" % [recipient.display_name, hp_damage, old_shield - recipient.current_shield, " / 치명타" if roll.critical else "", roll.d20])
 	if not recipient.is_alive():
-		message_logged.emit("  %s · 전투 불능" % recipient.display_name)
+		message_logged.emit("  %s · 쓰러짐" % recipient.display_name)
 
 
 func finish_action() -> void:
@@ -170,7 +170,7 @@ func check_outcome() -> bool:
 	if TargetRules.living(party).is_empty() or TargetRules.living(enemies).is_empty():
 		victory = not TargetRules.living(party).is_empty()
 		phase = Phase.FINISHED
-		message_logged.emit("작전 성공 · 봉쇄선 돌파" if victory else "작전 실패 · 파티 전멸")
+		message_logged.emit("승리 · 고갯길을 되찾았습니다" if victory else "패배 · 일행이 모두 쓰러졌습니다")
 		battle_finished.emit(victory)
 		changed.emit()
 		return true

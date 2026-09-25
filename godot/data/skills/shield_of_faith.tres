@@ -4,11 +4,11 @@
 
 [resource]
 script = ExtResource("1_skill")
-id = &"shield_guard"
-skill_name = "Shield Guard"
-description = "자신에게 실드 25를 부여합니다."
+id = &"shield_of_faith"
+skill_name = "신앙의 방패"
+description = "맹세의 가호로 자신에게 보호막 25를 두릅니다."
 target_type = 0
-damage_type = 1
+damage_type = 3
 effect_type = 1
 attack_multiplier = 0.00
 flat_value = 25

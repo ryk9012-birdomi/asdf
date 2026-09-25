@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/characters/CharacterData.gd" id="1_data"]
+[ext_resource type="Script" path="res://scripts/skills/SkillData.gd" id="2_type"]
+[ext_resource type="Resource" path="res://data/skills/judgement_strike.tres" id="3_skill"]
+[ext_resource type="Resource" path="res://data/skills/shield_of_faith.tres" id="4_skill"]
+
+[resource]
+script = ExtResource("1_data")
+id = &"aldric"
+character_name = "알데릭"
+class_id = &"paladin"
+class_name_label = "Paladin"
+description = "헌신의 맹세를 지킨 성기사. 무너진 신전의 마지막 방패로 동료들 앞에 선다."
+display_color = Color(0.91, 0.72, 0.33, 1)
+max_hp = 140
+starting_shield = 25
+max_energy = 5
+speed = 8
+attack = 16
+defense = 10
+accuracy = 0.9
+evasion = 0.03
+critical_chance = 0.05
+skills = Array[ExtResource("2_type")]([ExtResource("3_skill"), ExtResource("4_skill")])

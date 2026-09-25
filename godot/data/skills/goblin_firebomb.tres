@@ -4,14 +4,14 @@
 
 [resource]
 script = ExtResource("1_skill")
-id = &"double_slash"
-skill_name = "Double Slash"
-description = "전열의 적 하나에게 공격력 70%의 피해를 두 번 가합니다."
+id = &"goblin_firebomb"
+skill_name = "화염병 투척"
+description = "전열의 적에게 공격력 170%의 화염 피해."
 target_type = 5
-damage_type = 1
+damage_type = 2
 effect_type = 0
-attack_multiplier = 0.70
+attack_multiplier = 1.70
 flat_value = 0
-hit_count = 2
+hit_count = 1
 energy_cost = 2
-cooldown = 1
+cooldown = 0
