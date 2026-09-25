@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b8ssoar8ml61n"
-path="res://.godot/imported/torso.svg-a3347c89bcf3d1beb24771668b5d7737.ctex"
+uid="uid://cinsyq8lhh23k"
+path="res://.godot/imported/weapon.png-01f11e3df6598a39d4bb27e12e1b5bf2.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/heroes/rogue/torso.svg"
-dest_files=["res://.godot/imported/torso.svg-a3347c89bcf3d1beb24771668b5d7737.ctex"]
+source_file="res://art/heroes/rogue/weapon.png"
+dest_files=["res://.godot/imported/weapon.png-01f11e3df6598a39d4bb27e12e1b5bf2.ctex"]
 
 [params]
 
@@ -38,6 +38,3 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
-svg/scale=3.0
-editor/scale_with_editor_scale=false
-editor/convert_colors_with_editor_theme=false

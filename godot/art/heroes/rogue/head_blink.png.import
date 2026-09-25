@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bwbm6rodhfugt"
-path="res://.godot/imported/head.svg-e8160ff82585b4e3f12bb6c98f06e1ee.ctex"
+uid="uid://8c6i3418itry"
+path="res://.godot/imported/head_blink.png-4651dcb8120c61c19818bfe886fb8683.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/heroes/rogue/head.svg"
-dest_files=["res://.godot/imported/head.svg-e8160ff82585b4e3f12bb6c98f06e1ee.ctex"]
+source_file="res://art/heroes/rogue/head_blink.png"
+dest_files=["res://.godot/imported/head_blink.png-4651dcb8120c61c19818bfe886fb8683.ctex"]
 
 [params]
 
@@ -38,6 +38,3 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
-svg/scale=3.0
-editor/scale_with_editor_scale=false
-editor/convert_colors_with_editor_theme=false

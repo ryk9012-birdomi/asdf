@@ -225,59 +225,6 @@ def knight(folder):
 
 # ------------------------------------------------------------------ rogue
 
-def rogue(folder):
-    green = ("#8a9a52", "#6b7a3e", "#4a5a2a")
-    d = common() + [grad("green", [green[2], green[0], green[1]]), grad("greenv", [green[0], green[2]], True)]
-    boots(folder, cuff="#a8703e")
-    legs_file(folder, "#4a3a44")
-    motif = "".join(leaf(x, y, 2.4, a, GOLD[1]) for x, y, a in ((14, 26, -30), (22, 40, 20), (12, 52, -10), (20, 64, 30), (26, 20, 60)))
-    write(folder, "torso", 52, 72, d, f'''
-<path d="M12 45 L40 45 L42 62 L36 58 L32 64 L27 58 L22 64 L17 58 L10 62 Z" fill="url(#green)" {SW}/>
-<path d="M12.6 20 Q14.6 12.6 25 12 Q37 12 40.6 19.6 Q44 30 40.6 45 L12 46 Q8.8 34 12.6 20 Z" fill="url(#cream)" {SW}/>
-<path d="M16 16 Q22 14 28 15 L27 46 L15 46 Q12.6 30 16 16 Z M33 16 Q38 17 40 21 Q42.6 32 40 46 L33.6 46 Z" fill="url(#leather)" {SW}/>
-<path d="M14 18 L39 40 L37.4 43 L12.4 21 Z" fill="{LEATHER[2]}" {THIN}/>
-<path d="M10.4 43.4 L41.6 43.4 L41.8 48.4 L10.2 48.4 Z" fill="url(#leather)" {SW}/>
-<rect x="28.4" y="42.6" width="5.6" height="6.6" rx="1.2" fill="url(#gold)" {THIN}/>
-<rect x="15" y="47" width="7" height="8" rx="1.6" fill="url(#leather)" {SW}/>
-<path d="M15 50 L22 50" stroke="{LEATHER[2]}" stroke-width="0.8"/>
-<rect x="33" y="47" width="6" height="7" rx="1.4" fill="url(#leather)" {SW}/>
-<path d="M17 11.4 Q25 8.6 34.6 11.6 L35.6 17 Q25 14.8 16 17 Z" fill="url(#green)" {SW}/>''')
-    write(folder, "cape", 40, 92, d, f'''
-<path d="M24 0 L32 -4" stroke="none"/>
-<rect x="26" y="-2" width="7" height="30" rx="2" transform="rotate(18 29 12)" fill="url(#leather)" {SW}/>
-{"".join(f'<path d="M{27 + i * 2.4} -2 l1.2 -5 l1.2 5 Z" fill="#e8e0c8" {THIN} transform="rotate(18 29 12)"/>' for i in range(3))}
-<path d="M18 2 Q29 -0.4 31 6 L29.4 36 Q29 50 31 62 L26 58 L22 64 L17.6 58.6 L12 64 L9 57 L3 60 Q6 40 10 20 Q12 6 18 2 Z" fill="url(#green)" {SW}/>
-{motif}
-<path d="M20 12 Q18.6 36 17.4 58 M25.6 12 Q25 36 25.6 58" fill="none" stroke="{green[2]}" stroke-width="1"/>''')
-    write(folder, "arm_upper", 30, 30, d, f'''
-<path d="M7.4 5 Q14 1.6 20.6 5 L21 25 Q14 28.6 7.6 25 Z" fill="url(#cream)" {SW}/>
-<path d="M10.6 10 Q11.4 18 10.6 24 M17.6 10 Q17 18 17.8 24" fill="none" stroke="{CREAM[2]}" stroke-width="0.8"/>
-<path d="M5 9.4 Q6 1.6 14.6 1.2 Q23 1.6 23.6 9.4 Q18.6 7 14.4 7.2 Q9.4 7.4 5 9.4 Z" fill="url(#green)" {SW}/>''')
-    write(folder, "arm_lower", 18, 30, d, f'''
-<path d="M4.6 2.6 L13.4 2.6 L12.8 10 L5.2 10 Z" fill="url(#cream)" {SW}/>
-<path d="M4 8.6 Q9 7.2 14 8.6 L13.4 22.4 Q9 23.6 4.6 22.4 Z" fill="url(#leather)" {SW}/>
-<path d="M4.6 13 L13.4 13 M4.8 17.6 L13.2 17.6" stroke="{LEATHER[2]}" stroke-width="0.8"/>''')
-    glove_hand(folder, "url(#leather)", fingers=True)
-    hood_back = (f'<path d="M1 44 Q-7 6 22 -6 Q44 -8 48.6 14 Q49.6 22 45.6 29 L42 20 Q36 10 26 10 Q16 10 12 20 L12.6 58 L-1 58 Q-2 50 1 44 Z" fill="url(#green)" {SW}/>'
-                 + "".join(leaf(x, y, 2.4, a, GOLD[1]) for x, y, a in ((4, 30, -70), (6, 44, -80), (2, 52, -90))))
-    hair = ('<path d="M14 21 Q16 10 27 10.6 Q37.6 11 41 20 Q35 17 30 18 Q26 14 21 18 Q17 17 14 21 Z" fill="url(#hair)" stroke="#5a3a28" stroke-width="0.8"/>'
-            '<path d="M11.6 24 Q9.6 34 12.6 40 Q14 32 14.6 26 Z" fill="url(#hair)" stroke="#5a3a28" stroke-width="0.7"/>')
-    hood_front = (f'<path d="M45.6 29 Q49.6 16 41 5.6 Q30 -2 17 2.4 Q7.6 7.6 9 24 L12.6 22 Q14.4 11.6 26 10.2 Q37.4 10.4 42.4 21 Z" fill="url(#green)" {SW}/>'
-                  f'<path d="M12.6 22 Q14.4 11.6 26 10.2 Q37.4 10.4 42.4 21" fill="none" stroke="{green[2]}" stroke-width="2"/>'
-                  + "".join(leaf(x, y, 2.2, a, GOLD[1]) for x, y, a in ((18, 4, -20), (30, 2, 10), (8, 16, -70), (42, 9, 50))))
-    heads(folder, d + [grad("hair", ["#9a6a40", "#7a4a2a", "#5a3420"], True)], hood_back, hair + hood_front, iris="#6a4226", brow="#6a4226")
-    b = base.BLADES["steel"]
-    dagger = (f'<path d="M14 54 L17.2 60 L16.8 81 L11.2 81 L10.8 60 Z" fill="url(#steel)" {SW}/>'
-              f'<path d="M7.6 79.8 Q14 78.2 20.4 79.8 Q21.6 81.6 20.4 83.4 Q14 82 7.6 83.4 Q6.4 81.6 7.6 79.8 Z" fill="url(#gold)" {SW}/>'
-              f'<rect x="12" y="83.4" width="4" height="10" rx="1" fill="url(#leather)" {THIN}/>'
-              f'<circle cx="14" cy="95.6" r="2.4" fill="url(#gold)" {THIN}/>')
-    base.write(folder, "weapon", 28, 110, d, dagger)
-    base.write(folder, "shield", 64, 64, d, f'<g transform="rotate(-42 20 22)"><g transform="translate(6,-68) rotate(180 14 90)">{dagger}</g></g>')
-    base.glow(folder, ("#fff6e8", "#ffe0a8", "#ffb070"))
-
-
-# ------------------------------------------------------------------ mage
-
 def mage(folder):
     red = ("#d45a4a", "#b8423a", "#8a2a26")
     d = common() + [grad("red", [red[2], red[0], red[1]]), grad("redv", [red[0], red[2]], True)]
@@ -339,10 +286,13 @@ def mage(folder):
 
 
 def build(root):
-    for name, make in (("paladin", knight), ("rogue", rogue), ("wizard", mage)):
+    for name, make in (("paladin", knight), ("wizard", mage)):
         folder = os.path.join(root, "art", "heroes", name)
         os.makedirs(folder, exist_ok=True)
         make(folder)
+    # The rogue is cut from the painted character sheet instead (tools/sheet_rig.py).
+    import sheet_rig
+    sheet_rig.rogue()
     enemies(root)
 
 

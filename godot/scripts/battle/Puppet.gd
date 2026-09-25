@@ -24,6 +24,8 @@ class Bone:
 	var sprite: Sprite2D
 	## Stretches the part (and moves its children's joints with it), for proportions.
 	var stretch: Vector2 = Vector2.ONE
+	## Texture pixels per rig unit: TEXTURE_SCALE for SVG parts, the sheet's for painted ones.
+	var density: float = TEXTURE_SCALE
 
 
 ## Damped spring for hanging cloth and plumes that trail behind the body.
@@ -59,16 +61,17 @@ static func hero(art: String, style_id: StringName = &"knight", scale_by: float 
 ## Declares a bone. Parents come first. `pivot` is the joint inside the part's own drawing;
 ## `joint` is where it pins onto the parent, measured from the parent's pivot. A `slot`
 ## bone gets a sprite even without a texture, for gear that may be worn later.
-func bone(id: StringName, texture: Texture2D, pivot: Vector2, parent: StringName = &"", joint: Vector2 = Vector2.ZERO, slot: bool = false) -> Sprite2D:
+func bone(id: StringName, texture: Texture2D, pivot: Vector2, parent: StringName = &"", joint: Vector2 = Vector2.ZERO, slot: bool = false, density: float = TEXTURE_SCALE) -> Sprite2D:
 	var entry := Bone.new()
 	entry.parent = parent
 	entry.joint = joint
+	entry.density = density
 	if texture != null or slot:
 		entry.sprite = Sprite2D.new()
 		entry.sprite.name = String(id)
 		entry.sprite.texture = texture
 		entry.sprite.centered = false
-		entry.sprite.offset = -pivot * TEXTURE_SCALE
+		entry.sprite.offset = -pivot * density
 		add_child(entry.sprite)
 	bones[id] = entry
 	order.append(id)
@@ -97,7 +100,6 @@ func world_angle(id: StringName) -> float:
 
 func solve() -> void:
 	var placed := {}
-	var shrink := Transform2D(0.0, Vector2.ONE / TEXTURE_SCALE, 0.0, Vector2.ZERO)
 	for id in order:
 		var entry: Bone = bones[id]
 		var parent: Bone = bones.get(entry.parent)
@@ -106,7 +108,7 @@ func solve() -> void:
 		var xform: Transform2D = (placed[entry.parent] * local) if parent != null else Transform2D(angles[id], root + joint)
 		placed[id] = xform
 		if entry.sprite != null:
-			entry.sprite.transform = xform * Transform2D(0.0, entry.stretch / TEXTURE_SCALE, 0.0, Vector2.ZERO) if entry.stretch != Vector2.ONE else xform * shrink
+			entry.sprite.transform = xform * Transform2D(0.0, entry.stretch / entry.density, 0.0, Vector2.ZERO)
 
 
 ## Forward speed of the figure in its own facing, in pixels per second.

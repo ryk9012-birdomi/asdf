@@ -150,6 +150,9 @@ class Figure extends Control:
 	func light() -> void:
 		if puppet == null or lit_view != null:
 			return
+		# Parts cut from a painted sheet are watercolour already.
+		if puppet is HeroPuppet and not (puppet as HeroPuppet).sheet.is_empty():
+			return
 		var box := size + FighterView.LIT_MARGIN * Vector2(2, 1)
 		lit_view = SubViewport.new()
 		lit_view.transparent_bg = true
