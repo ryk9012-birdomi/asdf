@@ -3,7 +3,8 @@ extends Puppet
 ## A character animated from painted key poses (tools/pose_sheet.py) instead of jointed
 ## parts: ready, wind-up, strike, follow-through, recovery and so on, each a whole painting.
 ## The fighter's motion values choose the pose; poses cross-fade, the figure breathes,
-## tips into a lunge and rocks back when struck. Gear is remembered but not drawn.
+## tips into a lunge and rocks back when struck. At rest an idle loop plays round and round
+## when the sheet has one (poses.json "idle"). Gear is remembered but not drawn.
 
 ## Which painted pose plays each moment, per rig style.
 ##   wind: winding up · dash: closing in · hit: the blow · through: the blow's far end
@@ -18,7 +19,13 @@ const FADE := 0.08
 ## Arm speed (per second) that counts as a blow rather than lowering a guard.
 const SWING_SPEED := 8.0
 
+## name -> [texture, anchor, pixels per rig unit]
 var frames: Dictionary = {}
+## Idle loop frame names in order, and how many play per second.
+var idle: Array = []
+var idle_fps: float = 5.0
+## How long the pose being faded out takes to disappear.
+var fade: float = FADE
 var plan: Dictionary
 var density: float = 3.0
 var current: Sprite2D
@@ -37,15 +44,17 @@ func _init(art: String, style_id: StringName) -> void:
 	painted = not data.get("paint", false)
 	plan = PLANS.get(style_id, PLANS[&"knight"])
 	for name in data.frames:
-		var anchor: Array = data.frames[name].anchor
-		frames[name] = [load(art + "pose_%s.png" % name), Vector2(anchor[0], anchor[1])]
+		var entry: Dictionary = data.frames[name]
+		frames[name] = [load(art + "pose_%s.png" % name), Vector2(entry.anchor[0], entry.anchor[1]), entry.get("density", density)]
+	idle = data.get("idle", [])
+	idle_fps = data.get("idle_fps", 5.0)
 	previous = Sprite2D.new()
 	previous.centered = false
 	add_child(previous)
 	current = Sprite2D.new()
 	current.centered = false
 	add_child(current)
-	show_pose("ready")
+	show_pose(rest(0.0))
 
 
 func wear(equipment: Dictionary) -> void:
@@ -55,17 +64,28 @@ func wear(equipment: Dictionary) -> void:
 func show_pose(name: String) -> void:
 	if name == pose or not frames.has(name):
 		return
+	# Idle frames melt into each other; action poses snap over quickly.
+	fade = 0.9 / idle_fps if idle.has(name) and idle.has(pose) else FADE
 	if pose != "":
 		previous.texture = current.texture
 		previous.offset = current.offset
+		previous.set_meta("density", current.get_meta("density", density))
 		previous.modulate.a = 1.0
 	pose = name
 	current.texture = frames[name][0]
 	current.offset = -frames[name][1]
+	current.set_meta("density", frames[name][2])
+
+
+## The resting pose: the idle loop's frame for this moment, or the single ready pose.
+func rest(t: float) -> String:
+	if idle.is_empty():
+		return "ready"
+	return idle[int(t * idle_fps) % idle.size()]
 
 
 ## The pose for this moment of the fighter's motion.
-func choose(arm: float, glow: float, lean: float, fallen: float) -> String:
+func choose(arm: float, glow: float, lean: float, fallen: float, t: float = 0.0) -> String:
 	if fallen > 0.3:
 		return plan.back
 	if arm <= -1.9:
@@ -82,7 +102,7 @@ func choose(arm: float, glow: float, lean: float, fallen: float) -> String:
 		return plan.back
 	if glow > 0.3:
 		return plan.guard
-	return "ready"
+	return rest(t)
 
 
 func drive(figure: Control, delta: float) -> void:
@@ -92,13 +112,14 @@ func drive(figure: Control, delta: float) -> void:
 		swinging = 0.14
 	swinging = maxf(0.0, swinging - delta)
 	last_arm = arm
-	show_pose(choose(arm, figure.glow, figure.lean, figure.fallen))
-	previous.modulate.a = maxf(0.0, previous.modulate.a - delta / FADE)
+	show_pose(choose(arm, figure.glow, figure.lean, figure.fallen, t))
+	previous.modulate.a = maxf(0.0, previous.modulate.a - delta / fade)
 	previous.visible = previous.modulate.a > 0.0
 	# Breathing, a tip into the lunge, and a rock back when struck; the frames are
 	# drawn at `density` sheet pixels per rig unit.
-	var breathe: float = 1.0 + 0.008 * sin(t * 2.2) * (1.0 - figure.fallen)
+	# The idle loop breathes on its own; single poses get a slight rise and fall.
+	var breathe: float = 1.0 + (0.0 if idle.has(pose) else 0.008 * sin(t * 2.2)) * (1.0 - figure.fallen)
 	var tilt: float = figure.lean * 0.05 - figure.hurt * 0.14
 	for sprite in [current, previous]:
-		sprite.scale = Vector2(1.0, breathe) / density
+		sprite.scale = Vector2(1.0, breathe) / float(sprite.get_meta("density", density))
 		sprite.rotation = tilt

@@ -265,7 +265,7 @@ func test_ui() -> void:
 	check(hero_view.kind == &"paladin" and foe_view.kind == &"goblin_raider", "Each unit gets its own drawing")
 	var poses: Puppet = hero_view.figure.puppet
 	check(poses is PosePuppet and foe_view.figure.puppet is HeroPuppet and foe_view.figure.puppet.size < 1.0, "The knight plays painted key poses; foes are cut-out puppets, goblins drawn small")
-	check(poses.pose == "ready" and poses.current.texture != null, "The knight stands in the ready pose")
+	check((poses.pose == "ready" or poses.idle.has(poses.pose)) and poses.current.texture != null, "The knight stands at rest")
 	hero_view.figure.arm = -1.3
 	hero_view.figure.lean = 1.0
 	poses.drive(hero_view.figure, 0.016)
@@ -276,7 +276,7 @@ func test_ui() -> void:
 	hero_view.figure.arm = 0.0
 	hero_view.figure.lean = 0.0
 	poses.drive(hero_view.figure, 0.3)
-	check(poses.pose == "ready", "Back at rest the knight returns to ready")
+	check(poses.pose == "ready" or poses.idle.has(poses.pose), "Back at rest the knight returns to its resting pose")
 	var rogue_view: FighterView = scene.view.fighters[scene.battle.party[1]]
 	var puppet: Puppet = rogue_view.figure.puppet
 	check(puppet is HeroPuppet and puppet.get_child_count() >= 17 and puppet.bones.head.sprite.texture != null, "The rogue's puppet assembles every part")

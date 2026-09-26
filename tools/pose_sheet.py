@@ -79,19 +79,40 @@ class PoseSheet:
         return image, [round(float(anchor_x - crop[0]), 1), round(float(sole - crop[1]), 1)]
 
 
-def build(name, sheet_file, frames, density, paint, out=None):
-    """Cuts every frame and writes art/heroes/<name>/poses.json. `frames` maps a pose name
-    to its box and options; `density` is sheet pixels per rig unit."""
+def cut_all(sheet_file, frames, out):
+    """Cuts the named frames of one sheet into out/pose_<name>.png; returns their anchors
+    and heights (for matching the scale of another sheet)."""
     sheet = PoseSheet(os.path.join(HERE, "sheets", sheet_file))
-    out = out or os.path.join(ROOT, "art", "heroes", name)
-    os.makedirs(out, exist_ok=True)
     listing = {}
     for pose, (box, options) in frames.items():
         image, anchor = sheet.frame(box, **options)
         image.save(os.path.join(out, "pose_%s.png" % pose))
-        listing[pose] = {"anchor": anchor}
+        listing[pose] = {"anchor": anchor, "height": anchor[1]}
+    return listing
+
+
+def build(name, sheet_file, frames, density, paint, idle=None):
+    """Cuts every frame and writes art/heroes/<name>/poses.json. `frames` maps a pose name
+    to its box and options; `density` is sheet pixels per rig unit. `idle` optionally names
+    a looping idle sheet (file, frames in order, frames per second); its frames are scaled
+    so the first stands as tall as the ready pose."""
+    out = os.path.join(ROOT, "art", "heroes", name)
+    os.makedirs(out, exist_ok=True)
+    listing = cut_all(sheet_file, frames, out)
+    data = {"density": density, "paint": paint, "frames": listing}
+    if idle and os.path.exists(os.path.join(HERE, "sheets", idle[0])):
+        loop = cut_all(idle[0], idle[1], out)
+        first = next(iter(loop.values()))
+        idle_density = round(density * first["height"] / listing["ready"]["height"], 3)
+        for entry in loop.values():
+            entry["density"] = idle_density
+        listing.update(loop)
+        data["idle"] = list(idle[1].keys())
+        data["idle_fps"] = idle[2]
+    for entry in listing.values():
+        entry.pop("height")
     with open(os.path.join(out, "poses.json"), "w") as handle:
-        json.dump({"density": density, "paint": paint, "frames": listing}, handle, indent=1)
+        json.dump(data, handle, indent=1)
 
 
 # Three columns of 483 px; row one stands on y ~490, row two on y ~980 (labels below).
@@ -103,12 +124,25 @@ def cell(column, row, top=None, bottom=None, left=None, right=None):
     return (x0, y0, x1, y1)
 
 
+def grid(columns, index, tops, bottoms, width=1448):
+    """Box of cell `index` in a sheet of `columns` equal columns and the given row bands."""
+    row, column = divmod(index, columns)
+    step = width / columns
+    return (int(column * step), tops[row], int(min(width, (column + 1) * step)), bottoms[row])
+
+
+# The idle loop: ten frames, five to a row (idle, breathe, weight shift, prepare, lift,
+# guard high, hold, settle, lower, return), played round and round while waiting.
+KNIGHT_IDLE = ("knight_idle.webp",
+               {"idle_%02d" % (index + 1): (grid(5, index, (0, 555), (515, 1000)), {}) for index in range(10)}, 5.0)
+
+
 def knight():
     frames = {
         "ready": (cell(0, 0), {}), "anticipation": (cell(1, 0), {}), "lunge": (cell(2, 0), {}),
         "strike": (cell(0, 1), {}), "follow": (cell(1, 1), {}), "recovery": (cell(2, 1), {}),
     }
-    build("paladin", "knight_poses.webp", frames, 3.1, False)
+    build("paladin", "knight_poses.webp", frames, 3.1, False, KNIGHT_IDLE)
 
 
 def mage():
