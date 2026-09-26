@@ -161,8 +161,8 @@ class Figure extends Control:
 	func light() -> void:
 		if puppet == null or lit_view != null:
 			return
-		# Parts cut from a painted sheet carry their own brushwork.
-		if puppet is HeroPuppet and not (puppet as HeroPuppet).sheet.is_empty():
+		# Hand-painted art carries its own brushwork.
+		if puppet.painted:
 			return
 		var box := size + FighterView.LIT_MARGIN * Vector2(2, 1)
 		lit_view = SubViewport.new()
@@ -235,7 +235,7 @@ func setup(combatant: CharacterUnit, facing_right: bool) -> void:
 	figure.puppet = Puppet.create(kind)
 	if figure.puppet != null:
 		figure.puppet.phase = figure.phase
-		if figure.puppet is HeroPuppet and not unit.character_data.gear.is_empty():
+		if not unit.character_data.gear.is_empty():
 			figure.puppet.wear(unit.character_data.gear)
 		figure.add_child(figure.puppet)
 	add_child(figure)

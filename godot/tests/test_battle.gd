@@ -263,17 +263,31 @@ func test_ui() -> void:
 	check(hero_view.shields.amount == 2, "Shield points show as shield icons")
 	check(foe_view.info.text.begins_with("▸"), "Enemy intent shows above the enemy")
 	check(hero_view.kind == &"paladin" and foe_view.kind == &"goblin_raider", "Each unit gets its own drawing")
-	var puppet: Puppet = hero_view.figure.puppet
-	check(puppet is HeroPuppet and foe_view.figure.puppet is HeroPuppet and foe_view.figure.puppet.size < 1.0, "Heroes and foes are cut-out puppets; goblins are drawn small")
-	check(puppet.get_child_count() >= 17 and puppet.bones.head.sprite.texture != null, "Puppet assembles every SVG part")
-	var resting_sword: float = puppet.world_angle(&"sword")
+	var poses: Puppet = hero_view.figure.puppet
+	check(poses is PosePuppet and foe_view.figure.puppet is HeroPuppet and foe_view.figure.puppet.size < 1.0, "The knight plays painted key poses; foes are cut-out puppets, goblins drawn small")
+	check(poses.pose == "ready" and poses.current.texture != null, "The knight stands in the ready pose")
+	hero_view.figure.arm = -1.3
+	hero_view.figure.lean = 1.0
+	poses.drive(hero_view.figure, 0.016)
+	check(poses.pose == "lunge", "Closing in shows the lunge")
 	hero_view.figure.arm = 1.5
-	hero_view.figure.hurt = 1.0
-	puppet.drive(hero_view.figure, 0.016)
-	check(puppet.world_angle(&"sword") > resting_sword + 1.0, "A swing carries the sword forward")
-	check(puppet.bones.head.sprite.texture == puppet.faces.head_hurt, "A blow changes Aldric's face")
+	poses.drive(hero_view.figure, 0.016)
+	check(poses.pose == "follow", "A fast swing shows the blow carried through")
 	hero_view.figure.arm = 0.0
-	hero_view.figure.hurt = 0.0
+	hero_view.figure.lean = 0.0
+	poses.drive(hero_view.figure, 0.3)
+	check(poses.pose == "ready", "Back at rest the knight returns to ready")
+	var rogue_view: FighterView = scene.view.fighters[scene.battle.party[1]]
+	var puppet: Puppet = rogue_view.figure.puppet
+	check(puppet is HeroPuppet and puppet.get_child_count() >= 17 and puppet.bones.head.sprite.texture != null, "The rogue's puppet assembles every part")
+	var resting_sword: float = puppet.world_angle(&"sword")
+	rogue_view.figure.arm = 1.5
+	rogue_view.figure.hurt = 1.0
+	puppet.drive(rogue_view.figure, 0.016)
+	check(puppet.world_angle(&"sword") > resting_sword + 1.0, "A swing carries the dagger forward")
+	check(puppet.bones.head.sprite.texture == puppet.faces.head_hurt, "A blow changes the rogue's face")
+	rogue_view.figure.arm = 0.0
+	rogue_view.figure.hurt = 0.0
 	scene.view.skill_row.get_child(0).pressed.emit()
 	var front: CharacterUnit = scene.battle.enemies[0]
 	check(not scene.view.fighters[front].disabled and not scene.view.fighters[scene.battle.enemies[2]].disabled and scene.view.fighters[scene.battle.party[0]].disabled, "Melee skill lights every foe and no ally")

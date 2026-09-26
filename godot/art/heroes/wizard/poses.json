@@ -1,0 +1,42 @@
+{
+ "density": 3.0,
+ "paint": true,
+ "frames": {
+  "ready": {
+   "anchor": [
+    190.0,
+    480.0
+   ]
+  },
+  "anticipation": {
+   "anchor": [
+    260.0,
+    435.0
+   ]
+  },
+  "channel": {
+   "anchor": [
+    228.5,
+    479.0
+   ]
+  },
+  "cast": {
+   "anchor": [
+    213.0,
+    429.0
+   ]
+  },
+  "release": {
+   "anchor": [
+    185.0,
+    405.0
+   ]
+  },
+  "recovery": {
+   "anchor": [
+    144.0,
+    410.0
+   ]
+  }
+ }
+}

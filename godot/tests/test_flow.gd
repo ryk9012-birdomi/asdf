@@ -74,7 +74,7 @@ func run_tests() -> void:
 	check(setup.name == "PartySetup" and RunState.active == null, "New journey first asks for the party")
 	check(setup.classes == ["paladin", "rogue", "wizard"], "The party starts as knight, rogue, wizard")
 	check(setup.names.all(func(name): return not name.is_empty()) and setup.names[0] != setup.names[1] and setup.names[1] != setup.names[2] and setup.names[0] != setup.names[2], "Every hero gets a different random name")
-	check(setup.slots.all(func(slot): return slot.figure.puppet is HeroPuppet), "Each place previews its hero on the battle rig")
+	check(setup.slots.all(func(slot): return slot.figure.puppet is Puppet), "Each place previews its hero on the battle rig")
 	var first_name: String = setup.names[2]
 	setup.find_child("Class_2_paladin", true, false).pressed.emit()
 	await process_frame

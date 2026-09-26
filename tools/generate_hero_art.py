@@ -8,8 +8,8 @@ pointed hat and carry an orb staff.
 
     python tools/generate_hero_art.py
 
-writes godot/art/knights|rogues|wizards/<id>/ for every example, the battle sets in
-godot/art/heroes/<class>/ (HEROES picks which example each class wears), and
+writes godot/art/knights|rogues|wizards/<id>/ for every example, the battle heroes in
+godot/art/heroes/<class>/ (cut from painted sheets, see build_heroes), and
 godot/art/gallery.json for scenes/dev/HeroGallery.tscn.
 
 Part pivots (drawing units; the rig scales them up). A canvas may be larger than listed as
@@ -1329,22 +1329,18 @@ def use_lines(ink, width, thin):
     THIN = f'stroke="{INK}" stroke-width="{thin}" stroke-linejoin="round"'
 
 
-## The battle heroes: the Art Bible's weathered knight, scout and hedge mage.
-## The rogue is cut from its painted parts sheet instead (tools/sheet_rig.py).
-HEROES = {"paladin": ("grey_warden", VARIANTS, build), "wizard": ("hedge_mage", WIZARDS, wizard_parts)}
-
-
+## The battle heroes come from painted sheets: the rogue from its parts sheet
+## (tools/sheet_rig.py), the knight and the mage from key-pose sheets (tools/pose_sheet.py).
 def build_heroes():
-    for role, (pick, variants, make) in HEROES.items():
-        for k in variants:
-            if k["id"] == pick:
-                make(k, os.path.join(ROOT, "art", "heroes", role))
+    import pose_sheet
     import sheet_rig
     folder = os.path.join(ROOT, "art", "heroes", "rogue")
     sheet_rig.rogue_painterly(folder)
     # Vector extras the rig still loads: the skill light and an empty plume.
     glow(folder, ("#fff6e8", "#ffd9a0", "#ff9a5a"))
     write(folder, "plume", 30, 24, [], "")
+    pose_sheet.knight()
+    pose_sheet.mage()
 
 
 def main():

@@ -48,9 +48,9 @@ const STYLES := {
 ## Battle art per fighter kind (hero class id or enemy id). size scales the whole figure;
 ## head gives the head canvas margins [left, top] when they differ from the style's.
 const RIGS := {
-	&"paladin": {"art": "res://art/heroes/paladin/", "style": &"knight", "shape": "realistic"},
+	&"paladin": {"art": "res://art/heroes/paladin/", "style": &"knight"},
 	&"rogue": {"art": "res://art/heroes/rogue/", "style": &"rogue"},
-	&"wizard": {"art": "res://art/heroes/wizard/", "style": &"wizard", "shape": "realistic"},
+	&"wizard": {"art": "res://art/heroes/wizard/", "style": &"wizard"},
 	&"goblin_raider": {"art": "res://art/enemies/goblin_raider/", "style": &"rogue", "size": 0.76, "head": [16, 24], "shape": "realistic"},
 	&"goblin_archer": {"art": "res://art/enemies/goblin_archer/", "style": &"rogue", "size": 0.74, "head": [16, 24], "shape": "realistic"},
 	&"hobgoblin_captain": {"art": "res://art/enemies/hobgoblin_captain/", "style": &"knight", "size": 1.1, "head": [16, 24], "shape": "realistic"},
@@ -102,6 +102,7 @@ func _init(art: String, style_id: StringName = &"knight", head_margins: Array = 
 	art_path = art
 	if ResourceLoader.exists(art + "rig.json"):
 		sheet = (load(art + "rig.json") as JSON).data
+		painted = true
 		# The sheet may carry its own far-arm rest and raise poses (shoulder, elbow).
 		for pose in ["rest", "raise"]:
 			if sheet.has(pose):

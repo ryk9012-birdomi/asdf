@@ -16,6 +16,8 @@ var phase: float = 0.0
 var last_x: float = NAN
 ## Scale of the whole figure on top of the fighter's art scale (goblins are small).
 var size: float = 1.0
+## Hand-painted art that already carries its brushwork skips the painterly shader.
+var painted: bool = false
 
 
 class Bone:
@@ -44,6 +46,12 @@ static func create(kind: StringName) -> Puppet:
 	if not HeroPuppet.RIGS.has(kind):
 		return null
 	var rig: Dictionary = HeroPuppet.RIGS[kind]
+	# A painted key-pose sheet (tools/pose_sheet.py) plays whole poses instead of joints.
+	if ResourceLoader.exists(rig.art + "poses.json"):
+		var poses := PosePuppet.new(rig.art, rig.style)
+		poses.size = rig.get("size", 1.0)
+		poses.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+		return poses
 	var puppet := hero(rig.art, rig.style, rig.get("size", 1.0), rig.get("head", []))
 	if rig.get("shape", "") == "realistic":
 		(puppet as HeroPuppet).proportion(HeroPuppet.REALISTIC)
@@ -117,6 +125,11 @@ func pace(figure: Control, delta: float) -> float:
 	var speed := 0.0 if is_nan(last_x) or delta <= 0.0 else (x - last_x) / delta * signf(figure.scale.x)
 	last_x = x
 	return speed
+
+
+## Dresses the figure in its equipment (slot -> item id), where the art allows it.
+func wear(_equipment: Dictionary) -> void:
+	pass
 
 
 ## Called every frame by the fighter's figure with its motion values.
