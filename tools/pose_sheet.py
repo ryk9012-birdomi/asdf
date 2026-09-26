@@ -91,11 +91,61 @@ def cut_all(sheet_file, frames, out):
     return listing
 
 
-def build(name, sheet_file, frames, density, paint, idle=None):
+def cut_transparent(sheet_file, prefix, out):
+    """Frames of a sheet already on a transparent ground (tools/sheets/<name>.webp with
+    alpha): every figure is one opaque blob, numbered in reading order. Returns anchors and
+    heights like cut_all."""
+    image = Image.open(os.path.join(HERE, "sheets", sheet_file)).convert("RGBA")
+    alpha = np.asarray(image)[..., 3]
+    labels, count = nd.label(alpha > 20)
+    boxes = [box for index, box in enumerate(nd.find_objects(labels)) if (labels[box] == index + 1).sum() > 2000]
+    boxes.sort(key=lambda box: (box[0].start + box[0].stop) / 2)
+    rows = []
+    for box in boxes:
+        middle = (box[0].start + box[0].stop) / 2
+        if rows and abs(middle - rows[-1][0]) < 120:
+            rows[-1][1].append(box)
+        else:
+            rows.append([middle, [box]])
+    ordered = [box for _middle, row in rows for box in sorted(row, key=lambda box: box[1].start)]
+    listing = {}
+    for index, box in enumerate(ordered):
+        crop = (max(0, box[1].start - 6), max(0, box[0].start - 6), min(image.width, box[1].stop + 6), min(image.height, box[0].stop + 6))
+        frame = image.crop(crop)
+        solid = np.asarray(frame)[..., 3] > 128
+        sole = np.nonzero(solid.sum(1) >= 24)[0].max() + 1
+        feet = np.nonzero(solid[max(0, sole - 30):sole].any(0))[0]
+        name = "%s_%02d" % (prefix, index + 1)
+        frame.save(os.path.join(out, "pose_%s.png" % name))
+        listing[name] = {"anchor": [round(float(feet.min() + feet.max()) / 2.0, 1), float(sole)], "height": float(sole)}
+    return listing
+
+
+def match_colours(out, names, reference):
+    """Shifts each channel of the named frames to the mean and spread of the reference
+    frame (opaque pixels only): a simple colour transfer between two painted sheets."""
+    def stats(image):
+        pixels = np.asarray(image).astype(float)
+        solid = pixels[..., 3] > 200
+        return pixels[..., :3][solid].mean(0), pixels[..., :3][solid].std(0)
+    ref_mean, ref_std = stats(Image.open(os.path.join(out, "pose_%s.png" % reference)))
+    images = {name: Image.open(os.path.join(out, "pose_%s.png" % name)).convert("RGBA") for name in names}
+    stacked = np.concatenate([np.asarray(image).reshape(-1, 4) for image in images.values()])
+    solid = stacked[:, 3] > 200
+    mean, std = stacked[solid, :3].astype(float).mean(0), stacked[solid, :3].astype(float).std(0)
+    for name, image in images.items():
+        pixels = np.asarray(image).astype(float)
+        pixels[..., :3] = np.clip((pixels[..., :3] - mean) / np.maximum(std, 1) * ref_std + ref_mean, 0, 255)
+        Image.fromarray(pixels.astype(np.uint8), "RGBA").save(os.path.join(out, "pose_%s.png" % name))
+
+
+def build(name, sheet_file, frames, density, paint, idle=None, attack=None):
     """Cuts every frame and writes art/heroes/<name>/poses.json. `frames` maps a pose name
     to its box and options; `density` is sheet pixels per rig unit. `idle` optionally names
     a looping idle sheet (file, frames in order, frames per second); its frames are scaled
-    so the first stands as tall as the ready pose."""
+    so the first stands as tall as the ready pose. `attack` optionally names a transparent
+    frame-by-frame attack sheet: (file, frame prefix, the old pose its last frame matches in
+    height, clips, plan overrides)."""
     out = os.path.join(ROOT, "art", "heroes", name)
     os.makedirs(out, exist_ok=True)
     listing = cut_all(sheet_file, frames, out)
@@ -109,6 +159,18 @@ def build(name, sheet_file, frames, density, paint, idle=None):
         listing.update(loop)
         data["idle"] = list(idle[1].keys())
         data["idle_fps"] = idle[2]
+    if attack and os.path.exists(os.path.join(HERE, "sheets", attack[0])):
+        sheet_file, prefix, match, clips, plan = attack
+        frames = cut_transparent(sheet_file, prefix, out)
+        last = list(frames.values())[-1]
+        attack_density = round(density * last["height"] / listing[match]["height"], 3)
+        # Paint the new frames in the old sheet's colours so poses don't flicker in tone.
+        match_colours(out, list(frames), match)
+        for entry in frames.values():
+            entry["density"] = attack_density
+        listing.update(frames)
+        data["clips"] = clips
+        data["plan"] = plan
     for entry in listing.values():
         entry.pop("height")
     with open(os.path.join(out, "poses.json"), "w") as handle:
@@ -137,12 +199,20 @@ KNIGHT_IDLE = ("knight_idle.webp",
                {"idle_%02d" % (index + 1): (grid(5, index, (0, 555), (515, 1000)), {}) for index in range(10)}, 5.0)
 
 
+# The attack, frame by frame (tools/sheets/knight_attack.webp, 16 frames on transparency):
+# frames 1-7 raise and cock the sword, 8-16 bring it down and across into a low guard.
+KNIGHT_ATTACK = ("knight_attack.webp", "atk", "recovery",
+                 {"windup": {"frames": ["atk_%02d" % n for n in range(1, 8)], "fps": 30},
+                  "swing": {"frames": ["atk_%02d" % n for n in range(8, 17)], "fps": 30, "commit": True}},
+                 {"wind": "windup", "dash": "windup", "hit": "swing", "through": "swing", "back": "atk_16",
+                  "raise": "atk_01", "cheer": "atk_01", "guard": "recovery"})
+
+
 def knight():
-    frames = {
-        "ready": (cell(0, 0), {}), "anticipation": (cell(1, 0), {}), "lunge": (cell(2, 0), {}),
-        "strike": (cell(0, 1), {}), "follow": (cell(1, 1), {}), "recovery": (cell(2, 1), {}),
-    }
-    build("paladin", "knight_poses.webp", frames, 3.1, False, KNIGHT_IDLE)
+    # From the first key-pose sheet only the stance at rest and the shield guard remain;
+    # the attack itself comes frame by frame from KNIGHT_ATTACK.
+    frames = {"ready": (cell(0, 0), {}), "recovery": (cell(2, 1), {})}
+    build("paladin", "knight_poses.webp", frames, 3.1, False, KNIGHT_IDLE, KNIGHT_ATTACK)
 
 
 def mage():

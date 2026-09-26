@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b3lyyb8ya7cw3"
-path="res://.godot/imported/pose_lunge.png-f799998e86df57b8a281980f79e874db.ctex"
+uid="uid://cslhtvasnacls"
+path="res://.godot/imported/pose_atk_04.png-200033fa995fa17991a5a01129a1cbdd.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/heroes/paladin/pose_lunge.png"
-dest_files=["res://.godot/imported/pose_lunge.png-f799998e86df57b8a281980f79e874db.ctex"]
+source_file="res://art/heroes/paladin/pose_atk_04.png"
+dest_files=["res://.godot/imported/pose_atk_04.png-200033fa995fa17991a5a01129a1cbdd.ctex"]
 
 [params]
 

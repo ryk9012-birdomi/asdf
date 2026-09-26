@@ -8,35 +8,162 @@
     415.0
    ]
   },
-  "anticipation": {
-   "anchor": [
-    210.0,
-    454.0
-   ]
-  },
-  "lunge": {
-   "anchor": [
-    229.5,
-    388.0
-   ]
-  },
-  "strike": {
-   "anchor": [
-    236.0,
-    408.0
-   ]
-  },
-  "follow": {
-   "anchor": [
-    221.0,
-    408.0
-   ]
-  },
   "recovery": {
    "anchor": [
     210.0,
     404.0
    ]
+  },
+  "atk_01": {
+   "anchor": [
+    132.0,
+    304.0
+   ],
+   "density": 1.957
+  },
+  "atk_02": {
+   "anchor": [
+    138.0,
+    301.0
+   ],
+   "density": 1.957
+  },
+  "atk_03": {
+   "anchor": [
+    134.0,
+    319.0
+   ],
+   "density": 1.957
+  },
+  "atk_04": {
+   "anchor": [
+    136.5,
+    327.0
+   ],
+   "density": 1.957
+  },
+  "atk_05": {
+   "anchor": [
+    139.5,
+    297.0
+   ],
+   "density": 1.957
+  },
+  "atk_06": {
+   "anchor": [
+    141.0,
+    309.0
+   ],
+   "density": 1.957
+  },
+  "atk_07": {
+   "anchor": [
+    140.5,
+    322.0
+   ],
+   "density": 1.957
+  },
+  "atk_08": {
+   "anchor": [
+    141.0,
+    261.0
+   ],
+   "density": 1.957
+  },
+  "atk_09": {
+   "anchor": [
+    148.5,
+    245.0
+   ],
+   "density": 1.957
+  },
+  "atk_10": {
+   "anchor": [
+    145.5,
+    273.0
+   ],
+   "density": 1.957
+  },
+  "atk_11": {
+   "anchor": [
+    143.5,
+    253.0
+   ],
+   "density": 1.957
+  },
+  "atk_12": {
+   "anchor": [
+    139.0,
+    232.0
+   ],
+   "density": 1.957
+  },
+  "atk_13": {
+   "anchor": [
+    146.0,
+    254.0
+   ],
+   "density": 1.957
+  },
+  "atk_14": {
+   "anchor": [
+    148.0,
+    251.0
+   ],
+   "density": 1.957
+  },
+  "atk_15": {
+   "anchor": [
+    144.5,
+    251.0
+   ],
+   "density": 1.957
+  },
+  "atk_16": {
+   "anchor": [
+    150.0,
+    255.0
+   ],
+   "density": 1.957
   }
+ },
+ "clips": {
+  "windup": {
+   "frames": [
+    "atk_01",
+    "atk_02",
+    "atk_03",
+    "atk_04",
+    "atk_05",
+    "atk_06",
+    "atk_07"
+   ],
+   "fps": 30
+  },
+  "swing": {
+   "frames": [
+    "atk_08",
+    "atk_09",
+    "atk_10",
+    "atk_11",
+    "atk_12",
+    "atk_13",
+    "atk_14",
+    "atk_15",
+    "atk_16"
+   ],
+   "fps": 30,
+   "commit": true
+  }
+ },
+ "plan": {
+  "wind": "windup",
+  "dash": "windup",
+  "hit": "swing",
+  "through": "swing",
+  "back": "atk_16",
+  "raise": "atk_01",
+  "cheer": "atk_01",
+  "guard": "recovery"
  }
 }

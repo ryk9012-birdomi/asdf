@@ -269,12 +269,16 @@ func test_ui() -> void:
 	hero_view.figure.arm = -1.3
 	hero_view.figure.lean = 1.0
 	poses.drive(hero_view.figure, 0.016)
-	check(poses.pose == "lunge", "Closing in shows the lunge")
+	check(poses.clip == "windup" and poses.pose == "atk_01", "Closing in starts the wind-up frames")
 	hero_view.figure.arm = 1.5
 	poses.drive(hero_view.figure, 0.016)
-	check(poses.pose == "follow", "A fast swing shows the blow carried through")
+	check(poses.clip == "swing" and poses.pose == "atk_08", "A fast swing starts the blow's frames")
+	hero_view.figure.time += 0.2
+	poses.drive(hero_view.figure, 0.016)
+	check(poses.pose == "atk_14", "The blow plays on frame by frame")
 	hero_view.figure.arm = 0.0
 	hero_view.figure.lean = 0.0
+	hero_view.figure.time += 0.3
 	poses.drive(hero_view.figure, 0.3)
 	check(poses.pose == "ready" or poses.idle.has(poses.pose), "Back at rest the knight returns to its resting pose")
 	var rogue_view: FighterView = scene.view.fighters[scene.battle.party[1]]

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c13tvo1ha3vie"
-path="res://.godot/imported/pose_ready.png-eae971f0eb1030ef1b783fdfb217c3d8.ctex"
+uid="uid://drqm8pgplwv7m"
+path="res://.godot/imported/pose_atk_09.png-bc7dc0243389129aa7e179aa6e046a34.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/heroes/paladin/pose_ready.png"
-dest_files=["res://.godot/imported/pose_ready.png-eae971f0eb1030ef1b783fdfb217c3d8.ctex"]
+source_file="res://art/heroes/paladin/pose_atk_09.png"
+dest_files=["res://.godot/imported/pose_atk_09.png-bc7dc0243389129aa7e179aa6e046a34.ctex"]
 
 [params]
 
